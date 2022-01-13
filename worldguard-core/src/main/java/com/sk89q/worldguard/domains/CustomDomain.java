@@ -32,6 +32,7 @@ public abstract class CustomDomain implements Domain, ChangeTracked {
     private static final Pattern VALID_NAME = Pattern.compile("^[A-Za-z0-9\\-]{1,40}$");
 
     private final String name;
+    private boolean dirty;
 
     public CustomDomain(String name) {
         if (name == null ||!isValidName(name)) {
@@ -92,5 +93,15 @@ public abstract class CustomDomain implements Domain, ChangeTracked {
     @Override
     public int size() {
         return 1;
+    }
+
+    @Override
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    @Override
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
     }
 }

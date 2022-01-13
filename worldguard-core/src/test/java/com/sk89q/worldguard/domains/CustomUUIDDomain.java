@@ -17,40 +17,39 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.domains.registry;
+package com.sk89q.worldguard.domains;
 
-import com.sk89q.worldguard.domains.CustomDomain;
+import com.sk89q.worldguard.domains.registry.CustomDomainContext;
+import com.sk89q.worldguard.domains.registry.InvalidDomainFormat;
 
+import java.util.Objects;
 import java.util.UUID;
 
-public class UnknownDomain extends CustomDomain {
-    public static DomainFactory<UnknownDomain> FACTORY = UnknownDomain::new;
+public class CustomUUIDDomain extends CustomDomain {
+    private UUID test;
 
-    private boolean isDirty = false;
-    private Object o;
-
-    public UnknownDomain(String name) {
+    public CustomUUIDDomain(String name, UUID test) {
         super(name);
+        this.test = test;
     }
 
     @Override
     public void parseInput(CustomDomainContext context) throws InvalidDomainFormat {
-        throw new InvalidDomainFormat("The plugin that registered this flag is not currently installed");
+        throw new InvalidDomainFormat("not supported");
     }
 
     @Override
     public void unmarshal(Object o) {
-        this.o = o;
     }
 
     @Override
     public Object marshal() {
-        return o;
+        return null;
     }
 
     @Override
     public boolean contains(UUID uniqueId) {
-        return false;
+        return Objects.equals(test, uniqueId);
     }
 
     @Override
@@ -59,30 +58,7 @@ public class UnknownDomain extends CustomDomain {
     }
 
     @Override
-    public int size() {
-        return 0;
-    }
-
-    @Override
     public void clear() {
-        isDirty = true;
-        o = null;
-    }
-
-    @Override
-    public void setDirty(boolean dirty) {
-        isDirty = dirty;
-    }
-
-    @Override
-    public boolean isDirty() {
-        return isDirty;
-    }
-
-    @Override
-    public String toString() {
-        return "UnknownDomain{" +
-                "o=" + o +
-                '}';
+        test = null;
     }
 }

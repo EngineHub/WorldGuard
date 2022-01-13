@@ -54,6 +54,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
     private GroupDomain groupDomain = new GroupDomain();
 
     private Set<CustomDomain> customDomains = new HashSet<>();
+    private boolean customDomainsChanged = false;
 
     /**
      * Create a new domain.
@@ -119,6 +120,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
         checkNotNull(customDomain);
         removeCustomDomain(customDomain.getName());
         this.customDomains.add(customDomain);
+        customDomainsChanged = true;
     }
 
     /**
@@ -128,7 +130,9 @@ public class DefaultDomain implements Domain, ChangeTracked {
      */
     public void removeCustomDomain(String name) {
         checkNotNull(name);
-        this.customDomains.removeIf(d -> d.getName().equalsIgnoreCase(name));
+        if (this.customDomains.removeIf(d -> d.getName().equalsIgnoreCase(name))) {
+            customDomainsChanged = true;
+        }
     }
 
     /**
@@ -138,7 +142,9 @@ public class DefaultDomain implements Domain, ChangeTracked {
      */
     public void removeCustomDomain(CustomDomain customDomain) {
         checkNotNull(customDomain);
-        this.customDomains.remove(customDomain);
+        if (this.customDomains.remove(customDomain)) {
+            customDomainsChanged = true;
+        }
     }
 
     /**
@@ -149,6 +155,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
     public void setCustomDomains(Collection<CustomDomain> customDomains) {
         checkNotNull(customDomains);
         this.customDomains = new HashSet<>(customDomains);
+        customDomainsChanged = true;
     }
 
     /**
@@ -534,13 +541,15 @@ public class DefaultDomain implements Domain, ChangeTracked {
 
     @Override
     public boolean isDirty() {
-        return playerDomain.isDirty() || groupDomain.isDirty() || customDomains.stream().anyMatch(ChangeTracked::isDirty);
+        return playerDomain.isDirty() || groupDomain.isDirty() ||
+                customDomainsChanged ||  customDomains.stream().anyMatch(ChangeTracked::isDirty);
     }
 
     @Override
     public void setDirty(boolean dirty) {
         playerDomain.setDirty(dirty);
         groupDomain.setDirty(dirty);
+        customDomainsChanged = true;
         customDomains.forEach(d -> d.setDirty(dirty));
     }
 
