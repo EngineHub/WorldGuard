@@ -211,7 +211,7 @@ class RegionCommandsBase {
                 return global;
             }
             throw new CommandException(
-                    "You're not standing in a region." +
+                    "You're not standing in a region. " +
                             "Specify an ID if you want to select a specific region.");
         } else if (set.size() > 1) {
             boolean first = true;
