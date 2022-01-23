@@ -158,7 +158,7 @@ public class RegionLister implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         Map<String, ProtectedRegion> regions = manager.getRegions();
-        Collection<ProtectedRegion> iterableRegions = manager.getRegions().values();
+        Collection<ProtectedRegion> iterableRegions = regions.values();
 
         if (filterByIntersecting != null) {
             iterableRegions = filterByIntersecting.getIntersectingRegions(iterableRegions);
@@ -184,7 +184,7 @@ public class RegionLister implements Callable<Integer> {
         // insert global on top
         if (regions.containsKey("__global__")) {
             final RegionListEntry entry = new RegionListEntry(regions.get("__global__"));
-            if (entry.matches(ownerMatcher)) {
+            if (entry.matches(idFilter) && entry.matches(ownerMatcher)) {
                 entries.add(0, entry);
             }
         }
@@ -198,6 +198,8 @@ public class RegionLister implements Callable<Integer> {
         String cmd = "/rg list -w \"" + world + "\""
                 + (playerName != null ? " -p " + playerName : "")
                 + (nameOnly ? " -n" : "")
+                + (filterByIntersecting != null ? " -s" : "")
+                + (idFilter != null ? " -i " + idFilter : "")
                 + " %page%";
         PaginationBox box = new RegionListBox(title, cmd, perms, entries, world);
         sender.print(box.create(page));
