@@ -100,31 +100,37 @@ public class SimpleDomainRegistry implements DomainRegistry {
         return domains.get(name.toLowerCase());
     }
 
+    @Nullable
+    @Override
+    public CustomDomain createDomain(String name) {
+        DomainFactory<?> factory = get(name);
+        if (factory == null) return null;
+        return factory.create(name);
+    }
+
     @Override
     public Map<String, DomainFactory<?>> getAll() {
         return ImmutableMap.copyOf(domains);
     }
 
     private CustomDomain getOrCreate(String name, Object value, boolean createUnknown) {
-        DomainFactory<? extends CustomDomain> domainFactory = get(name);
+        CustomDomain customDomain = createDomain(name);
 
-        if (domainFactory != null) {
-            CustomDomain customDomain = domainFactory.create(name);
-            if (customDomain != null) customDomain.unmarshal(value);
+        if (customDomain != null) {
+            customDomain.unmarshal(value);
             return customDomain;
         }
 
         synchronized (lock) {
-            domainFactory = get(name); // Load again because the previous load was not synchronized
-            if (domainFactory != null) {
-                CustomDomain customDomain = domainFactory.create(name);
-                if (customDomain != null) customDomain.unmarshal(value);
+            customDomain = createDomain(name); // Load again because the previous load was not synchronized
+            if (customDomain != null) {
+                customDomain.unmarshal(value);
                 return customDomain;
             }
             if (createUnknown) {
                 DomainFactory<UnknownDomain> unknownFactory = forceRegister(name, UnknownDomain.FACTORY);
                 if (unknownFactory != null) {
-                    CustomDomain customDomain = unknownFactory.create(name);
+                    customDomain = unknownFactory.create(name);
                     if (customDomain != null) customDomain.unmarshal(value);
                     return customDomain;
                 }

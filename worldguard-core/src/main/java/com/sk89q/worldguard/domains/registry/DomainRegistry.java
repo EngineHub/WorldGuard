@@ -63,6 +63,12 @@ public interface DomainRegistry extends Iterable<DomainFactory<?>> {
     DomainFactory<?> get(String name);
 
     /**
+     * Try to get a domain by its name
+     */
+    @Nullable
+    CustomDomain createDomain(String name);
+
+    /**
      * Get all domains keyed by the registered name
      *
      * @return All domains

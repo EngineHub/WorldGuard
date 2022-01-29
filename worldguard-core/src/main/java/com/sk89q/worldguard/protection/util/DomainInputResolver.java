@@ -135,11 +135,10 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
                 domain.addGroup(groupMatcher.group(1));
             } else if (customMatcher.matches()) {
                 String domainName = customMatcher.group(1);
-                DomainFactory<?> domainFactory = WorldGuard.getInstance().getDomainRegistry().get(domainName);
-                if (domainFactory == null) {
+                CustomDomain customDomain = WorldGuard.getInstance().getDomainRegistry().createDomain(domainName);
+                if (customDomain == null) {
                     throw new InvalidDomainFormat("No domain named '" + domainName + "' found.");
                 }
-                CustomDomain customDomain = domainFactory.create(domainName);
                 customDomain.parseInput(CustomDomainContext.create()
                     .setSender(actor).setInput(customMatcher.group(2)).setObject("region", region).build());
             } else {
