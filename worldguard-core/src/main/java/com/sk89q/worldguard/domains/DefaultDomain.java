@@ -260,7 +260,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
             removeGroup(group);
         }
         for (CustomDomain domain : other.getCustomDomains()) {
-            removeCustomDomain(domain);
+            removeCustomDomain(domain.getName());
         }
     }
 
@@ -549,7 +549,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
     public void setDirty(boolean dirty) {
         playerDomain.setDirty(dirty);
         groupDomain.setDirty(dirty);
-        customDomainsChanged = true;
+        customDomainsChanged = dirty;
         customDomains.forEach(d -> d.setDirty(dirty));
     }
 

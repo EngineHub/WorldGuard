@@ -426,13 +426,4 @@ class RegionCommandsBase {
         region.setFlag(flag, val);
         return val;
     }
-
-    /**
-     * Utility method to set a custom domain
-     */
-    protected static void setDomain(ProtectedRegion region, DefaultDomain target, CustomDomain domain, Actor sender, String value) throws InvalidDomainFormat {
-        domain.parseInput(CustomDomainContext.create().setSender(sender).setInput(value).setObject("region", region).build());
-        target.addCustomDomain(domain);
-    }
-
 }

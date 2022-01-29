@@ -81,7 +81,8 @@ public abstract class CustomDomain implements Domain, ChangeTracked {
      */
     public static boolean isValidName(String name) {
         checkNotNull(name, "name");
-        return VALID_NAME.matcher(name).matches();
+        // g is already reserved by the group domain
+        return VALID_NAME.matcher(name).matches() && !name.equalsIgnoreCase("g");
     }
 
 

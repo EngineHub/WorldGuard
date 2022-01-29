@@ -81,6 +81,8 @@ public class MemberCommands extends RegionCommandsBase {
         DomainInputResolver resolver = new DomainInputResolver(
                 WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
         resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
+        resolver.setActor(sender);
+        resolver.setRegion(region);
 
 
         final String description = String.format("Adding members to the region '%s' on '%s'", region.getId(), world.getName());
@@ -115,7 +117,8 @@ public class MemberCommands extends RegionCommandsBase {
         DomainInputResolver resolver = new DomainInputResolver(
                 WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
         resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
-
+        resolver.setActor(sender);
+        resolver.setRegion(region);
 
         final String description = String.format("Adding owners to the region '%s' on '%s'", region.getId(), world.getName());
         AsyncCommandBuilder.wrap(checkedAddOwners(sender, manager, region, world, resolver), sender)
@@ -188,6 +191,8 @@ public class MemberCommands extends RegionCommandsBase {
             DomainInputResolver resolver = new DomainInputResolver(
                     WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
             resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_AND_NAME);
+            resolver.setActor(sender);
+            resolver.setRegion(region);
 
             callable = resolver;
         }
@@ -231,6 +236,8 @@ public class MemberCommands extends RegionCommandsBase {
             DomainInputResolver resolver = new DomainInputResolver(
                     WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
             resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_AND_NAME);
+            resolver.setActor(sender);
+            resolver.setRegion(region);
 
             callable = resolver;
         }
@@ -244,98 +251,7 @@ public class MemberCommands extends RegionCommandsBase {
                 .buildAndExec(worldGuard.getExecutorService());
     }
 
-
-    /**
-     * Modify a custom domain for owner.
-     *
-     * @param args the arguments
-     * @param sender the sender
-     * @throws CommandException any error
-     */
-    @Command(aliases = {"ownerdomain"},
-            usage = "<id> <domain> [-w world] [value]",
-            flags = "w:",
-            desc = "Set flags",
-            min = 2)
-    public void ownerDomain(CommandContext args, Actor sender) throws CommandException {
-        domain(args, sender, true);
-    }
-
-    /**
-     * Modify a custom domain for member.
-     *
-     * @param args the arguments
-     * @param sender the sender
-     * @throws CommandException any error
-     */
-    @Command(aliases = {"memberdomain"},
-            usage = "<id> <domain> [-w world] [value]",
-            flags = "w:",
-            desc = "Set flags",
-            min = 2)
-    public void onMemberDomain(CommandContext args, Actor sender) throws CommandException {
-        domain(args, sender, false);
-    }
-
-    private void domain(CommandContext args, Actor sender, boolean isOwner) throws CommandException {
-        warnAboutSaveFailures(sender);
-
-        World world = checkWorld(args, sender, 'w'); // Get the world
-        String domainName = args.getString(1);
-        String value = args.argsLength() >= 3 ? args.getJoinedStrings(2) : null;
-        DomainRegistry domainRegistry = WorldGuard.getInstance().getDomainRegistry();
-        RegionPermissionModel permModel = getPermissionModel(sender);
-
-        // Lookup the existing region
-        RegionManager manager = checkRegionManager(world);
-        ProtectedRegion existing = checkExistingRegion(manager, args.getString(0), true);
-
-        // Check permissions
-        if (!permModel.mayModifyCustomDomain(existing, isOwner, domainName)) {
-            throw new CommandPermissionsException();
-        }
-        String regionId = existing.getId();
-
-        DomainFactory<?> domainFactory = domainRegistry.get(domainName);
-
-        // We didn't find the domain, so let's print a list of domains that the user
-        // can use, and do nothing afterwards
-        if (domainFactory == null) {
-            AsyncCommandBuilder.wrap(new DomainListBuilder(domainRegistry, permModel, existing, world,
-                    regionId, sender, domainName, isOwner), sender)
-                    .registerWithSupervisor(WorldGuard.getInstance().getSupervisor(), "Domain list for invalid domain command.")
-                    .onSuccess((Component) null, sender::print)
-                    .onFailure((Component) null, WorldGuard.getInstance().getExceptionConverter())
-                    .buildAndExec(WorldGuard.getInstance().getExecutorService());
-            return;
-        }
-
-        DefaultDomain usedDomain = isOwner ? existing.getOwners() : existing.getMembers();
-
-        // Set the flag value if a value was set
-        if (value != null) {
-            // Set the flag if [value] was given even if [-g group] was given as well
-            try {
-                CustomDomain customDomain = domainFactory.create(domainName);
-                setDomain(existing, usedDomain, customDomain, sender, value);
-            } catch (InvalidDomainFormat e) {
-                throw new CommandException(e.getMessage());
-            }
-            // No value? Clear the flag, if -g isn't specified
-        } else {
-            usedDomain.removeCustomDomain(domainName);
-        }
-
-        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), existing, null, sender);
-        printout.append(SubtleFormat.wrap("(Current domains:"));
-        printout.newline();
-        printout.appendDomain();
-        printout.append(SubtleFormat.wrap(")"));
-        printout.send(sender);
-        checkSpawnOverlap(sender, world, existing);
-
-    }
-
+    // TODO: Implement a list for available domains. Maybe /rg domains? or /rg addmembers/addowners/delmembers/delowners?
     private static class DomainListBuilder implements Callable<Component> {
         private final DomainRegistry domainRegistry;
         private final RegionPermissionModel permModel;
@@ -375,11 +291,11 @@ public class MemberCommands extends RegionCommandsBase {
 
             final HoverEvent clickToSet = HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set"));
             for (int i = 0; i < domainList.size(); i++) {
-                String flag = domainList.get(i);
+                String domainName = domainList.get(i);
 
-                builder.append(TextComponent.of(flag, i % 2 == 0 ? TextColor.GRAY : TextColor.WHITE)
+                builder.append(TextComponent.of(domainName, i % 2 == 0 ? TextColor.GRAY : TextColor.WHITE)
                         .hoverEvent(clickToSet).clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
-                                "/rg " + (isOwner ? "ownerdomains" : "memberdomains") +" -w \"" + world.getName() + "\" " + regionId + " " + flag + " ")));
+                                "/rg " + (isOwner ? "addowner" : "addmember") +" -w \"" + world.getName() + "\" " + regionId + " " + domainName + ":")));
                 if (i < domainList.size() + 1) {
                     builder.append(TextComponent.of(", "));
                 }
