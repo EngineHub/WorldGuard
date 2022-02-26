@@ -684,7 +684,8 @@ public class WorldGuardEntityListener extends AbstractListener {
                 if (associable != null) {
                     // NB there is no way to cancel the teleport without PTA (since PlayerPortal doesn't have block info)
                     // removing PTA was a mistake
-                    associable.print("Destination is an a protected area.");
+                    String message = regions.queryValue(associable, Flags.DENY_MESSAGE);
+                    RegionProtectionListener.formatAndSendDenyMessage("create portals", associable, message);
                 }
                 event.setCancelled(true);
             }
