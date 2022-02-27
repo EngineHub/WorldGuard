@@ -140,6 +140,8 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             throw e;
         }
 
+        boolean needParentSave = false;
+
         summaryOnStart = getBoolean("summary-on-start", true);
         opPermissions = getBoolean("op-permissions", true);
 
@@ -158,7 +160,8 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         itemDurability = getBoolean("protection.item-durability", true);
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
         disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
-        disableObsidianGenerators = getBoolean("protection.disable-obsidian-generators", false);
+
+        needParentSave |= removeProperty("protection.disable-obsidian-generators");
 
         useMaxPriorityAssociation = getBoolean("protection.use-max-priority-association", false);
 
@@ -181,7 +184,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         if (simulateSponge) {
             log.warning("Sponge simulation is deprecated for removal in a future version. We recommend using CraftBook's sponge simulation instead.");
         } else {
-            config.removeProperty("simulation.sponge");
+            needParentSave |= removeProperty("simulation");
         }
 
         pumpkinScuba = getBoolean("default.pumpkin-scuba", false);
@@ -245,7 +248,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         if (signChestProtection) {
             log.warning("Sign-based chest protection is deprecated for removal in a future version. See https://worldguard.enginehub.org/en/latest/chest-protection/ for details.");
         } else {
-            config.removeProperty("chest-protection");
+            needParentSave |= removeProperty("chest-protection");
         }
 
         disableCreatureCropTrampling = getBoolean("crops.disable-creature-trampling", false);
@@ -413,6 +416,20 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         config.setHeader(CONFIG_HEADER);
 
         config.save();
+        if (needParentSave) {
+            parentConfig.save();
+        }
+    }
+
+    private boolean removeProperty(String prop) {
+        if (config.getProperty(prop) != null) {
+            config.removeProperty(prop);
+        }
+        if (parentConfig.getProperty(prop) != null) {
+            parentConfig.removeProperty(prop);
+            return true;
+        }
+        return false;
     }
 
     public boolean isChestProtected(Location block, LocalPlayer player) {

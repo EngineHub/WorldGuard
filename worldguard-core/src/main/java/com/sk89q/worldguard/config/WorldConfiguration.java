@@ -172,7 +172,6 @@ public abstract class WorldConfiguration {
     public boolean fakePlayerBuildOverride;
     public boolean explosionFlagCancellation;
     public boolean disableDeathMessages;
-    public boolean disableObsidianGenerators;
     public boolean strictEntitySpawn;
     public boolean ignoreHopperMoveEvents;
     public boolean breakDeniedHoppers;
