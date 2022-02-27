@@ -178,6 +178,11 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         simulateSponge = getBoolean("simulation.sponge.enable", false);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = getBoolean("simulation.sponge.redstone", false);
+        if (simulateSponge) {
+            log.warning("Sponge simulation is deprecated for removal in a future version. We recommend using CraftBook's sponge simulation instead.");
+        } else {
+            config.removeProperty("simulation.sponge");
+        }
 
         pumpkinScuba = getBoolean("default.pumpkin-scuba", false);
         disableHealthRegain = getBoolean("default.disable-health-regain", false);
@@ -237,6 +242,11 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
         signChestProtection = getBoolean("chest-protection.enable", false);
         disableSignChestProtectionCheck = getBoolean("chest-protection.disable-off-check", false);
+        if (signChestProtection) {
+            log.warning("Sign-based chest protection is deprecated for removal in a future version. See https://worldguard.enginehub.org/en/latest/chest-protection/ for details.");
+        } else {
+            config.removeProperty("chest-protection");
+        }
 
         disableCreatureCropTrampling = getBoolean("crops.disable-creature-trampling", false);
         disablePlayerCropTrampling = getBoolean("crops.disable-player-trampling", false);
