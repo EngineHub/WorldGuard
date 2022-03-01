@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.google.common.collect.ImmutableList;
-import com.sk89q.bukkit.util.ClassSourceValidator;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -60,6 +59,7 @@ import com.sk89q.worldguard.bukkit.listener.WorldGuardWeatherListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
 import com.sk89q.worldguard.bukkit.listener.WorldRulesListener;
 import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
+import com.sk89q.worldguard.bukkit.util.ClassSourceValidator;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.commands.GeneralCommands;
 import com.sk89q.worldguard.commands.ProtectionCommands;
@@ -71,7 +71,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver;
 import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
 import org.bstats.bukkit.Metrics;
@@ -137,6 +136,10 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        // Catch bad things being done by naughty plugins that include WorldGuard's classes
+        ClassSourceValidator verifier = new ClassSourceValidator(this);
+        verifier.reportMismatches(ImmutableList.of(WorldGuard.class, ProtectedRegion.class, Flag.class));
+
         configureLogger();
 
         getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
@@ -149,13 +152,6 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         // Set the proper command injector
         commands.setInjector(new SimpleInjector(WorldGuard.getInstance()));
-
-        // Catch bad things being done by naughty plugins that include WorldGuard's classes
-        try {
-            ClassSourceValidator verifier = new ClassSourceValidator(this);
-            verifier.reportMismatches(ImmutableList.of(WorldGuard.class, ProtectedRegion.class, Flag.class));
-        } catch (NoClassDefFoundError ignored) { // was added to WE two years ago but who knows
-        }
 
         // Register command classes
         final CommandsManagerRegistration reg = new CommandsManagerRegistration(this, commands);
