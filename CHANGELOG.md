@@ -10,6 +10,7 @@
 * Improve lightning strike handling from channeling tridents (PaperMC only).
 * Ignore an error caused by lingering player references of offline players.
 * Add red sand to no-physics-sand.
+* Fix potion splash events being cancelled if no entities were affected.
 
 ## 7.0.6
 
