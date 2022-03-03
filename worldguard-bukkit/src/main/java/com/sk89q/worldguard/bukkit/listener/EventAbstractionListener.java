@@ -1047,7 +1047,7 @@ public class EventAbstractionListener extends AbstractListener {
                 }
             }
 
-            if (blocked == affectedSize) { // server does weird things with this if the event is modified, so use cached number
+            if (affectedSize > 0 && blocked == affectedSize) { // server does weird things with this if the event is modified, so use cached number
                 event.setCancelled(true);
             }
         }
