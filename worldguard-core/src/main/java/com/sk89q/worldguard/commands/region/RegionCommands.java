@@ -1169,6 +1169,10 @@ public final class RegionCommands extends RegionCommandsBase {
             throw new CommandPermissionsException();
         }
 
+        if (!WorldGuard.getInstance().getPlatform().hasMiniMessage()) {
+            throw new CommandException("This command is only available when you're using a platform which supports MiniMessage such as Paper.");
+        }
+
         if (!args.hasFlag('y')) {
             throw new CommandException("This command is potentially dangerous.\n" +
                     "Please ensure you have made a backup of your data, and then re-enter the command with -y tacked on at the end to proceed.");
