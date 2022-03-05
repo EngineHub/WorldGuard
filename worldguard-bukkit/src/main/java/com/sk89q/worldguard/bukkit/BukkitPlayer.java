@@ -25,11 +25,15 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.util.MiniMessageUtil;
 import com.sk89q.worldguard.util.MessagingUtil;
 import io.papermc.lib.PaperLib;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import java.util.Collections;
+import java.util.Map;
 
 public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implements LocalPlayer {
 
@@ -173,6 +177,7 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     }
 
     @Override
+    @Deprecated
     public void sendTitle(String title, String subtitle) {
         if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(getWorld()).forceDefaultTitleTimes) {
             getPlayer().sendTitle(title, subtitle, 10, 70, 20);
@@ -182,18 +187,41 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     }
 
     @Override
+    public void sendMiniMessage(String message, Map<String, String> replacements) {
+        if (!PaperLib.isPaper()) {
+            plugin.getLogger().warning("Trying to send a minimessage formatted message without minimessage support.");
+            return;
+        }
+        MiniMessageUtil.sendMiniMessage(this, message, replacements);
+    }
+
+    @Override
+    public void sendMiniMessageTitle(String title, String subtitle, Map<String, String> replacements) {
+        if (!PaperLib.isPaper()) {
+            plugin.getLogger().warning("Trying to send a minimessage formatted title without minimessage support.");
+            return;
+        }
+        MiniMessageUtil.sendMiniMessageTitle(this, title, subtitle, replacements);
+    }
+
+    @Override
     public void resetFallDistance() {
         getPlayer().setFallDistance(0);
     }
 
     @Override
     public void teleport(Location location, String successMessage, String failMessage) {
+        teleport(location, successMessage, failMessage, Collections.emptyMap());
+    }
+
+    @Override
+    public void teleport(Location location, String successMessage, String failMessage, Map<String, String> replacements) {
         PaperLib.teleportAsync(getPlayer(), BukkitAdapter.adapt(location))
                 .thenApply(success -> {
                     if (success) {
                         // The success message can be cleared via flag
                         if (!successMessage.isEmpty()) {
-                            MessagingUtil.sendStringToChat(this, successMessage);
+                            MessagingUtil.sendStringToChat(this, successMessage, replacements);
                         }
                     } else {
                         printError(failMessage);

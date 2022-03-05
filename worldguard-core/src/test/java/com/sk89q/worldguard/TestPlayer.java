@@ -33,6 +33,7 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -174,7 +175,18 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
+    @Deprecated
     public void sendTitle(String title, String subtitle) {
+
+    }
+
+    @Override
+    public void sendMiniMessageTitle(String title, String subtitle, Map<String, String> replacements) {
+
+    }
+
+    @Override
+    public void sendMiniMessage(String message, Map<String, String> replacements) {
 
     }
 
@@ -185,6 +197,11 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
 
     @Override
     public void teleport(Location location, String successMessage, String failMessage) {
+
+    }
+
+    @Override
+    public void teleport(Location location, String successMessage, String failMessage, Map<String, String> replacements) {
 
     }
 

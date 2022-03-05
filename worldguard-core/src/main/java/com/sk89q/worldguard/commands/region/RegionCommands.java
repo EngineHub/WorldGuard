@@ -65,6 +65,7 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
+import com.sk89q.worldguard.protection.managers.migration.ComponentFlagMigration;
 import com.sk89q.worldguard.protection.managers.migration.DriverMigration;
 import com.sk89q.worldguard.protection.managers.migration.MigrationException;
 import com.sk89q.worldguard.protection.managers.migration.UUIDMigration;
@@ -85,6 +86,7 @@ import com.sk89q.worldguard.util.logging.LoggerToChatHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1150,6 +1152,60 @@ public final class RegionCommands extends RegionCommandsBase {
         }
     }
 
+    /**
+     * Migrate components from region flags
+     *
+     * @param args the arguments
+     * @param sender the sender
+     * @throws CommandException any error
+     */
+    @Command(aliases = {"migratecomponents"},
+            usage = "[world]", max = 1,
+            flags = "yw:",
+            desc = "Migrate regions from old legacy format to minimessage format")
+    public void migrateComponents(CommandContext args, Actor sender) throws CommandException {
+        // Check permissions
+        if (!getPermissionModel(sender).mayMigrateRegionHeights()) {
+            throw new CommandPermissionsException();
+        }
+
+        if (!args.hasFlag('y')) {
+            throw new CommandException("This command is potentially dangerous.\n" +
+                    "Please ensure you have made a backup of your data, and then re-enter the command with -y tacked on at the end to proceed.");
+        }
+
+        World world = null;
+        try {
+            world = checkWorld(args, sender, 'w');
+        } catch (CommandException ignored) {
+        }
+
+        LoggerToChatHandler handler = null;
+        Logger minecraftLogger = null;
+
+        if (sender instanceof LocalPlayer) {
+            handler = new LoggerToChatHandler(sender);
+            handler.setLevel(Level.ALL);
+            minecraftLogger = Logger.getLogger("com.sk89q.worldguard");
+            minecraftLogger.addHandler(handler);
+        }
+
+        try {
+            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+            RegionDriver driver = container.getDriver();
+            ComponentFlagMigration migration = new ComponentFlagMigration(driver, WorldGuard.getInstance().getFlagRegistry(), world);
+            container.migrate(migration);
+            sender.print("Migration complete!");
+        } catch (MigrationException e) {
+            log.log(Level.WARNING, "Failed to migrate", e);
+            throw new CommandException("Error encountered while migrating: " + e.getMessage());
+        } finally {
+            if (minecraftLogger != null) {
+                minecraftLogger.removeHandler(handler);
+            }
+        }
+    }
+
 
     /**
      * Teleport to a region
@@ -1219,8 +1275,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         player.teleport(teleportLocation,
-                message.replace("%id%", existing.getId()),
-                "Unable to teleport to region '" + existing.getId() + "'.");
+                message, "Unable to teleport to region '" + existing.getId() + "'.", Map.of("id", existing.getId()));
     }
 
     @Command(aliases = {"toggle-bypass", "bypass"},

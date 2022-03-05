@@ -34,7 +34,9 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BukkitStringMatcher implements StringMatcher {
@@ -227,20 +229,30 @@ public class BukkitStringMatcher implements StringMatcher {
 
     @Override
     public String replaceMacros(Actor sender, String message) {
+        return replaceMacros(sender, message, replacements(sender));
+    }
+
+    @Override
+    public String replaceMacros(Actor sender, String message, Map<String, String> replacements) {
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            message = message.replace("%" + entry.getKey() + "%", entry.getValue());
+        }
+        return message;
+    }
+
+    @Override
+    public Map<String, String> replacements(Actor sender) {
         Collection<? extends Player> online = Bukkit.getServer().getOnlinePlayers();
 
-        message = message.replace("%name%", sender.getName());
-        message = message.replace("%id%", sender.getUniqueId().toString());
-        message = message.replace("%online%", String.valueOf(online.size()));
+        Map<String, String> map = new HashMap<>();
+        map.put("name", sender.getName());
+        map.put("id", sender.getUniqueId().toString());
+        map.put("online", String.valueOf(online.size()));
 
-        if (sender instanceof LocalPlayer) {
-            LocalPlayer player = (LocalPlayer) sender;
-            World world = (World) player.getExtent();
-
-            message = message.replace("%world%", world.getName());
-            message = message.replace("%health%", String.valueOf(player.getHealth()));
+        if (sender instanceof LocalPlayer player) {
+            map.put("world", player.getWorld().getName());
+            map.put("health", String.valueOf(player.getHealth()));
         }
-
-        return message;
+        return map;
     }
 }

@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard;
 
-import com.google.common.annotations.Beta;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.weather.WeatherType;
@@ -28,6 +27,7 @@ import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.util.List;
+import java.util.Map;
 
 public interface LocalPlayer extends Player, RegionAssociable {
 
@@ -204,9 +204,27 @@ public interface LocalPlayer extends Player, RegionAssociable {
      *
      * @param title the title to display
      * @param subtitle the subtitle to display
+     * @deprecated use sendMiniMessageTitle instead
      */
-    @Beta
+    @Deprecated
     void sendTitle(String title, String subtitle);
+
+    /**
+     * Send the message to the player
+     *
+     * @param message the message as component
+     * @param replacements the placeholders as map
+     */
+    void sendMiniMessage(String message, Map<String, String> replacements);
+
+    /**
+     * Send the message to the player
+     *
+     * @param title the title in minimessage format
+     * @param subtitle the subtitle in minimessage format
+     * @param replacements the placeholders as map
+     */
+    void sendMiniMessageTitle(String title, String subtitle, Map<String, String> replacements);
 
     /**
      * Clears fall distance.
@@ -220,4 +238,12 @@ public interface LocalPlayer extends Player, RegionAssociable {
      * @param failMessage message to display on failure
      */
     void teleport(Location location, String successMessage, String failMessage);
+
+    /**
+     * Teleport the player, potentially async, displaying the message on a success.
+     *  @param location location to teleport to
+     * @param successMessage message to display on success
+     * @param failMessage message to display on failure
+     */
+    void teleport(Location location, String successMessage, String failMessage, Map<String, String> replacements);
 }

@@ -140,14 +140,10 @@ public final class Flags {
     public static final LocationFlag TELE_LOC = register(new LocationFlag("teleport"));
     public static final LocationFlag SPAWN_LOC = register(new LocationFlag("spawn", RegionGroup.MEMBERS));
 
-    /**
-     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
-     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
-     */
-    @Deprecated
-    public static final StringFlag TELE_MESSAGE = register(new StringFlag("teleport-message",
+    public static final ComponentFlag TELE_MESSAGE = register(new ComponentFlag("teleport-message",
             LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of(
-                    "Teleported you to the region '%id%'.", TextColor.LIGHT_PURPLE)))));
+                    "Teleported you to the region '%id%'.", TextColor.LIGHT_PURPLE))),
+            "<light_purple>Teleported you to the region '<id>'."));
 
     // idk?
     public static final StateFlag INVINCIBILITY = register(new StateFlag("invincible", false));
@@ -164,30 +160,10 @@ public final class Flags {
     public static final StateFlag ENDERPEARL = register(new StateFlag("enderpearl", true));
     public static final StateFlag CHORUS_TELEPORT = register(new StateFlag("chorus-fruit-teleport", true));
 
-    /**
-     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
-     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
-     */
-    @Deprecated
-    public static final StringFlag GREET_MESSAGE = register(new StringFlag("greeting"));
-    /**
-     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
-     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
-     */
-    @Deprecated
-    public static final StringFlag FAREWELL_MESSAGE = register(new StringFlag("farewell"));
-    /**
-     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
-     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
-     */
-    @Deprecated
-    public static final StringFlag GREET_TITLE = register(new StringFlag("greeting-title"));
-    /**
-     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
-     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
-     */
-    @Deprecated
-    public static final StringFlag FAREWELL_TITLE = register(new StringFlag("farewell-title"));
+    public static final ComponentFlag GREET_MESSAGE = register(new ComponentFlag("greeting"));
+    public static final ComponentFlag FAREWELL_MESSAGE = register(new ComponentFlag("farewell"));
+    public static final ComponentFlag GREET_TITLE = register(new ComponentFlag("greeting-title"));
+    public static final ComponentFlag FAREWELL_TITLE = register(new ComponentFlag("farewell-title"));
 
     public static final BooleanFlag NOTIFY_ENTER = register(new BooleanFlag("notify-enter"));
     public static final BooleanFlag NOTIFY_LEAVE = register(new BooleanFlag("notify-leave"));
@@ -210,33 +186,23 @@ public final class Flags {
     public static final IntegerFlag MAX_FOOD = register(new IntegerFlag("feed-max-hunger"), f -> f.setSuggestedValues(VITALS_MAXS));
 
     // deny messages
-    /**
-     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
-     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
-     */
-    @Deprecated
-    public static final StringFlag DENY_MESSAGE = register(new StringFlag("deny-message",
+    public static final ComponentFlag DENY_MESSAGE = register(new ComponentFlag("deny-message",
             LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("Hey!",
                     TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
-                    .append(TextComponent.of(" Sorry, but you can't %what% here.", TextColor.GRAY)))));
-    /**
-     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
-     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
-     */
-    @Deprecated
-    public static final StringFlag ENTRY_DENY_MESSAGE = register(new StringFlag("entry-deny-message",
+                    .append(TextComponent.of(" Sorry, but you can't %what% here.", TextColor.GRAY))),
+            "<red>Hey! <gray>Sorry, but you can't <what> here."));
+
+    public static final ComponentFlag ENTRY_DENY_MESSAGE = register(new ComponentFlag("entry-deny-message",
+            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("Hey!",
+                TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
+                .append(TextComponent.of(" You are not permitted to enter this area.", TextColor.GRAY))),
+            "<red>Hey! <gray>You are not permitted to enter this area."));
+
+    public static final ComponentFlag EXIT_DENY_MESSAGE = register(new ComponentFlag("exit-deny-message",
             LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("Hey!",
                     TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
-                    .append(TextComponent.of(" You are not permitted to enter this area.", TextColor.GRAY)))));
-    /**
-     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
-     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
-     */
-    @Deprecated
-    public static final StringFlag EXIT_DENY_MESSAGE = register(new StringFlag("exit-deny-message",
-            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("Hey!",
-                    TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
-                    .append(TextComponent.of(" You are not permitted to leave this area.", TextColor.GRAY)))));
+                    .append(TextComponent.of(" You are not permitted to leave this area.", TextColor.GRAY))),
+            "<red>Hey! <gray>You are not permitted to leave this area."));
 
     private Flags() {
     }

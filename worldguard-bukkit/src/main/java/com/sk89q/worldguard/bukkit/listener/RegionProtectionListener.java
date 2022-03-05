@@ -39,13 +39,13 @@ import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.InteropUtils;
 import com.sk89q.worldguard.bukkit.util.Materials;
-import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
+import com.sk89q.worldguard.util.MessagingUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -67,6 +67,7 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Handle events that need to be processed by region protection.
@@ -101,8 +102,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         Object rootCause = cause.getRootCause();
 
-        if (rootCause instanceof Player) {
-            Player player = (Player) rootCause;
+        if (rootCause instanceof Player player) {
 
             long now = System.currentTimeMillis();
             Long lastTime = WGMetadata.getIfPresent(player, DENY_MESSAGE_KEY, Long.class);
@@ -118,9 +118,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     static void formatAndSendDenyMessage(String what, LocalPlayer localPlayer, String message) {
         if (message == null || message.isEmpty()) return;
-        message = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(localPlayer, message);
-        message = CommandUtils.replaceColorMacros(message);
-        localPlayer.printRaw(message.replace("%what%", what));
+        MessagingUtil.sendStringToChat(localPlayer, message, Map.of("what", what));
     }
 
     /**

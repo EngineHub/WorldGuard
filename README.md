@@ -23,7 +23,7 @@ A Bukkit server implementation (such as [Paper](https://papermc.io)) and the [Wo
 Compiling
 ---------
 
-The project is written for Java 16 and our build process makes use of
+The project is written for Java 17 and our build process makes use of
 [Gradle](http://gradle.org).
 
 Dependencies are automatically handled by Gradle.
