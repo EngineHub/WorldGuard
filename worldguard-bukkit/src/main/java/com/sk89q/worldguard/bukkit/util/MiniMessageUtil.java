@@ -67,6 +67,6 @@ public abstract class MiniMessageUtil {
             TextComponent deserialize = LegacyComponentSerializer.legacySection().deserialize(message);
             return MiniMessage.miniMessage().serialize(deserialize);
         }
-        return null;
+        return message;
     }
 }

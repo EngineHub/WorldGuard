@@ -85,7 +85,7 @@ public class ComponentFlagMigration extends AbstractMigration {
                 String val = region.getFlag(replaceFlag);
                 if (val != null) {
                     String migration = migrateToMinimessage(val);
-                    if (migration != null) {
+                    if (!val.equals(migration)) {
                         region.setFlag(replaceFlag, migration);
                         changed++;
                     }
