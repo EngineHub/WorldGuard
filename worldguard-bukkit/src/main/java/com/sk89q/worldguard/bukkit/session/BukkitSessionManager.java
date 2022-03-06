@@ -83,8 +83,12 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     public boolean hasBypass(LocalPlayer player, World world) {
         if (player instanceof BukkitPlayer) {
             if (((BukkitPlayer) player).getPlayer().hasMetadata("NPC")
-                && WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).fakePlayerBuildOverride)
+                && WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).fakePlayerBuildOverride) {
                 return true;
+            }
+            if (!((BukkitPlayer) player).getPlayer().isOnline()) {
+                return false;
+            }
         }
         return super.hasBypass(player, world);
     }

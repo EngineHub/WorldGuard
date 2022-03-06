@@ -21,6 +21,7 @@ package com.sk89q.worldguard.commands.region;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -30,6 +31,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.LabelFormat;
@@ -41,6 +43,7 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.commands.task.RegionAdder;
@@ -74,6 +77,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
+import com.sk89q.worldguard.protection.util.WorldEditRegionConverter;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.util.Enums;
 import com.sk89q.worldguard.util.logging.LoggerToChatHandler;
@@ -281,7 +285,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        // We have to check whether this region violates the space of any other reion
+        // We have to check whether this region violates the space of any other region
         ApplicableRegionSet regions = manager.getApplicableRegions(region);
 
         // Check if this region overlaps any other region
@@ -311,6 +315,18 @@ public final class RegionCommands extends RegionCommandsBase {
                 player.printError("Вы не можете заприватить регион такого размера.");
                 player.printError("Максимальный размер: " + wcfg.maxClaimVolume + ", размер твоего региона: " + region.volume());
                 return;
+            }
+        }
+
+        // Inherit from a template region
+        if (!Strings.isNullOrEmpty(wcfg.setParentOnClaim)) {
+            ProtectedRegion templateRegion = manager.getRegion(wcfg.setParentOnClaim);
+            if (templateRegion != null) {
+                try {
+                    region.setParent(templateRegion);
+                } catch (CircularInheritanceException e) {
+                    throw new CommandException(e.getMessage());
+                }
             }
         }
 
@@ -436,9 +452,9 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"list"},
-             usage = "[страница]",
+             usage = "[-w мир] [-p владелец [-n]] [-s] [-i фильтр] [страницп]",
              desc = "Показать список всех регионов",
-             flags = "np:w:",
+             flags = "np:w:i:s",
              max = 1)
     public void list(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -473,6 +489,16 @@ public final class RegionCommands extends RegionCommandsBase {
         task.setPage(page);
         if (ownedBy != null) {
             task.filterOwnedByName(ownedBy, args.hasFlag('n'));
+        }
+
+        if (args.hasFlag('s')) {
+            ProtectedRegion existing = checkRegionFromSelection(sender, "tmp");
+            task.filterByIntersecting(existing);
+        }
+
+        // -i string is in region id
+        if (args.hasFlag('i')) {
+            task.filterIdByMatch(args.getFlag('i'));
         }
 
         AsyncCommandBuilder.wrap(task, sender)
@@ -1132,8 +1158,8 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"teleport", "tp"},
-             usage = "<id>",
-             flags = "sw:",
+             usage = "[-w world] [-c|s] <id>",
+             flags = "csw:",
              desc = "Телепортироваться на заданную точку в регионе.",
              min = 1, max = 1)
     public void teleport(CommandContext args, Actor sender) throws CommandException {
@@ -1157,6 +1183,23 @@ public final class RegionCommands extends RegionCommandsBase {
             if (teleportLocation == null) {
                 throw new CommandException(
                         "В данном регионе нет точки спавна.");
+            }
+        } else if (args.hasFlag('c')) {
+            // Check permissions
+            if (!getPermissionModel(player).mayTeleportToCenter(existing)) {
+                throw new CommandPermissionsException();
+            }
+            Region region = WorldEditRegionConverter.convertToRegion(existing);
+            if (region == null || region.getCenter() == null) {
+                throw new CommandException("The region has no center point.");
+            }
+            if (player.getGameMode() == GameModes.SPECTATOR) {
+                teleportLocation = new Location(world, region.getCenter(), 0, 0);
+            } else {
+                // TODO: Add some method to create a safe teleport location.
+                // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
+                // It doesn't return the found location and it can't be checked if the location is inside the region.
+                throw new CommandException("Center teleport is only availible in Spectator gamemode.");
             }
         } else {
             teleportLocation = FlagValueCalculator.getEffectiveFlagOf(existing, Flags.TELE_LOC, player);

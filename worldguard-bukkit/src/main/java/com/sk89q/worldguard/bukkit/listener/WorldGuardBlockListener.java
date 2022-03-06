@@ -365,7 +365,7 @@ public class WorldGuardBlockListener extends AbstractListener {
             return;
         }
 
-        if (id == Material.SAND && wcfg.noPhysicsSand) {
+        if ((id == Material.SAND || id == Material.RED_SAND) && wcfg.noPhysicsSand) {
             event.setCancelled(true);
             return;
         }

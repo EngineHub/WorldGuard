@@ -684,7 +684,8 @@ public class WorldGuardEntityListener extends AbstractListener {
                 if (associable != null) {
                     // NB there is no way to cancel the teleport without PTA (since PlayerPortal doesn't have block info)
                     // removing PTA was a mistake
-                    associable.print("Пункт назначения является защищенным приватом.");
+                    String message = regions.queryValue(associable, Flags.DENY_MESSAGE);
+                    RegionProtectionListener.formatAndSendDenyMessage("create portals", associable, message);
                 }
                 event.setCancelled(true);
             }
@@ -788,7 +789,7 @@ public class WorldGuardEntityListener extends AbstractListener {
                 return;
             }
 
-            if (id == Material.SAND && wcfg.noPhysicsSand) {
+            if ((id == Material.SAND || id == Material.RED_SAND) && wcfg.noPhysicsSand) {
                 event.setCancelled(true);
                 return;
             }

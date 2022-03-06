@@ -1,5 +1,17 @@
 # Changelog
 
+## 7.0.7
+* Add rock-growth flag for budding amethyst and pointed dripstone.
+* Add /rg migrateheights command. See https://worldguard.enginehub.org/en/latest/regions/commands/#migrate-region-heights
+* Add regions.set-parent-on-claim config (set to a region id for /rg claim to automatically assign the parent region).
+* Add `-i search` and `-s` flags to /rg list, -c to /rg teleport.
+* Fix an error in blacklist logging caused by non-player actions (eg on-dispense)
+* Treat unknown causes as known if using paper-entity-origin config option.
+* Improve lightning strike handling from channeling tridents (PaperMC only).
+* Ignore an error caused by lingering player references of offline players.
+* Add red sand to no-physics-sand.
+* Fix potion splash events being cancelled if no entities were affected.
+
 ## 7.0.6
 
 * Add support for 1.17 blocks/items, drop support for 1.16.

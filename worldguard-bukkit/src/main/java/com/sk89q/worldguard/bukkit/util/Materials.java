@@ -1491,7 +1491,10 @@ public final class Materials {
     public static boolean isConsideredBuildingIfUsed(Material type) {
         return type == Material.REPEATER
             || type == Material.COMPARATOR
-            || Tag.FLOWER_POTS.isTagged(type);
+            || type == Material.CAKE
+            || Tag.FLOWER_POTS.isTagged(type)
+            || Tag.CANDLES.isTagged(type)
+            || Tag.CANDLE_CAKES.isTagged(type);
     }
 
     /**

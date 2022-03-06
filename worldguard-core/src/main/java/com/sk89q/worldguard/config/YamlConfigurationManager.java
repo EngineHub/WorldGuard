@@ -93,6 +93,12 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         String sqlUsername = config.getString("regions.sql.username", "worldguard");
         String sqlPassword = config.getString("regions.sql.password", "worldguard");
         String sqlTablePrefix = config.getString("regions.sql.table-prefix", "");
+        if (!useSqlDatabase) {
+            config.removeProperty("regions.sql");
+        } else {
+            log.warning("SQL support for WorldGuard region storage is deprecated for removal in a future version. Please migrate to YAML storage.");
+            log.warning("For details, see https://worldguard.enginehub.org/en/latest/regions/storage/");
+        }
 
         DataSourceConfig dataSourceConfig = new DataSourceConfig(sqlDsn, sqlUsername, sqlPassword, sqlTablePrefix);
         SQLDriver sqlDriver = new SQLDriver(dataSourceConfig);

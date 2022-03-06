@@ -140,6 +140,8 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             throw e;
         }
 
+        boolean needParentSave = false;
+
         summaryOnStart = getBoolean("summary-on-start", true);
         opPermissions = getBoolean("op-permissions", true);
 
@@ -158,7 +160,8 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         itemDurability = getBoolean("protection.item-durability", true);
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
         disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
-        disableObsidianGenerators = getBoolean("protection.disable-obsidian-generators", false);
+
+        needParentSave |= removeProperty("protection.disable-obsidian-generators");
 
         useMaxPriorityAssociation = getBoolean("protection.use-max-priority-association", false);
 
@@ -178,6 +181,11 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         simulateSponge = getBoolean("simulation.sponge.enable", false);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = getBoolean("simulation.sponge.redstone", false);
+        if (simulateSponge) {
+            log.warning("Sponge simulation is deprecated for removal in a future version. We recommend using CraftBook's sponge simulation instead.");
+        } else {
+            needParentSave |= removeProperty("simulation");
+        }
 
         pumpkinScuba = getBoolean("default.pumpkin-scuba", false);
         disableHealthRegain = getBoolean("default.disable-health-regain", false);
@@ -237,6 +245,11 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
         signChestProtection = getBoolean("chest-protection.enable", false);
         disableSignChestProtectionCheck = getBoolean("chest-protection.disable-off-check", false);
+        if (signChestProtection) {
+            log.warning("Sign-based chest protection is deprecated for removal in a future version. See https://worldguard.enginehub.org/en/latest/chest-protection/ for details.");
+        } else {
+            needParentSave |= removeProperty("chest-protection");
+        }
 
         disableCreatureCropTrampling = getBoolean("crops.disable-creature-trampling", false);
         disablePlayerCropTrampling = getBoolean("crops.disable-player-trampling", false);
@@ -281,6 +294,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         regionWand = convertLegacyItem(getString("regions.wand", ItemTypes.LEATHER.getId()));
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
+        setParentOnClaim = getString("regions.set-parent-on-claim", "");
         boundedLocationFlags = getBoolean("regions.location-flags-only-inside-regions", false);
 
         maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player.default", 7);
@@ -402,6 +416,20 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         config.setHeader(CONFIG_HEADER);
 
         config.save();
+        if (needParentSave) {
+            parentConfig.save();
+        }
+    }
+
+    private boolean removeProperty(String prop) {
+        if (config.getProperty(prop) != null) {
+            config.removeProperty(prop);
+        }
+        if (parentConfig.getProperty(prop) != null) {
+            parentConfig.removeProperty(prop);
+            return true;
+        }
+        return false;
     }
 
     public boolean isChestProtected(Location block, LocalPlayer player) {
