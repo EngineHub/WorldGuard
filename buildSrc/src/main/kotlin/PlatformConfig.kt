@@ -25,6 +25,7 @@ fun Project.applyPlatformAndCoreConfiguration(javaRelease: Int = 17) {
     configure<PublishingExtension> {
         publications {
             register<MavenPublication>("maven") {
+                from(components["java"])
                 versionMapping {
                     usage("java-api") {
                         fromResolutionOf("runtimeClasspath")
