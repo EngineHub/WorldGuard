@@ -177,12 +177,6 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
-    @Deprecated
-    public void sendTitle(String title, String subtitle) {
-
-    }
-
-    @Override
     public void showTitle(Title title) {
 
     }
@@ -194,12 +188,6 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
 
     @Override
     public void resetFallDistance() {
-
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Location location, String successMessage, String failMessage) {
 
     }
 

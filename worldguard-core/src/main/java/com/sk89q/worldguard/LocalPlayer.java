@@ -203,16 +203,6 @@ public interface LocalPlayer extends Player, RegionAssociable {
     void setCompassTarget(Location location);
 
     /**
-     * This should preferably take Components but there's no way to do that yet
-     *
-     * @param title the title to display
-     * @param subtitle the subtitle to display
-     * @deprecated use sendMiniMessageTitle instead
-     */
-    @Deprecated
-    void sendTitle(String title, String subtitle);
-
-    /**
      * Send the message to the player
      *
      * @param message the message as component

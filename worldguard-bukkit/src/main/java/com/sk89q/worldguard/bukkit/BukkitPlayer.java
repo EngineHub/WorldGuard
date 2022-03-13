@@ -176,16 +176,6 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     }
 
     @Override
-    @Deprecated
-    public void sendTitle(String title, String subtitle) {
-        if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(getWorld()).forceDefaultTitleTimes) {
-            getPlayer().sendTitle(title, subtitle, 10, 70, 20);
-        } else {
-            getPlayer().sendTitle(title, subtitle, -1, -1, -1);
-        }
-    }
-
-    @Override
     public void sendMessage(Component message) {
         getPlayer().sendMessage(message);
     }
