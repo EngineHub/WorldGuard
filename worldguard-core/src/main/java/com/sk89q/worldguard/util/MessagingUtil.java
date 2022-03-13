@@ -21,32 +21,29 @@ package com.sk89q.worldguard.util;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.commands.CommandUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.title.Title;
 
 public final class MessagingUtil {
-
     private MessagingUtil() {
     }
 
     public static void sendStringToChat(LocalPlayer player, String message) {
-        String effective = CommandUtils.replaceColorMacros(message);
-        effective = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(player, effective);
-        for (String mess : effective.replaceAll("\\\\n", "\n").split("\\n")) {
-            player.printRaw(mess);
-        }
+        player.sendMessage(WorldGuard.getInstance().getMiniMessage().deserialize(message,
+                WorldGuard.getInstance().getPlatform().getMatcher().replacements(player)));
     }
 
-    public static void sendStringToTitle(LocalPlayer player, String message) {
+    public static void formatTitleFromString(LocalPlayer player, String message) {
         String[] parts = message.replaceAll("\\\\n", "\n").split("\\n", 2);
-        String title = CommandUtils.replaceColorMacros(parts[0]);
-        title = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(player, title);
-        if (parts.length > 1) {
-            String subtitle = CommandUtils.replaceColorMacros(parts[1]);
-            subtitle = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(player, subtitle);
-            player.sendTitle(title, subtitle);
-        } else {
-            player.sendTitle(title, null);
-        }
+        TagResolver resolvers = WorldGuard.getInstance().getPlatform().getMatcher().replacements(player);
+
+        Component title = WorldGuard.getInstance().getMiniMessage().deserialize(parts[0], resolvers);
+        Component subtitle = parts.length > 1 ? WorldGuard.getInstance().getMiniMessage().deserialize(parts[1], resolvers) : Component.empty();
+
+        Title t = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(player.getWorld()).forceDefaultTitleTimes ?
+                Title.title(title, subtitle, Title.DEFAULT_TIMES) : Title.title(title, subtitle);
+        player.showTitle(t);
     }
 
 }

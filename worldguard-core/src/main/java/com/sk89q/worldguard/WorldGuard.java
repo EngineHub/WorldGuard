@@ -38,6 +38,7 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 import com.sk89q.worldguard.util.WorldGuardExceptionConverter;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +61,8 @@ public final class WorldGuard {
     private ProfileService profileService;
     private ListeningExecutorService executorService;
     private WorldGuardExceptionConverter exceptionConverter = new WorldGuardExceptionConverter();
+
+    private MiniMessage miniMessage = MiniMessage.miniMessage();
 
     static {
         Flags.registerAll();
@@ -235,4 +238,7 @@ public final class WorldGuard {
         return version;
     }
 
+    public MiniMessage getMiniMessage() {
+        return miniMessage;
+    }
 }

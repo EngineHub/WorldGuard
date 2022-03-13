@@ -22,12 +22,12 @@ package com.sk89q.worldguard.session.handler;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
+import com.sk89q.worldguard.util.MessagingUtil;
 
 import java.util.Set;
 
@@ -57,7 +57,7 @@ public class EntryFlag extends Handler {
             long now = System.currentTimeMillis();
 
             if ((now - lastMessage) > MESSAGE_THRESHOLD && message != null && !message.isEmpty()) {
-                player.printRaw(CommandUtils.replaceColorMacros(message));
+                MessagingUtil.sendStringToChat(player, message);
                 lastMessage = now;
             }
 

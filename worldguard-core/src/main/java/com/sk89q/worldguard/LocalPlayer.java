@@ -19,15 +19,18 @@
 
 package com.sk89q.worldguard;
 
-import com.google.common.annotations.Beta;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public interface LocalPlayer extends Player, RegionAssociable {
 
@@ -200,13 +203,18 @@ public interface LocalPlayer extends Player, RegionAssociable {
     void setCompassTarget(Location location);
 
     /**
-     * This should preferably take Components but there's no way to do that yet
+     * Send the message to the player
      *
-     * @param title the title to display
-     * @param subtitle the subtitle to display
+     * @param message the message as component
      */
-    @Beta
-    void sendTitle(String title, String subtitle);
+    void sendMessage(Component message);
+
+    /**
+     * Send the message to the player
+     *
+     * @param title the title
+     */
+    void showTitle(Title title);
 
     /**
      * Clears fall distance.
@@ -214,10 +222,9 @@ public interface LocalPlayer extends Player, RegionAssociable {
     void resetFallDistance();
 
     /**
-     * Teleport the player, potentially async, displaying the message on a success.
-     *  @param location location to teleport to
-     * @param successMessage message to display on success
-     * @param failMessage message to display on failure
+     * Teleport the player, potentially async.
+     * @param location location to teleport to
+     * @return a future object whether the teleport was successful
      */
-    void teleport(Location location, String successMessage, String failMessage);
+    CompletableFuture<Boolean> teleport(Location location);
 }

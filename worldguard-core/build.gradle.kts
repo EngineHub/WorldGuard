@@ -11,6 +11,10 @@ dependencies {
     "implementation"("org.yaml:snakeyaml:1.30")
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
 
+    "api"("net.kyori:adventure-api:${Versions.ADVENTURE}")
+    "api"("net.kyori:adventure-text-minimessage:${Versions.ADVENTURE}")
+    "api"("net.kyori:adventure-text-serializer-legacy:${Versions.ADVENTURE}")
+
     "compileOnly"("com.google.code.findbugs:jsr305:${Versions.FINDBUGS}")
     "testImplementation"("org.hamcrest:hamcrest-library:1.2.1")
 }

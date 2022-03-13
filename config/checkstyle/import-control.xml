@@ -17,6 +17,7 @@
     <allow pkg="org.flywaydb"/>
     <allow pkg="org.yaml"/>
     <allow pkg="org.enginehub.piston"/>
+    <allow pkg="net.kyori.adventure"/>
 
     <subpackage name="util.profile.resolver">
       <allow pkg="org.bukkit"/>

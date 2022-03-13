@@ -66,7 +66,7 @@ public class FarewellFlag extends Handler {
                                    Set<ProtectedRegion> entered, Set<ProtectedRegion> exited, MoveType moveType) {
 
         lastMessageStack = collectAndSend(player, toSet, Flags.FAREWELL_MESSAGE, lastMessageStack, MessagingUtil::sendStringToChat);
-        lastTitleStack = collectAndSend(player, toSet, Flags.FAREWELL_TITLE, lastTitleStack, MessagingUtil::sendStringToTitle);
+        lastTitleStack = collectAndSend(player, toSet, Flags.FAREWELL_TITLE, lastTitleStack, MessagingUtil::formatTitleFromString);
 
         return true;
     }

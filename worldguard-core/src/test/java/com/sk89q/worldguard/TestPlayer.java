@@ -30,11 +30,14 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.weather.WeatherType;
+import net.kyori.adventure.title.Title;
 
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 
@@ -174,7 +177,12 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
-    public void sendTitle(String title, String subtitle) {
+    public void showTitle(Title title) {
+
+    }
+
+    @Override
+    public void sendMessage(net.kyori.adventure.text.Component message) {
 
     }
 
@@ -184,8 +192,8 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
-    public void teleport(Location location, String successMessage, String failMessage) {
-
+    public CompletableFuture<Boolean> teleport(Location location) {
+        return CompletableFuture.completedFuture(false);
     }
 
     @Override

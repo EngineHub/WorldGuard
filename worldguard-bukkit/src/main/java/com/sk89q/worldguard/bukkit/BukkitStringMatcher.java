@@ -29,12 +29,16 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.internal.platform.StringMatcher;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BukkitStringMatcher implements StringMatcher {
@@ -226,21 +230,13 @@ public class BukkitStringMatcher implements StringMatcher {
     }
 
     @Override
-    public String replaceMacros(Actor sender, String message) {
-        Collection<? extends Player> online = Bukkit.getServer().getOnlinePlayers();
-
-        message = message.replace("%name%", sender.getName());
-        message = message.replace("%id%", sender.getUniqueId().toString());
-        message = message.replace("%online%", String.valueOf(online.size()));
-
-        if (sender instanceof LocalPlayer) {
-            LocalPlayer player = (LocalPlayer) sender;
-            World world = (World) player.getExtent();
-
-            message = message.replace("%world%", world.getName());
-            message = message.replace("%health%", String.valueOf(player.getHealth()));
-        }
-
-        return message;
+    public TagResolver replacements(LocalPlayer sender) {
+        return TagResolver.builder()
+                .resolver(Placeholder.unparsed("name", sender.getName()))
+                .resolver(Placeholder.unparsed("id", sender.getUniqueId().toString()))
+                .resolver(Placeholder.unparsed("online", String.valueOf(Bukkit.getServer().getOnlinePlayers().size())))
+                .resolver(Placeholder.unparsed("world", sender.getWorld().getName()))
+                .resolver(Placeholder.unparsed("health", String.valueOf(sender.getHealth())))
+                .build();
     }
 }

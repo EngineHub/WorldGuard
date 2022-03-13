@@ -25,11 +25,14 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.util.MessagingUtil;
 import io.papermc.lib.PaperLib;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import java.util.concurrent.CompletableFuture;
 
 public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implements LocalPlayer {
 
@@ -173,12 +176,13 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     }
 
     @Override
-    public void sendTitle(String title, String subtitle) {
-        if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(getWorld()).forceDefaultTitleTimes) {
-            getPlayer().sendTitle(title, subtitle, 10, 70, 20);
-        } else {
-            getPlayer().sendTitle(title, subtitle, -1, -1, -1);
-        }
+    public void sendMessage(Component message) {
+        getPlayer().sendMessage(message);
+    }
+
+    @Override
+    public void showTitle(Title title) {
+        getPlayer().showTitle(title);
     }
 
     @Override
@@ -187,19 +191,8 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     }
 
     @Override
-    public void teleport(Location location, String successMessage, String failMessage) {
-        PaperLib.teleportAsync(getPlayer(), BukkitAdapter.adapt(location))
-                .thenApply(success -> {
-                    if (success) {
-                        // The success message can be cleared via flag
-                        if (!successMessage.isEmpty()) {
-                            MessagingUtil.sendStringToChat(this, successMessage);
-                        }
-                    } else {
-                        printError(failMessage);
-                    }
-                    return success;
-                });
+    public CompletableFuture<Boolean> teleport(Location location) {
+        return PaperLib.teleportAsync(getPlayer(), BukkitAdapter.adapt(location));
     }
 
     @Override
