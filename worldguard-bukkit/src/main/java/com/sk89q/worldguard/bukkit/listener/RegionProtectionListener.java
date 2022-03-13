@@ -45,7 +45,7 @@ import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
-import com.sk89q.worldguard.util.MessagingUtil;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -118,7 +118,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     static void formatAndSendDenyMessage(String what, LocalPlayer localPlayer, String message) {
         if (message == null || message.isEmpty()) return;
-        MessagingUtil.sendStringToChat(localPlayer, message, Map.of("what", what));
+        localPlayer.sendMessage(WorldGuard.getInstance().getMiniMessage().deserialize(message, Placeholder.unparsed("what", what)));
     }
 
     /**

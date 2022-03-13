@@ -7,4 +7,5 @@ object Versions {
     const val SQUIRRELID = "0.3.0"
     const val GUAVA = "31.0.1-jre"
     const val FINDBUGS = "3.0.2"
+    const val ADVENTURE = "4.10.1"
 }

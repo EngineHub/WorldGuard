@@ -28,6 +28,8 @@ import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -100,12 +102,17 @@ public class ComponentFlagMigration extends AbstractMigration {
     }
 
     private String migrateToMinimessage(String string) {
-        String serialized = WorldGuard.getInstance().getPlatform().formatToMiniMessage(string);
-        if (serialized == null) return null;
-        for (Map.Entry<String, String> replacement : REPLACE_TEXTS.entrySet()) {
-            serialized = serialized.replace(replacement.getKey(), replacement.getValue());
+        // first strip all legacy color formats from the string
+        if (string.indexOf('§') != -1) {
+            TextComponent deserialize = LegacyComponentSerializer.legacySection().deserialize(string);
+            string = WorldGuard.getInstance().getMiniMessage().serialize(deserialize);
         }
-        return serialized;
+
+        // then replace all legacy placeholder with tags
+        for (Map.Entry<String, String> replacement : REPLACE_TEXTS.entrySet()) {
+            string = string.replace(replacement.getKey(), replacement.getValue());
+        }
+        return string;
     }
 
     @Override

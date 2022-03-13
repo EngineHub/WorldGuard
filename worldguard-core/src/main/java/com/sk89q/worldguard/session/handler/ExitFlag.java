@@ -22,13 +22,13 @@ package com.sk89q.worldguard.session.handler;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
+import com.sk89q.worldguard.util.MessagingUtil;
 
 public class ExitFlag extends FlagValueChangeHandler<State> {
 
@@ -60,7 +60,7 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
         long now = System.currentTimeMillis();
 
         if ((now - lastMessage) > MESSAGE_THRESHOLD && storedMessage != null && !storedMessage.isEmpty()) {
-            player.printRaw(CommandUtils.replaceColorMacros(storedMessage));
+            MessagingUtil.sendStringToChat(player, storedMessage);
             lastMessage = now;
         }
     }

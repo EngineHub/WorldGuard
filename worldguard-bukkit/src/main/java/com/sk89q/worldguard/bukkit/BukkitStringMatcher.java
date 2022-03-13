@@ -29,6 +29,8 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.internal.platform.StringMatcher;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -228,31 +230,13 @@ public class BukkitStringMatcher implements StringMatcher {
     }
 
     @Override
-    public String replaceMacros(Actor sender, String message) {
-        return replaceMacros(sender, message, replacements(sender));
-    }
-
-    @Override
-    public String replaceMacros(Actor sender, String message, Map<String, String> replacements) {
-        for (Map.Entry<String, String> entry : replacements.entrySet()) {
-            message = message.replace("%" + entry.getKey() + "%", entry.getValue());
-        }
-        return message;
-    }
-
-    @Override
-    public Map<String, String> replacements(Actor sender) {
-        Collection<? extends Player> online = Bukkit.getServer().getOnlinePlayers();
-
-        Map<String, String> map = new HashMap<>();
-        map.put("name", sender.getName());
-        map.put("id", sender.getUniqueId().toString());
-        map.put("online", String.valueOf(online.size()));
-
-        if (sender instanceof LocalPlayer player) {
-            map.put("world", player.getWorld().getName());
-            map.put("health", String.valueOf(player.getHealth()));
-        }
-        return map;
+    public TagResolver replacements(LocalPlayer sender) {
+        return TagResolver.builder()
+                .resolver(Placeholder.unparsed("name", sender.getName()))
+                .resolver(Placeholder.unparsed("id", sender.getUniqueId().toString()))
+                .resolver(Placeholder.unparsed("online", String.valueOf(Bukkit.getServer().getOnlinePlayers().size())))
+                .resolver(Placeholder.unparsed("world", sender.getWorld().getName()))
+                .resolver(Placeholder.unparsed("health", String.valueOf(sender.getHealth())))
+                .build();
     }
 }

@@ -29,7 +29,6 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.util.MiniMessageUtil;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.profile.resolver.PaperPlayerService;
@@ -270,20 +269,6 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
                             spawnLoc.add(radius, 0, radius).withY(world.getMaxY()));
                 }
             }
-        }
-        return null;
-    }
-
-    @Override
-    public boolean hasMiniMessage() {
-        return PaperLib.isPaper();
-    }
-
-    @Override
-    public String formatToMiniMessage(String message) {
-        Objects.requireNonNull(message);
-        if (hasMiniMessage()) {
-            return MiniMessageUtil.legacyToMiniMessage(message);
         }
         return null;
     }

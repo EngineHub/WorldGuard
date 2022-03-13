@@ -25,6 +25,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -155,32 +156,6 @@ public interface StringMatcher {
     @Nullable
     World getWorldByName(String worldName);
 
-    /**
-     * Replace macros in the text.
-     *
-     * The macros replaced are as follows:
-     * %name%: The name of {@code sender}.
-     * %id%: The unique name of the sender.
-     * %online%: The number of players currently online on the server
-     * If {@code sender} is a Player:
-     * %world%: The name of the world {@code sender} is located in
-     * %health%: The health of {@code sender}.
-     *
-     * @param sender The sender to check
-     * @param message The message to replace macros in
-     * @return The message with macros replaced
-     */
-    String replaceMacros(Actor sender, String message);
-
-    /**
-     * Replace macros in the text.
-     *
-     * @param sender The sender to check
-     * @param message The message to replace macros in
-     * @param replacements The provided replacements
-     * @return The message with macros replaced
-     */
-    String replaceMacros(Actor sender, String message, Map<String, String> replacements);
 
     /**
      * Get the replacements for the current sender context
@@ -189,13 +164,12 @@ public interface StringMatcher {
      * name: The name of {@code sender}.
      * id: The unique name of the sender.
      * online: The number of players currently online on the server
-     * If {@code sender} is a Player:
      * world: The name of the world {@code sender} is located in
      * health: The health of {@code sender}.
      *
      * @param sender The sender to check
-     * @return The map with the replacements
+     * @return The set of tag resolvers for the sender
      */
-    Map<String, String> replacements(Actor sender);
+    TagResolver replacements(LocalPlayer sender);
 
 }

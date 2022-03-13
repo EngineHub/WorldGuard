@@ -19,11 +19,6 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import com.google.common.collect.Sets;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
-import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.weather.WeatherType;
@@ -140,9 +135,7 @@ public final class Flags {
     public static final LocationFlag TELE_LOC = register(new LocationFlag("teleport"));
     public static final LocationFlag SPAWN_LOC = register(new LocationFlag("spawn", RegionGroup.MEMBERS));
 
-    public static final ComponentFlag TELE_MESSAGE = register(new ComponentFlag("teleport-message",
-            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of(
-                    "Teleported you to the region '%id%'.", TextColor.LIGHT_PURPLE))),
+    public static final StringFlag TELE_MESSAGE = register(new StringFlag("teleport-message",
             "<light_purple>Teleported you to the region '<id>'."));
 
     // idk?
@@ -160,10 +153,10 @@ public final class Flags {
     public static final StateFlag ENDERPEARL = register(new StateFlag("enderpearl", true));
     public static final StateFlag CHORUS_TELEPORT = register(new StateFlag("chorus-fruit-teleport", true));
 
-    public static final ComponentFlag GREET_MESSAGE = register(new ComponentFlag("greeting"));
-    public static final ComponentFlag FAREWELL_MESSAGE = register(new ComponentFlag("farewell"));
-    public static final ComponentFlag GREET_TITLE = register(new ComponentFlag("greeting-title"));
-    public static final ComponentFlag FAREWELL_TITLE = register(new ComponentFlag("farewell-title"));
+    public static final StringFlag GREET_MESSAGE = register(new StringFlag("greeting"));
+    public static final StringFlag FAREWELL_MESSAGE = register(new StringFlag("farewell"));
+    public static final StringFlag GREET_TITLE = register(new StringFlag("greeting-title"));
+    public static final StringFlag FAREWELL_TITLE = register(new StringFlag("farewell-title"));
 
     public static final BooleanFlag NOTIFY_ENTER = register(new BooleanFlag("notify-enter"));
     public static final BooleanFlag NOTIFY_LEAVE = register(new BooleanFlag("notify-leave"));
@@ -186,22 +179,13 @@ public final class Flags {
     public static final IntegerFlag MAX_FOOD = register(new IntegerFlag("feed-max-hunger"), f -> f.setSuggestedValues(VITALS_MAXS));
 
     // deny messages
-    public static final ComponentFlag DENY_MESSAGE = register(new ComponentFlag("deny-message",
-            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("Hey!",
-                    TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
-                    .append(TextComponent.of(" Sorry, but you can't %what% here.", TextColor.GRAY))),
+    public static final StringFlag DENY_MESSAGE = register(new StringFlag("deny-message",
             "<red>Hey! <gray>Sorry, but you can't <what> here."));
 
-    public static final ComponentFlag ENTRY_DENY_MESSAGE = register(new ComponentFlag("entry-deny-message",
-            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("Hey!",
-                TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
-                .append(TextComponent.of(" You are not permitted to enter this area.", TextColor.GRAY))),
+    public static final StringFlag ENTRY_DENY_MESSAGE = register(new StringFlag("entry-deny-message",
             "<red>Hey! <gray>You are not permitted to enter this area."));
 
-    public static final ComponentFlag EXIT_DENY_MESSAGE = register(new ComponentFlag("exit-deny-message",
-            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("Hey!",
-                    TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
-                    .append(TextComponent.of(" You are not permitted to leave this area.", TextColor.GRAY))),
+    public static final StringFlag EXIT_DENY_MESSAGE = register(new StringFlag("exit-deny-message",
             "<red>Hey! <gray>You are not permitted to leave this area."));
 
     private Flags() {

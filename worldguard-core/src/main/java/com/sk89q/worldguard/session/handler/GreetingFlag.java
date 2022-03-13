@@ -60,7 +60,7 @@ public class GreetingFlag extends Handler {
     public boolean onCrossBoundary(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet,
                                    Set<ProtectedRegion> entered, Set<ProtectedRegion> exited, MoveType moveType) {
         lastMessageStack = sendAndCollect(player, toSet, Flags.GREET_MESSAGE, lastMessageStack, MessagingUtil::sendStringToChat);
-        lastTitleStack = sendAndCollect(player, toSet, Flags.GREET_TITLE, lastTitleStack, MessagingUtil::sendStringToTitle);
+        lastTitleStack = sendAndCollect(player, toSet, Flags.GREET_TITLE, lastTitleStack, MessagingUtil::formatTitleFromString);
         return true;
     }
 

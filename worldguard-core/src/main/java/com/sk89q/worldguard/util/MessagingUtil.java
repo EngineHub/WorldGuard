@@ -21,49 +21,29 @@ package com.sk89q.worldguard.util;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.commands.CommandUtils;
-
-import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.title.Title;
 
 public final class MessagingUtil {
-
     private MessagingUtil() {
     }
 
     public static void sendStringToChat(LocalPlayer player, String message) {
-        sendStringToChat(player, message,
-                WorldGuard.getInstance().getPlatform().getMatcher().replacements(player));
+        player.sendMessage(WorldGuard.getInstance().getMiniMessage().deserialize(message,
+                WorldGuard.getInstance().getPlatform().getMatcher().replacements(player)));
     }
 
-    public static void sendStringToChat(LocalPlayer player, String message, Map<String, String> resolver) {
-        if (WorldGuard.getInstance().getPlatform().hasMiniMessage()) {
-            player.sendMiniMessage(message, resolver);
-        } else {
-            String effective = CommandUtils.replaceColorMacros(message);
-            effective = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(player, effective, resolver);
-            for (String mess : effective.replaceAll("\\\\n", "\n").split("\\n")) {
-                player.printRaw(mess);
-            }
-        }
-    }
-
-    public static void sendStringToTitle(LocalPlayer player, String message) {
+    public static void formatTitleFromString(LocalPlayer player, String message) {
         String[] parts = message.replaceAll("\\\\n", "\n").split("\\n", 2);
-        Map<String, String> resolvers = WorldGuard.getInstance().getPlatform().getMatcher().replacements(player);
+        TagResolver resolvers = WorldGuard.getInstance().getPlatform().getMatcher().replacements(player);
 
-        if (WorldGuard.getInstance().getPlatform().hasMiniMessage()) {
-            player.sendMiniMessageTitle(parts[0], parts.length > 1 ? parts[1] : "", resolvers);
-        } else {
-            String title = CommandUtils.replaceColorMacros(parts[0]);
-            title = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(player, title, resolvers);
-            if (parts.length > 1) {
-                String subtitle = CommandUtils.replaceColorMacros(parts[1]);
-                subtitle = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(player, subtitle, resolvers);
-                player.sendTitle(title, subtitle);
-            } else {
-                player.sendTitle(title, null);
-            }
-        }
+        Component title = WorldGuard.getInstance().getMiniMessage().deserialize(parts[0], resolvers);
+        Component subtitle = parts.length > 1 ? WorldGuard.getInstance().getMiniMessage().deserialize(parts[1], resolvers) : Component.empty();
+
+        Title t = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(player.getWorld()).forceDefaultTitleTimes ?
+                Title.title(title, subtitle, Title.DEFAULT_TIMES) : Title.title(title, subtitle);
+        player.showTitle(t);
     }
 
 }

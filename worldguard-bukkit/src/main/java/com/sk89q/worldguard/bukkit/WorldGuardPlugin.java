@@ -73,6 +73,7 @@ import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver
 import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
+import io.papermc.lib.PaperLib;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.DrilldownPie;
 import org.bstats.charts.SimplePie;
@@ -139,6 +140,13 @@ public class WorldGuardPlugin extends JavaPlugin {
         // Catch bad things being done by naughty plugins that include WorldGuard's classes
         ClassSourceValidator verifier = new ClassSourceValidator(this);
         verifier.reportMismatches(ImmutableList.of(WorldGuard.class, ProtectedRegion.class, Flag.class));
+
+        if (!PaperLib.isPaper()) {
+            // TODO: Tidy up this message
+            getLogger().severe("Unable to start WorldGuard. This version does only support Paper.");
+            getLogger().severe("Update your server or downgrade WorldGuard.");
+            throw new RuntimeException("No capable platform found.");
+        }
 
         configureLogger();
 

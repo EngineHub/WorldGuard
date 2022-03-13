@@ -82,11 +82,12 @@ import com.sk89q.worldguard.protection.util.WorldEditRegionConverter;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.util.Enums;
 import com.sk89q.worldguard.util.logging.LoggerToChatHandler;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1169,10 +1170,6 @@ public final class RegionCommands extends RegionCommandsBase {
             throw new CommandPermissionsException();
         }
 
-        if (!WorldGuard.getInstance().getPlatform().hasMiniMessage()) {
-            throw new CommandException("This command is only available when you're using a platform which supports MiniMessage such as Paper.");
-        }
-
         if (!args.hasFlag('y')) {
             throw new CommandException("This command is potentially dangerous.\n" +
                     "Please ensure you have made a backup of your data, and then re-enter the command with -y tacked on at the end to proceed.");
@@ -1278,8 +1275,14 @@ public final class RegionCommands extends RegionCommandsBase {
             message = Flags.TELE_MESSAGE.getDefault();
         }
 
-        player.teleport(teleportLocation,
-                message, "Unable to teleport to region '" + existing.getId() + "'.", Map.of("id", existing.getId()));
+        final String successMessage = message;
+        player.teleport(teleportLocation).thenAccept(success -> {
+            if (success && successMessage != null) {
+                player.sendMessage(worldGuard.getMiniMessage().deserialize(successMessage, Placeholder.unparsed("id", existing.getId())));
+            } else {
+                player.sendMessage(net.kyori.adventure.text.Component.text("Unable to teleport to region '" + existing.getId() + "'.", NamedTextColor.RED));
+            }
+        });
     }
 
     @Command(aliases = {"toggle-bypass", "bypass"},

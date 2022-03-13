@@ -25,9 +25,12 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public interface LocalPlayer extends Player, RegionAssociable {
 
@@ -213,18 +216,15 @@ public interface LocalPlayer extends Player, RegionAssociable {
      * Send the message to the player
      *
      * @param message the message as component
-     * @param replacements the placeholders as map
      */
-    void sendMiniMessage(String message, Map<String, String> replacements);
+    void sendMessage(Component message);
 
     /**
      * Send the message to the player
      *
-     * @param title the title in minimessage format
-     * @param subtitle the subtitle in minimessage format
-     * @param replacements the placeholders as map
+     * @param title the title
      */
-    void sendMiniMessageTitle(String title, String subtitle, Map<String, String> replacements);
+    void showTitle(Title title);
 
     /**
      * Clears fall distance.
@@ -232,18 +232,9 @@ public interface LocalPlayer extends Player, RegionAssociable {
     void resetFallDistance();
 
     /**
-     * Teleport the player, potentially async, displaying the message on a success.
-     *  @param location location to teleport to
-     * @param successMessage message to display on success
-     * @param failMessage message to display on failure
+     * Teleport the player, potentially async.
+     * @param location location to teleport to
+     * @return a future object whether the teleport was successful
      */
-    void teleport(Location location, String successMessage, String failMessage);
-
-    /**
-     * Teleport the player, potentially async, displaying the message on a success.
-     *  @param location location to teleport to
-     * @param successMessage message to display on success
-     * @param failMessage message to display on failure
-     */
-    void teleport(Location location, String successMessage, String failMessage, Map<String, String> replacements);
+    CompletableFuture<Boolean> teleport(Location location);
 }

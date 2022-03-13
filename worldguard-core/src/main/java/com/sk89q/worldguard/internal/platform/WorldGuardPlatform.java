@@ -169,18 +169,4 @@ public interface WorldGuardPlatform {
     default ProtectedRegion getSpawnProtection(World world) {
         return null;
     }
-
-    /**
-     * Check whether the platform has MiniMessage support.
-     *
-     * @return whether the platform supports MiniMessage
-     */
-    boolean hasMiniMessage();
-
-    /**
-     * Update the legacy message to a MiniMessage format.
-     *
-     * @return the updated format
-     */
-    String formatToMiniMessage(String message);
 }
