@@ -244,7 +244,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         disableDeathMessages = getBoolean("player-damage.disable-death-messages", false);
 
         signChestProtection = getBoolean("chest-protection.enable", false);
-        disableSignChestProtectionCheck = getBoolean("chest-protection.disable-off-check", false);
+        disableSignChestProtectionCheck = getBoolean("chest-protection.disable-off-check", true);
         if (signChestProtection) {
             log.warning("Sign-based chest protection is deprecated for removal in a future version. See https://worldguard.enginehub.org/en/latest/chest-protection/ for details.");
         } else {
