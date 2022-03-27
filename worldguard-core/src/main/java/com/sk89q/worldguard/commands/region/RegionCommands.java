@@ -452,7 +452,7 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"list"},
-             usage = "[-w мир] [-p владелец [-n]] [-s] [-i фильтр] [страницп]",
+             usage = "[-w мир] [-p владелец [-n]] [-s] [-i фильтр] [страница]",
              desc = "Показать список всех регионов",
              flags = "np:w:i:s",
              max = 1)
@@ -1160,7 +1160,11 @@ public final class RegionCommands extends RegionCommandsBase {
     @Command(aliases = {"teleport", "tp"},
              usage = "[-w world] [-c|s] <id>",
              flags = "csw:",
+<<<<<<< HEAD
              desc = "Телепортироваться на заданную точку в регионе.",
+=======
+             desc = "Teleports you to the location associated with the region.",
+>>>>>>> bc63119373d4603e5b040460c41e712275a4d062
              min = 1, max = 1)
     public void teleport(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
@@ -1183,6 +1187,23 @@ public final class RegionCommands extends RegionCommandsBase {
             if (teleportLocation == null) {
                 throw new CommandException(
                         "В данном регионе нет точки спавна.");
+            }
+        } else if (args.hasFlag('c')) {
+            // Check permissions
+            if (!getPermissionModel(player).mayTeleportToCenter(existing)) {
+                throw new CommandPermissionsException();
+            }
+            Region region = WorldEditRegionConverter.convertToRegion(existing);
+            if (region == null || region.getCenter() == null) {
+                throw new CommandException("The region has no center point.");
+            }
+            if (player.getGameMode() == GameModes.SPECTATOR) {
+                teleportLocation = new Location(world, region.getCenter(), 0, 0);
+            } else {
+                // TODO: Add some method to create a safe teleport location.
+                // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
+                // It doesn't return the found location and it can't be checked if the location is inside the region.
+                throw new CommandException("Center teleport is only availible in Spectator gamemode.");
             }
         } else if (args.hasFlag('c')) {
             // Check permissions
