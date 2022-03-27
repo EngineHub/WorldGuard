@@ -1160,11 +1160,7 @@ public final class RegionCommands extends RegionCommandsBase {
     @Command(aliases = {"teleport", "tp"},
              usage = "[-w world] [-c|s] <id>",
              flags = "csw:",
-<<<<<<< HEAD
              desc = "Телепортироваться на заданную точку в регионе.",
-=======
-             desc = "Teleports you to the location associated with the region.",
->>>>>>> bc63119373d4603e5b040460c41e712275a4d062
              min = 1, max = 1)
     public void teleport(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
