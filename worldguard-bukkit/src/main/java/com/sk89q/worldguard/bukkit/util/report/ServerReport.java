@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.util.report;
 
 import com.sk89q.worldedit.util.report.DataReport;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 
@@ -33,8 +34,17 @@ public class ServerReport extends DataReport {
         append("Bukkit Version", server.getBukkitVersion());
         append("Implementation", server.getName() + " " + server.getVersion());
         append("Player Count", "%d/%d", Bukkit.getOnlinePlayers().size(), server.getMaxPlayers());
-
         append("Server Class Source", server.getClass().getProtectionDomain().getCodeSource().getLocation());
+
+        DataReport onlineMode = new DataReport("Online Mode");
+        onlineMode.append("enabled?", server.getOnlineMode());
+        if (PaperLib.isSpigot()) {
+            onlineMode.append("BungeeCord support?", Bukkit.spigot().getSpigotConfig().getBoolean("settings.bungeecord", false));
+        }
+        if (PaperLib.isPaper()) {
+            onlineMode.append("Velocity support?", Bukkit.spigot().getPaperConfig().getBoolean("settings.velocity-support.enabled", false));
+        }
+        append(onlineMode.getTitle(), onlineMode);
 
         DataReport spawning = new DataReport("Spawning");
         spawning.append("Ambient Spawn Limit", server.getAmbientSpawnLimit());
