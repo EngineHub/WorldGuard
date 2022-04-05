@@ -330,17 +330,9 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        RegionAdder task = new RegionAdder(manager, region);
-        task.setLocatorPolicy(UserLocatorPolicy.UUID_ONLY);
-        task.setOwnersInput(new String[]{player.getName()});
-
-        final String description = String.format("Claiming region '%s'", id);
-        AsyncCommandBuilder.wrap(task, sender)
-                .registerWithSupervisor(WorldGuard.getInstance().getSupervisor(), description)
-                .sendMessageAfterDelay("(Please wait... " + description + ")")
-                .onSuccess(TextComponent.of(String.format("A new region has been claimed named '%s'.", id)), null)
-                .onFailure("Failed to claim region", WorldGuard.getInstance().getExceptionConverter())
-                .buildAndExec(WorldGuard.getInstance().getExecutorService());
+        region.getOwners().addPlayer(player);
+        manager.addRegion(region);
+        player.print(TextComponent.of(String.format("A new region has been claimed named '%s'.", id)));
     }
 
     /**
