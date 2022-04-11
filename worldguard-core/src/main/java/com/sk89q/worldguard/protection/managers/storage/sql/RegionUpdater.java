@@ -95,7 +95,7 @@ class RegionUpdater {
         }
 
         for (String name : domain.getGroups()) {
-            groupNames.add(name.toLowerCase());
+            groupNames.add(name);
         }
     }
 

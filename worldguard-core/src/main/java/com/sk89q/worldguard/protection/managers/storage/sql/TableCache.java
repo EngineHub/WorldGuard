@@ -255,7 +255,7 @@ abstract class TableCache<V> {
 
         @Override
         protected String toKey(String object) {
-            return object.toLowerCase();
+            return object;
         }
     }
 

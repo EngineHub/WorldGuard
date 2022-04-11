@@ -74,7 +74,7 @@ public class GroupDomain implements Domain, ChangeTracked {
         checkNotNull(name);
         if (!name.trim().isEmpty()) {
             setDirty(true);
-            groups.add(name.trim().toLowerCase());
+            groups.add(name.trim());
         }
     }
 
@@ -86,7 +86,7 @@ public class GroupDomain implements Domain, ChangeTracked {
     public void removeGroup(String name) {
         checkNotNull(name);
         setDirty(true);
-        groups.remove(name.trim().toLowerCase());
+        groups.remove(name.trim());
     }
 
     @Override

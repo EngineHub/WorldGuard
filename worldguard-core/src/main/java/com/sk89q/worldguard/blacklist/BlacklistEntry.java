@@ -67,7 +67,7 @@ public class BlacklistEntry {
     public void setIgnoreGroups(String[] ignoreGroups) {
         Set<String> ignoreGroupsSet = new HashSet<>();
         for (String group : ignoreGroups) {
-            ignoreGroupsSet.add(group.toLowerCase());
+            ignoreGroupsSet.add(group);
         }
         this.ignoreGroups = ignoreGroupsSet;
     }
@@ -122,7 +122,7 @@ public class BlacklistEntry {
 
         if (ignoreGroups != null) {
             for (String group : player.getGroups()) {
-                if (ignoreGroups.contains(group.toLowerCase())) {
+                if (ignoreGroups.contains(group)) {
                     return true;
                 }
             }

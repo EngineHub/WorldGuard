@@ -50,7 +50,7 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     public void addGroup(String group) {
-        groups.add(group.toLowerCase());
+        groups.add(group);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
 
     @Override
     public boolean hasGroup(String group) {
-        return groups.contains(group.toLowerCase());
+        return groups.contains(group);
     }
 
     @Override
