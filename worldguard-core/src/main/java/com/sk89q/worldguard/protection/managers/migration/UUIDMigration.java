@@ -118,7 +118,7 @@ public class UUIDMigration extends AbstractMigration {
                 profileService.findAllByName(lookupNames, new Predicate<Profile>() {
                     @Override
                     public boolean apply(Profile profile) {
-                        resolvedNames.put(profile.getName().toLowerCase(), profile.getUniqueId());
+                        resolvedNames.put(profile.getName(), profile.getUniqueId());
                         return true;
                     }
                 });
@@ -199,7 +199,7 @@ public class UUIDMigration extends AbstractMigration {
         }
 
         for (String name : domain.getPlayers()) {
-            UUID uuid = resolvedNames.get(name.toLowerCase());
+            UUID uuid = resolvedNames.get(name);
             if (uuid != null) {
                 playerDomain.addPlayer(uuid);
             } else {

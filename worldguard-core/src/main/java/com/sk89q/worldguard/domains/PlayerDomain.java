@@ -80,7 +80,7 @@ public class PlayerDomain implements Domain, ChangeTracked {
         checkNotNull(name);
         if (!name.trim().isEmpty()) {
             setDirty(true);
-            names.add(name.trim().toLowerCase());
+            names.add(name.trim());
             // Trim because some names contain spaces (previously valid Minecraft
             // names) and we cannot store these correctly in the SQL storage
             // implementations
@@ -119,7 +119,7 @@ public class PlayerDomain implements Domain, ChangeTracked {
     public void removePlayer(String name) {
         checkNotNull(name);
         setDirty(true);
-        names.remove(name.trim().toLowerCase());
+        names.remove(name.trim());
     }
 
     /**
@@ -181,7 +181,7 @@ public class PlayerDomain implements Domain, ChangeTracked {
     @Override
     public boolean contains(String playerName) {
         checkNotNull(playerName);
-        return names.contains(playerName.trim().toLowerCase());
+        return names.contains(playerName.trim());
     }
 
     @Override

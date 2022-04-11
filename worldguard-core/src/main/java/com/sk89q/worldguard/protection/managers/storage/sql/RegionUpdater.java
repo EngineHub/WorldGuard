@@ -87,7 +87,7 @@ class RegionUpdater {
     private void addDomain(DefaultDomain domain) {
         //noinspection deprecation
         for (String name : domain.getPlayers()) {
-            userNames.add(name.toLowerCase());
+            userNames.add(name);
         }
 
         for (UUID uuid : domain.getUniqueIds()) {
