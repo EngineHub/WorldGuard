@@ -1226,11 +1226,13 @@ public class EventAbstractionListener extends AbstractListener {
         } else {
             if (holder instanceof BlockState) {
                 final BlockState block = (BlockState) holder;
-                final UseBlockEvent useBlockEvent = new UseBlockEvent(originalEvent, cause, block.getBlock());
-                if (hasInteractBypass(block.getWorld(), block.getType())) {
-                    useBlockEvent.setAllowed(true);
+                if(block.isPlaced()) {
+                    final UseBlockEvent useBlockEvent = new UseBlockEvent(originalEvent, cause, block.getBlock());
+                    if (hasInteractBypass(block.getWorld(), block.getType())) {
+                        useBlockEvent.setAllowed(true);
+                    }
+                    Events.fireToCancel(originalEvent, useBlockEvent);
                 }
-                Events.fireToCancel(originalEvent, useBlockEvent);
             } else if (holder instanceof DoubleChest) {
                 InventoryHolder left = ((DoubleChest) holder).getLeftSide();
                 InventoryHolder right = ((DoubleChest) holder).getRightSide();
