@@ -318,7 +318,6 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
         }
         builder.append(bound);
         builder.append(TextComponent.of("\n§aРазмер: §e" + region.volume()));
-        builder.append(TextComponent.of("\n§c§lБудьте внимательны! Не добавляйте в приват кого попало!§r"));
         final Location teleFlag = FlagValueCalculator.getEffectiveFlagOf(region, Flags.TELE_LOC, perms != null && perms.getSender() instanceof RegionAssociable ? (RegionAssociable) perms.getSender() : null);
         if (teleFlag != null && perms != null && perms.mayTeleportTo(region)) {
             builder.append(TextComponent.space().append(TextComponent.of("[Телепортация]", TextColor.GRAY)
@@ -336,7 +335,7 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
                     .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                             "/rg tp -c -w \"" + world + "\" " + region.getId()))));
         }
-        builder.append(TextComponent.of("\n§7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"));
+		builder.append(TextComponent.of("\n§c§lБудьте внимательны! Не добавляйте в приват кого попало!§r"));
 
         newline();
     }
@@ -366,7 +365,7 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
 
     @Override
     public TextComponent call() {
-        MessageBox box = new MessageBox("§7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§6⦗§fИнформация о регионе§6⦘§7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", builder);
+        MessageBox box = new MessageBox("§6⦗§fИнформация о регионе§6⦘", builder);
         appendRegionInformation();
         return box.create();
     }
