@@ -109,11 +109,10 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
                             domain.addPlayer(s);
                             break;
                         case UUID_ONLY:
-                            namesToQuery.add(s.toLowerCase());
+                            domain.addPlayer(s);
                             break;
                         case UUID_AND_NAME:
                             domain.addPlayer(s);
-                            namesToQuery.add(s.toLowerCase());
                     }
                 }
             }
