@@ -1191,7 +1191,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
             Region region = WorldEditRegionConverter.convertToRegion(existing);
             if (region == null || region.getCenter() == null) {
-                throw new CommandException("The region has no center point.");
+                throw new CommandException("У региона нет центральной точки.");
             }
             if (player.getGameMode() == GameModes.SPECTATOR) {
                 teleportLocation = new Location(world, region.getCenter(), 0, 0);
@@ -1199,7 +1199,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 // TODO: Add some method to create a safe teleport location.
                 // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
                 // It doesn't return the found location and it can't be checked if the location is inside the region.
-                throw new CommandException("Center teleport is only availible in Spectator gamemode.");
+                throw new CommandException("Центральная точка телепорта доступна только в режиме наблюдения.");
             }
         } else if (args.hasFlag('c')) {
             // Check permissions
@@ -1208,7 +1208,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
             Region region = WorldEditRegionConverter.convertToRegion(existing);
             if (region == null || region.getCenter() == null) {
-                throw new CommandException("The region has no center point.");
+                throw new CommandException("Регион не имеет центральной точки.");
             }
             if (player.getGameMode() == GameModes.SPECTATOR) {
                 teleportLocation = new Location(world, region.getCenter(), 0, 0);
@@ -1216,7 +1216,24 @@ public final class RegionCommands extends RegionCommandsBase {
                 // TODO: Add some method to create a safe teleport location.
                 // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
                 // It doesn't return the found location and it can't be checked if the location is inside the region.
-                throw new CommandException("Center teleport is only availible in Spectator gamemode.");
+                throw new CommandException("Центральная точка телепорта доступна только в режиме наблюдения.");
+            }
+        } else if (args.hasFlag('c')) {
+            // Check permissions
+            if (!getPermissionModel(player).mayTeleportToCenter(existing)) {
+                throw new CommandPermissionsException();
+            }
+            Region region = WorldEditRegionConverter.convertToRegion(existing);
+            if (region == null || region.getCenter() == null) {
+                throw new CommandException("Регион не имеет центральной точки.");
+            }
+            if (player.getGameMode() == GameModes.SPECTATOR) {
+                teleportLocation = new Location(world, region.getCenter(), 0, 0);
+            } else {
+                // TODO: Add some method to create a safe teleport location.
+                // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
+                // It doesn't return the found location and it can't be checked if the location is inside the region.
+                throw new CommandException("Центральная точка телепорта доступна только в режиме наблюдения.");
             }
         } else {
             teleportLocation = FlagValueCalculator.getEffectiveFlagOf(existing, Flags.TELE_LOC, player);
@@ -1252,7 +1269,7 @@ public final class RegionCommands extends RegionCommandsBase {
         if (args.argsLength() > 0) {
             String arg1 = args.getString(0);
             if (!arg1.equalsIgnoreCase("on") && !arg1.equalsIgnoreCase("off")) {
-                throw new CommandException("Allowed optional arguments are: on, off");
+                throw new CommandException("Допустимыми необязательными аргументами являются: on, off");
             }
             shouldEnableBypass = arg1.equalsIgnoreCase("on");
         } else {
