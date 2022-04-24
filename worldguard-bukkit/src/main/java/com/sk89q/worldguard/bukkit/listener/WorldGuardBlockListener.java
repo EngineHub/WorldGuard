@@ -588,7 +588,7 @@ public class WorldGuardBlockListener extends AbstractListener {
             }
         }
 
-        if (newType == Material.BUDDING_AMETHYST || newType == Material.POINTED_DRIPSTONE) {
+        if (Materials.isAmethystGrowth(newType) || newType == Material.POINTED_DRIPSTONE) {
             if (wcfg.disableRockGrowth) {
                 event.setCancelled(true);
                 return;
