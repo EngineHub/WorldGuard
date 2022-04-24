@@ -1708,4 +1708,12 @@ public final class Materials {
         }
         return false;
     }
+
+    public static boolean isAmethystGrowth(Material mat) {
+        return mat == Material.BUDDING_AMETHYST
+                || mat == Material.AMETHYST_CLUSTER
+                || mat == Material.LARGE_AMETHYST_BUD
+                || mat == Material.MEDIUM_AMETHYST_BUD
+                || mat == Material.SMALL_AMETHYST_BUD;
+    }
 }

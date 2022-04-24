@@ -329,13 +329,13 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
                     .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                             "/rg tp -w \"" + world + "\" " + region.getId()))));
         } else if (perms != null && perms.mayTeleportToCenter(region) && region.isPhysicalArea()) {
-            builder.append(TextComponent.space().append(TextComponent.of("[Центр телепортации]", TextColor.GRAY)
+            builder.append(TextComponent.space().append(TextComponent.of("[Телепортироваться в центр]", TextColor.GRAY)
                     .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT,
                             TextComponent.of("Нажмите, чтобы телепортироваться в центр региона")))
                     .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                             "/rg tp -c -w \"" + world + "\" " + region.getId()))));
         }
-		builder.append(TextComponent.of("\n§c§lБудьте внимательны! Не добавляйте в приват кого попало!§r"));
+        builder.append(TextComponent.of("\n§c§lБудьте внимательны! Не добавляйте в приват кого попало!§r"));
 
         newline();
     }

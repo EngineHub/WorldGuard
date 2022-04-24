@@ -330,17 +330,9 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        RegionAdder task = new RegionAdder(manager, region);
-        task.setLocatorPolicy(UserLocatorPolicy.UUID_ONLY);
-        task.setOwnersInput(new String[]{player.getName()});
-
-        final String description = String.format("Создание региона '%s'", id);
-        AsyncCommandBuilder.wrap(task, sender)
-                .registerWithSupervisor(WorldGuard.getInstance().getSupervisor(), description)
-                .sendMessageAfterDelay("(Пожалуйста, подождите... " + description + ")")
-                .onSuccess(TextComponent.of(String.format("Новый регион '%s' создан.", id)), null)
-                .onFailure("Не удалось создать регион", WorldGuard.getInstance().getExceptionConverter())
-                .buildAndExec(WorldGuard.getInstance().getExecutorService());
+        region.getOwners().addPlayer(player);
+        manager.addRegion(region);
+        player.print(TextComponent.of(String.format("Новый регион '%s' создан.", id)));
     }
 
     /**
@@ -452,8 +444,13 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"list"},
+<<<<<<< HEAD
              usage = "[-w мир] [-p владелец [-n]] [-s] [-i фильтр] [страница]",
              desc = "Показать список всех регионов",
+=======
+             usage = "[-w world] [-p owner [-n]] [-s] [-i filter] [page]",
+             desc = "Get a list of regions",
+>>>>>>> 85dd012b850adbb54bc7f1e1d5cf82fe50942612
              flags = "np:w:i:s",
              max = 1)
     public void list(CommandContext args, Actor sender) throws CommandException {
@@ -1160,7 +1157,11 @@ public final class RegionCommands extends RegionCommandsBase {
     @Command(aliases = {"teleport", "tp"},
              usage = "[-w world] [-c|s] <id>",
              flags = "csw:",
+<<<<<<< HEAD
              desc = "Телепортироваться на заданную точку в регионе.",
+=======
+             desc = "Teleports you to the location associated with the region.",
+>>>>>>> 85dd012b850adbb54bc7f1e1d5cf82fe50942612
              min = 1, max = 1)
     public void teleport(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
@@ -1234,6 +1235,23 @@ public final class RegionCommands extends RegionCommandsBase {
                 // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
                 // It doesn't return the found location and it can't be checked if the location is inside the region.
                 throw new CommandException("Центральная точка телепорта доступна только в режиме наблюдения.");
+            }
+        } else if (args.hasFlag('c')) {
+            // Check permissions
+            if (!getPermissionModel(player).mayTeleportToCenter(existing)) {
+                throw new CommandPermissionsException();
+            }
+            Region region = WorldEditRegionConverter.convertToRegion(existing);
+            if (region == null || region.getCenter() == null) {
+                throw new CommandException("The region has no center point.");
+            }
+            if (player.getGameMode() == GameModes.SPECTATOR) {
+                teleportLocation = new Location(world, region.getCenter(), 0, 0);
+            } else {
+                // TODO: Add some method to create a safe teleport location.
+                // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
+                // It doesn't return the found location and it can't be checked if the location is inside the region.
+                throw new CommandException("Center teleport is only availible in Spectator gamemode.");
             }
         } else {
             teleportLocation = FlagValueCalculator.getEffectiveFlagOf(existing, Flags.TELE_LOC, player);
