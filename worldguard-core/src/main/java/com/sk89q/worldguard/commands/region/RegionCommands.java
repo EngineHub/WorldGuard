@@ -1192,7 +1192,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 // TODO: Add some method to create a safe teleport location.
                 // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
                 // It doesn't return the found location and it can't be checked if the location is inside the region.
-                throw new CommandException("Center teleport is only availible in Spectator gamemode.");
+                throw new CommandException("Center teleport is only available in Spectator gamemode.");
             }
         } else {
             teleportLocation = FlagValueCalculator.getEffectiveFlagOf(existing, Flags.TELE_LOC, player);
