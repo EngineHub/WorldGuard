@@ -66,20 +66,7 @@ import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Dispenser;
-import org.bukkit.entity.AreaEffectCloud;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Firework;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Painting;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Tameable;
-import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -762,6 +749,8 @@ public class EventAbstractionListener extends AbstractListener {
                 destroyEntityEvent.getRelevantFlags().add(Flags.ENTITY_ITEM_FRAME_DESTROY);
             } else if (event.getEntity() instanceof Painting) {
                 destroyEntityEvent.getRelevantFlags().add(Flags.ENTITY_PAINTING_DESTROY);
+            } else if (event.getEntity() instanceof ArmorStand) {
+                destroyEntityEvent.getRelevantFlags().add(Flags.ENTITY_ARMOR_STAND_DESTROY);
             }
             Events.fireToCancel(event, destroyEntityEvent);
         }
