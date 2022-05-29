@@ -184,8 +184,11 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
     @Override
     public int volume() {
-        // TODO: Fix this -- the previous algorithm returned incorrect results, but the current state of this method is even worse
-        return 0;
+        int sum = 0;
+        for (int i = 0; i < n -1; i++) {
+           sum = sum + x[i]*y[i+1] - y[i]*x[i+1];
+        }
+        return (sum/2) * (maxY - minY);
     }
 
 }
