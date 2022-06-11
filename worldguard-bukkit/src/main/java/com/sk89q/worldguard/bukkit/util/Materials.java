@@ -794,7 +794,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.HANGING_ROOTS, 0);
         MATERIAL_FLAGS.put(Material.POINTED_DRIPSTONE, 0);
 
-        // 1.19 TODO: Check for Modifications
+        // 1.19
         MATERIAL_FLAGS.put(Material.MUD, 0);
         MATERIAL_FLAGS.put(Material.MANGROVE_ROOTS, 0);
         MATERIAL_FLAGS.put(Material.MUDDY_MANGROVE_ROOTS, 0);
@@ -941,7 +941,7 @@ public final class Materials {
                 MATERIAL_FLAGS.put(material, 0);
             }
             if (!MATERIAL_FLAGS.containsKey(material)) {
-                logger.info("Missing material definition for " + (material.isBlock() ? "block " : "item ") + material.name());
+                logger.fine("Missing material definition for " + (material.isBlock() ? "block " : "item ") + material.name());
             }
         }
 
@@ -977,6 +977,7 @@ public final class Materials {
 //        DAMAGE_EFFECTS.add(PotionEffectType.DOLPHINS_GRACE);
         DAMAGE_EFFECTS.add(PotionEffectType.BAD_OMEN);
 //        DAMAGE_EFFECTS.add(PotionEffectType.HERO_OF_THE_VILLAGE);
+        DAMAGE_EFFECTS.add(PotionEffectType.DARKNESS);
     }
 
     private Materials() {
@@ -1465,11 +1466,6 @@ public final class Materials {
      */
     public static boolean hasDamageEffect(Collection<PotionEffect> effects) {
         for (PotionEffect effect : effects) {
-            /* TODO: Replace DAMAGE_EFFECTS with paper:
-            if (effect.getType().getEffectCategory() == PotionEffectType.Category.HARMFUL) {
-                return true;
-            }
-             */
             if (DAMAGE_EFFECTS.contains(effect.getType())) {
                 return true;
             }
