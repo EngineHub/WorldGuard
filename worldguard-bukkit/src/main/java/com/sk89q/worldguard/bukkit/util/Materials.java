@@ -1615,4 +1615,8 @@ public final class Materials {
                 || mat == Material.MEDIUM_AMETHYST_BUD
                 || mat == Material.SMALL_AMETHYST_BUD;
     }
+
+    public static boolean isSculkGrowth(Material mat) {
+        return mat == Material.SCULK || mat == Material.SCULK_VEIN;
+    }
 }
