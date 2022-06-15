@@ -135,7 +135,8 @@ class AbstractListener implements Listener {
             Location loc;
             if (PaperLib.isPaper()  && config.usePaperEntityOrigin) {
                 loc = entity.getOrigin();
-                if (loc == null) {
+                // Origin world may be null, and thus a Location with a null world created, which cannot be adapted to a WorldEdit location
+                if (loc == null || loc.getWorld() == null) {
                     loc = entity.getLocation();
                 }
             } else {
