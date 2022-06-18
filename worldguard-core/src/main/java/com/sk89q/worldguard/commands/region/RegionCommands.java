@@ -1193,57 +1193,6 @@ public final class RegionCommands extends RegionCommandsBase {
                 // It doesn't return the found location and it can't be checked if the location is inside the region.
                 throw new CommandException("Центральная точка телепорта доступна только в режиме наблюдения.");
             }
-        } else if (args.hasFlag('c')) {
-            // Check permissions
-            if (!getPermissionModel(player).mayTeleportToCenter(existing)) {
-                throw new CommandPermissionsException();
-            }
-            Region region = WorldEditRegionConverter.convertToRegion(existing);
-            if (region == null || region.getCenter() == null) {
-                throw new CommandException("Регион не имеет центральной точки.");
-            }
-            if (player.getGameMode() == GameModes.SPECTATOR) {
-                teleportLocation = new Location(world, region.getCenter(), 0, 0);
-            } else {
-                // TODO: Add some method to create a safe teleport location.
-                // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
-                // It doesn't return the found location and it can't be checked if the location is inside the region.
-                throw new CommandException("Центральная точка телепорта доступна только в режиме наблюдения.");
-            }
-        } else if (args.hasFlag('c')) {
-            // Check permissions
-            if (!getPermissionModel(player).mayTeleportToCenter(existing)) {
-                throw new CommandPermissionsException();
-            }
-            Region region = WorldEditRegionConverter.convertToRegion(existing);
-            if (region == null || region.getCenter() == null) {
-                throw new CommandException("Регион не имеет центральной точки.");
-            }
-            if (player.getGameMode() == GameModes.SPECTATOR) {
-                teleportLocation = new Location(world, region.getCenter(), 0, 0);
-            } else {
-                // TODO: Add some method to create a safe teleport location.
-                // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
-                // It doesn't return the found location and it can't be checked if the location is inside the region.
-                throw new CommandException("Центральная точка телепорта доступна только в режиме наблюдения.");
-            }
-        } else if (args.hasFlag('c')) {
-            // Check permissions
-            if (!getPermissionModel(player).mayTeleportToCenter(existing)) {
-                throw new CommandPermissionsException();
-            }
-            Region region = WorldEditRegionConverter.convertToRegion(existing);
-            if (region == null || region.getCenter() == null) {
-                throw new CommandException("У региона нет центральной точки.");
-            }
-            if (player.getGameMode() == GameModes.SPECTATOR) {
-                teleportLocation = new Location(world, region.getCenter(), 0, 0);
-            } else {
-                // TODO: Add some method to create a safe teleport location.
-                // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
-                // It doesn't return the found location and it can't be checked if the location is inside the region.
-                throw new CommandException("Телепортация в центральную точку доступна только в режиме наблюдателя.");
-            }
         } else {
             teleportLocation = FlagValueCalculator.getEffectiveFlagOf(existing, Flags.TELE_LOC, player);
             

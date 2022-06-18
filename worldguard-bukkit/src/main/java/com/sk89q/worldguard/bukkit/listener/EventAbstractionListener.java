@@ -1215,8 +1215,7 @@ public class EventAbstractionListener extends AbstractListener {
             return;
         }
 
-        if (holder instanceof Entity) {
-            Entity entity = (Entity) holder;
+        if (holder instanceof Entity entity) {
             Material mat = Materials.getRelatedMaterial((entity).getType());
             UseEntityEvent useEntityEvent = new UseEntityEvent(originalEvent, cause, entity);
             if (mat != null && hasInteractBypass((entity).getWorld(), mat)) {
@@ -1224,8 +1223,7 @@ public class EventAbstractionListener extends AbstractListener {
             }
             Events.fireToCancel(originalEvent, useEntityEvent);
         } else {
-            if (holder instanceof BlockState) {
-                final BlockState block = (BlockState) holder;
+            if (holder instanceof BlockState block && block.isPlaced()) {
                 final UseBlockEvent useBlockEvent = new UseBlockEvent(originalEvent, cause, block.getBlock());
                 if (hasInteractBypass(block.getWorld(), block.getType())) {
                     useBlockEvent.setAllowed(true);

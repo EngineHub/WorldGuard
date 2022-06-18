@@ -3,4 +3,4 @@ main: com.sk89q.worldguard.bukkit.WorldGuardPlugin
 version: "${internalVersion}"
 depend: [WorldEdit]
 softdepend: [CommandBook]
-api-version: 1.17
+api-version: 1.19
