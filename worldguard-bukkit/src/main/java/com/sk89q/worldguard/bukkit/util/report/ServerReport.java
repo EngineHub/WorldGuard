@@ -39,7 +39,7 @@ public class ServerReport extends DataReport {
         DataReport onlineMode = new DataReport("Online Mode");
         onlineMode.append("enabled?", server.getOnlineMode());
         if (PaperLib.isSpigot()) {
-            onlineMode.append("BungeeCord support?", Bukkit.spigot().getSpigotConfig().getBoolean("settings.bungeecord", false));
+            onlineMode.append("BungeeCord support?", Bukkit.spigot().getConfig().getBoolean("settings.bungeecord", false));
         }
         if (PaperLib.isPaper()) {
             onlineMode.append("Velocity support?", Bukkit.spigot().getPaperConfig().getBoolean("settings.velocity-support.enabled", false));
