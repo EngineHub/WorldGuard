@@ -27,6 +27,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 
 import java.awt.Polygon;
 import java.awt.geom.Area;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -184,8 +186,22 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
     @Override
     public int volume() {
-        // TODO: Fix this -- the previous algorithm returned incorrect results, but the current state of this method is even worse
-        return 0;
+      long area = 0;
+      int i;
+      int j = points.size() - 1;
+  
+      for (i = 0; i < points.size(); ++i) {
+        long x = points.get(j).getBlockX() + points.get(i).getBlockX();
+        long z = points.get(j).getBlockZ() - points.get(i).getBlockZ();
+        area += x * z;
+        j = i;
+      }
+  
+      return (int) BigDecimal.valueOf(area)
+                    .multiply(BigDecimal.valueOf(0.5))
+                    .abs()
+                    .setScale(0, RoundingMode.FLOOR)
+                    .longValue() * (maxY - minY + 1);
     }
 
 }
