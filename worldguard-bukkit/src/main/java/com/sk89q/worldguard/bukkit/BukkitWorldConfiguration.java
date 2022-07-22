@@ -182,7 +182,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = getBoolean("simulation.sponge.redstone", false);
         if (simulateSponge) {
-            log.warning("Sponge simulation is deprecated for removal in a future version. We recommend using CraftBook's sponge simulation instead.");
+            log.warning("Симуляция Sponge устарела и будет удалена в будущей версии. Вместо этого мы рекомендуем использовать симуляцию Sponge CraftBook.");
         } else {
             needParentSave |= removeProperty("simulation");
         }
@@ -190,8 +190,8 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         pumpkinScuba = getBoolean("default.pumpkin-scuba", false);
         disableHealthRegain = getBoolean("default.disable-health-regain", false);
 
-        noPhysicsGravel = getBoolean("physics.no-physics-gravel", false);
-        noPhysicsSand = getBoolean("physics.no-physics-sand", false);
+        noPhysicsGravel = getBoolean("physics.no-physics-gravel", true);
+        noPhysicsSand = getBoolean("physics.no-physics-sand", true);
         ropeLadders = getBoolean("physics.vine-like-rope-ladders", false);
         allowPortalAnywhere = getBoolean("physics.allow-portal-anywhere", false);
         preventWaterDamage = new HashSet<>(convertLegacyBlocks(getStringList("physics.disable-water-damage-blocks", null)));
