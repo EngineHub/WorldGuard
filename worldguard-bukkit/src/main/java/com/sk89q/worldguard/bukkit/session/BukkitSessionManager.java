@@ -100,4 +100,11 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     public void setUsingTimings(boolean useTimings) {
         this.useTimings = useTimings;
     }
+
+    public void shutdown() {
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+            get(localPlayer).uninitialize(localPlayer);
+        }
+    }
 }
