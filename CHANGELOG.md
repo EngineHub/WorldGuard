@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.0.8 (beta)
+* Add support for MC 1.19
+* Add skulk-growth flag and config option
+* Fix possible error when using Paper's entity origin API.
+
 ## 7.0.7
 * Add rock-growth flag for budding amethyst and pointed dripstone.
 * Add /rg migrateheights command. See https://worldguard.enginehub.org/en/latest/regions/commands/#migrate-region-heights
