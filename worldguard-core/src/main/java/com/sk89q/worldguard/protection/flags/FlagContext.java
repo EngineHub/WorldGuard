@@ -27,7 +27,7 @@ import com.sk89q.worldguard.commands.CommandInputContext;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public final class FlagContext extends CommandInputContext {
+public final class FlagContext extends CommandInputContext<InvalidFlagFormat> {
 
     private FlagContext(Actor sender, String input, Map<String, Object> values) {
         super(sender, input, values);
@@ -40,9 +40,9 @@ public final class FlagContext extends CommandInputContext {
     /**
      * Create a copy of this FlagContext, with optional substitutions for values
      *
-     * If any supplied variable is null, it will be ignored.
+     * <p>If any supplied variable is null, it will be ignored.
      * If a map is supplied, it will override this FlagContext's values of the same key,
-     * but unprovided keys will not be overriden and will be returned as shallow copies.
+     * but unprovided keys will not be overriden and will be returned as shallow copies.</p>
      *
      * @param commandSender CommandSender for the new FlagContext to run under
      * @param s String of the user input for the new FlagContext
@@ -56,6 +56,11 @@ public final class FlagContext extends CommandInputContext {
             map.putAll(values);
         }
         return new FlagContext(commandSender == null ? this.sender : commandSender, s == null ? this.input : s, map);
+    }
+
+    @Override
+    protected InvalidFlagFormat createException(String str) {
+        return new InvalidFlagFormat(str);
     }
 
     public static class FlagContextBuilder {

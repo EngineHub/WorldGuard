@@ -26,7 +26,7 @@ import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public class CommandInputContext {
+public abstract class CommandInputContext<T extends Exception> {
     protected final Actor sender;
     protected final String input;
 
@@ -56,29 +56,31 @@ public class CommandInputContext {
      * @return Player
      * @throws InvalidFlagFormat if the sender is not a player
      */
-    public LocalPlayer getPlayerSender() throws InvalidFlagFormat {
+    public LocalPlayer getPlayerSender() throws T {
         if (sender.isPlayer() && sender instanceof LocalPlayer) {
             return (LocalPlayer) sender;
         } else {
-            throw new InvalidFlagFormat("Not a player");
+            throw createException("Not a player");
         }
     }
 
-    public Integer getUserInputAsInt() throws InvalidFlagFormat {
+    public Integer getUserInputAsInt() throws T {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
+            throw createException("Not a number: " + input);
         }
     }
 
-    public Double getUserInputAsDouble() throws InvalidFlagFormat {
+    public Double getUserInputAsDouble() throws T {
         try {
             return Double.parseDouble(input);
         } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
+            throw createException("Not a number: " + input);
         }
     }
+
+    protected abstract T createException(String str);
 
     /**
      * Get an object from the context by key name.

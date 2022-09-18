@@ -49,7 +49,7 @@ public interface DomainRegistry extends Iterable<DomainFactory<?>> {
      * no exception will be thrown.</p>
      *
      * @param domains a collection of domain factories
-     * @throws IllegalStateException If it is not the right time to register new flags
+     * @throws IllegalStateException If it is not the right time to register new domains
      */
     void registerAll(Map<String, DomainFactory<?>> domains);
 

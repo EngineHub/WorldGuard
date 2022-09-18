@@ -26,7 +26,7 @@ import com.sk89q.worldguard.commands.CommandInputContext;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public final class CustomDomainContext extends CommandInputContext {
+public final class CustomDomainContext extends CommandInputContext<InvalidDomainFormat> {
 
     private CustomDomainContext(Actor sender, String input, Map<String, Object> values) {
         super(sender, input, values);
@@ -38,16 +38,16 @@ public final class CustomDomainContext extends CommandInputContext {
     }
 
     /**
-     * Create a copy of this FlagContext, with optional substitutions for values
+     * Create a copy of this CustomDomainContext, with optional substitutions for values
      *
-     * If any supplied variable is null, it will be ignored.
-     * If a map is supplied, it will override this FlagContext's values of the same key,
-     * but unprovided keys will not be overriden and will be returned as shallow copies.
+     * <p>If any supplied variable is null, it will be ignored.
+     * If a map is supplied, it will override this CustomDomainContext's values of the same key,
+     * but unprovided keys will not be overriden and will be returned as shallow copies.</p>
      *
-     * @param commandSender CommandSender for the new FlagContext to run under
-     * @param s String of the user input for the new FlagContext
-     * @param values map of values to override from the current FlagContext
-     * @return a copy of this FlagContext
+     * @param commandSender CommandSender for the new CustomDomainContext to run under
+     * @param s String of the user input for the new CustomDomainContext
+     * @param values map of values to override from the current CustomDomainContext
+     * @return a copy of this CustomDomainContext
      */
     public CustomDomainContext copyWith(@Nullable Actor commandSender, @Nullable String s, @Nullable Map<String, Object> values) {
         Map<String, Object> map = Maps.newHashMap();
@@ -56,6 +56,11 @@ public final class CustomDomainContext extends CommandInputContext {
             map.putAll(values);
         }
         return new CustomDomainContext(commandSender == null ? this.sender : commandSender, s == null ? this.input : s, map);
+    }
+
+    @Override
+    protected InvalidDomainFormat createException(String str) {
+        return new InvalidDomainFormat(str);
     }
 
     public static class CustomDomainContextBuilder {

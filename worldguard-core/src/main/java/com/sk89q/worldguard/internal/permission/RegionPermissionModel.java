@@ -179,7 +179,7 @@ public class RegionPermissionModel extends AbstractPermissionModel {
     }
 
     /**
-     * Checks to see if the given sender has permission to modify a custom region
+     * Checks to see if the given sender has permission to set or modify a custom domain
      *
      * @param region the region
      * @param isOwnerLevel whether the domain level is owner (else member)
