@@ -75,6 +75,16 @@ public abstract class Handler {
     }
 
     /**
+     * Called when the session should clear its caches.
+     *
+     * @param player The player
+     * @param current The player's current location
+     * @param set The regions for the current location
+     */
+    public void uninitialize(LocalPlayer player, Location current, ApplicableRegionSet set) {
+    }
+
+    /**
      * Called when {@link Session#testMoveTo(LocalPlayer, Location, MoveType)} is called.
      *
      * <p>If this method returns {@code false}, then no other handlers
