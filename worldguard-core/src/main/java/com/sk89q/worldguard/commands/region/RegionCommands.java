@@ -330,17 +330,9 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        RegionAdder task = new RegionAdder(manager, region);
-        task.setLocatorPolicy(UserLocatorPolicy.UUID_ONLY);
-        task.setOwnersInput(new String[]{player.getName()});
-
-        final String description = String.format("Claiming region '%s'", id);
-        AsyncCommandBuilder.wrap(task, sender)
-                .registerWithSupervisor(WorldGuard.getInstance().getSupervisor(), description)
-                .sendMessageAfterDelay("(Please wait... " + description + ")")
-                .onSuccess(TextComponent.of(String.format("A new region has been claimed named '%s'.", id)), null)
-                .onFailure("Failed to claim region", WorldGuard.getInstance().getExceptionConverter())
-                .buildAndExec(WorldGuard.getInstance().getExecutorService());
+        region.getOwners().addPlayer(player);
+        manager.addRegion(region);
+        player.print(TextComponent.of(String.format("A new region has been claimed named '%s'.", id)));
     }
 
     /**
@@ -1200,7 +1192,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 // TODO: Add some method to create a safe teleport location.
                 // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
                 // It doesn't return the found location and it can't be checked if the location is inside the region.
-                throw new CommandException("Center teleport is only availible in Spectator gamemode.");
+                throw new CommandException("Center teleport is only available in Spectator gamemode.");
             }
         } else {
             teleportLocation = FlagValueCalculator.getEffectiveFlagOf(existing, Flags.TELE_LOC, player);

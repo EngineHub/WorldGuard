@@ -1,5 +1,5 @@
 object Versions {
-    const val WORLDEDIT = "7.2.9"
+    const val WORLDEDIT = "7.2.10"
     const val PISTON = "0.5.7"
     const val AUTO_VALUE = "1.9"
     const val JUNIT = "5.8.1"

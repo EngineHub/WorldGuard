@@ -409,15 +409,18 @@ public class DefaultDomain implements Domain, ChangeTracked {
         final TextComponent.Builder builder = TextComponent.builder("");
         final Iterator<TextComponent> profiles = profileMap.keySet().stream().sorted().map(name -> {
             final UUID uuid = profileMap.get(name);
-            final TextComponent component = TextComponent.of(name, TextColor.YELLOW)
-                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, uuid == null
-                            ? TextComponent.of("Name only", TextColor.GRAY)
-                            : TextComponent.of("Last known name of uuid: ", TextColor.GRAY)
-                            .append(TextComponent.of(uuid.toString(), TextColor.WHITE))));
             if (uuid == null) {
-                return component;
+                return TextComponent.of(name, TextColor.YELLOW)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Name only", TextColor.GRAY)
+                            .append(TextComponent.newline()).append(TextComponent.of("Click to copy"))))
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.COPY_TO_CLIPBOARD, name));
+            } else {
+                return TextComponent.of(name, TextColor.YELLOW)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Last known name of uuid: ", TextColor.GRAY)
+                            .append(TextComponent.of(uuid.toString(), TextColor.WHITE))
+                            .append(TextComponent.newline()).append(TextComponent.of("Click to copy"))))
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.COPY_TO_CLIPBOARD, uuid.toString()));
             }
-            return component.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, uuid.toString()));
         }).iterator();
         while (profiles.hasNext()) {
             builder.append(profiles.next());
@@ -428,9 +431,11 @@ public class DefaultDomain implements Domain, ChangeTracked {
 
         if (!uuids.isEmpty()) {
             builder.append(TextComponent.of(uuids.size() + " unknown uuid" + (uuids.size() == 1 ? "" : "s"), TextColor.GRAY)
-                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(String.join("\n", uuids))
-                        .append(TextComponent.newline().append(TextComponent.of("Click to select")))))
-                    .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, String.join(",", uuids))));
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Unable to resolve the name for:", TextColor.GRAY)
+                        .append(TextComponent.newline())
+                        .append(TextComponent.of(String.join("\n", uuids), TextColor.WHITE))
+                        .append(TextComponent.newline().append(TextComponent.of("Click to copy")))))
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.COPY_TO_CLIPBOARD, String.join(",", uuids))));
         }
 
 

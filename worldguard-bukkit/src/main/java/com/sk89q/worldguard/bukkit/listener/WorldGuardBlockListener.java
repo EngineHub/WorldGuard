@@ -588,7 +588,7 @@ public class WorldGuardBlockListener extends AbstractListener {
             }
         }
 
-        if (newType == Material.BUDDING_AMETHYST || newType == Material.POINTED_DRIPSTONE) {
+        if (Materials.isAmethystGrowth(newType) || newType == Material.POINTED_DRIPSTONE) {
             if (wcfg.disableRockGrowth) {
                 event.setCancelled(true);
                 return;
@@ -596,6 +596,19 @@ public class WorldGuardBlockListener extends AbstractListener {
 
             if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
                     .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.ROCK_GROWTH))) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        if (Materials.isSculkGrowth(newType)) {
+            if (wcfg.disableSculkGrowth) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.SCULK_GROWTH))) {
                 event.setCancelled(true);
                 return;
             }

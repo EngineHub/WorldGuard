@@ -148,6 +148,8 @@ public class PlayerMoveListener extends AbstractListener {
         if (loc != null) {
             player.teleport(BukkitAdapter.adapt(loc));
         }
+
+        session.uninitialize(localPlayer);
     }
 
     private class EntityMountListener implements Listener {

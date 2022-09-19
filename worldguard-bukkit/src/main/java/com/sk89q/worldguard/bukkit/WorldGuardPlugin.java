@@ -158,11 +158,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         reg.register(ToggleCommands.class);
         reg.register(ProtectionCommands.class);
 
-        getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
-            if (!platform.getGlobalStateManager().hasCommandBookGodMode()) {
-                reg.register(GeneralCommands.class);
-            }
-        }, 0L);
+        if (!platform.getGlobalStateManager().hasCommandBookGodMode()) {
+            reg.register(GeneralCommands.class);
+        }
 
         getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
 
