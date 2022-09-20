@@ -59,4 +59,8 @@ public class NotifyExitFlag extends FlagValueChangeHandler<Boolean> {
         WorldGuard.getInstance().getPlatform().broadcastNotification(new Notify(player.getName(), " left NOTIFY region").create());
         return true;
     }
+
+    @Override
+    protected void onClearValue(LocalPlayer player, ApplicableRegionSet set) {
+    }
 }
