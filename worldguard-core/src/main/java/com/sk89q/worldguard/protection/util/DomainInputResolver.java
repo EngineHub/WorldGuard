@@ -141,6 +141,7 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
                 }
                 customDomain.parseInput(CustomDomainContext.create()
                     .setSender(actor).setInput(customMatcher.group(2)).setObject("region", region).build());
+                domain.addCustomDomain(customDomain);
             } else {
                 UUID uuid = parseUUID(s);
                 if (uuid != null) {
