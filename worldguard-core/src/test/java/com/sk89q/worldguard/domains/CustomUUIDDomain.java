@@ -58,6 +58,11 @@ public class CustomUUIDDomain extends CustomDomain {
     }
 
     @Override
+    public boolean containsNonplayer(String nonplayerProtectionDomain) {
+        return false;
+    }
+
+    @Override
     public void clear() {
         test = null;
     }

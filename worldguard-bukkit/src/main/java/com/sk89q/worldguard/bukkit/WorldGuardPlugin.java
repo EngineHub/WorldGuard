@@ -64,6 +64,8 @@ import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.commands.GeneralCommands;
 import com.sk89q.worldguard.commands.ProtectionCommands;
 import com.sk89q.worldguard.commands.ToggleCommands;
+import com.sk89q.worldguard.domains.CustomDomain;
+import com.sk89q.worldguard.domains.registry.CustomDomainContext;
 import com.sk89q.worldguard.domains.registry.SimpleDomainRegistry;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
@@ -93,8 +95,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -130,6 +138,61 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public static WorldGuardPlugin inst() {
         return inst;
+    }
+
+    @Override
+    public void onLoad() {
+        WorldGuard.getInstance().getDomainRegistry().register("nonplayer-protection-domains", n -> new CustomDomain(n) {
+            private final Set<String> nonplayerProtectionDomains = new HashSet<>();
+
+            @Override
+            public void parseInput(CustomDomainContext context) {
+                setDirty(true);
+                nonplayerProtectionDomains.addAll(Arrays.asList(context.getUserInput().split(",")));
+            }
+
+            @Override
+            public void unmarshal(Object o) {
+                nonplayerProtectionDomains.clear();
+                nonplayerProtectionDomains.addAll((Collection<? extends String>) o);
+            }
+
+            @Override
+            public Object marshal() {
+                return new ArrayList<>(nonplayerProtectionDomains);
+            }
+
+            @Override
+            public boolean contains(UUID uniqueId) {
+                return false;
+            }
+
+            @Override
+            public boolean contains(String playerName) {
+                return false;
+            }
+
+            @Override
+            public boolean containsNonplayer(String nonplayerProtectionDomain) {
+                return nonplayerProtectionDomains.contains(nonplayerProtectionDomain);
+            }
+
+            @Override
+            public int size() {
+                return nonplayerProtectionDomains.size();
+            }
+
+            @Override
+            public void clear() {
+                setDirty(true);
+                nonplayerProtectionDomains.clear();
+            }
+
+            @Override
+            public String toString() {
+                return " " + nonplayerProtectionDomains;
+            }
+        });
     }
 
     /**

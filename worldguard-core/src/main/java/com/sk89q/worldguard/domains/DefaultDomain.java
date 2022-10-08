@@ -325,6 +325,11 @@ public class DefaultDomain implements Domain, ChangeTracked {
     }
 
     @Override
+    public boolean containsNonplayer(String nonplayerProtectionDomain) {
+        return customDomains.stream().anyMatch(d -> d.containsNonplayer(nonplayerProtectionDomain));
+    }
+
+    @Override
     public int size() {
         return groupDomain.size() + playerDomain.size() + customDomains.size();
     }

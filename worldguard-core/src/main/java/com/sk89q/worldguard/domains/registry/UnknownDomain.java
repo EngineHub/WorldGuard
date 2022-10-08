@@ -59,6 +59,11 @@ public class UnknownDomain extends CustomDomain {
     }
 
     @Override
+    public boolean containsNonplayer(String nonplayerProtectionDomain) {
+        return false;
+    }
+
+    @Override
     public int size() {
         return 0;
     }

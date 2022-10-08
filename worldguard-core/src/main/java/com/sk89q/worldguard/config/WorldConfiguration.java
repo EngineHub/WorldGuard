@@ -130,6 +130,7 @@ public abstract class WorldConfiguration {
     public int maxClaimVolume;
     public boolean claimOnlyInsideExistingRegions;
     public String setParentOnClaim;
+    public boolean nonplayerBorderBypassOnClaim;
     public int maxRegionCountPerPlayer;
     public boolean antiWolfDumbness;
     public boolean signChestProtection;

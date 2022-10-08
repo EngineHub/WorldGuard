@@ -59,6 +59,14 @@ public interface Domain {
     boolean contains(String playerName);
 
     /**
+     * Returns true if a domain contains a non-player.
+     *
+     * @param nonplayerProtectionDomain the non-player protection domain to check
+     * @return whether this domain contains {@code nonplayerProtectionDomain}
+     */
+    boolean containsNonplayer(String nonplayerProtectionDomain);
+
+    /**
      * Get the number of entries.
      *
      * @return the number of entries

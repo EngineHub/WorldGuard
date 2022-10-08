@@ -185,6 +185,11 @@ public class PlayerDomain implements Domain, ChangeTracked {
     }
 
     @Override
+    public boolean containsNonplayer(String nonplayerProtectionDomain) {
+        return false; // PlayerDomains can't contain non-players.
+    }
+
+    @Override
     public int size() {
         return names.size() + uniqueIds.size();
     }

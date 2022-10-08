@@ -26,7 +26,9 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.FlagValueCalculator;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.util.ChangeTracked;
 import com.sk89q.worldguard.util.Normal;
 
@@ -35,6 +37,7 @@ import java.awt.geom.Line2D;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
@@ -326,6 +329,36 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     }
 
     /**
+     * Checks whether a region is an owner of this region or any of its parents.
+     *
+     * @param region region to check
+     * @return whether an owner
+     */
+    public boolean isOwner(ProtectedRegion region) {
+        checkNotNull(region);
+        Set<String> nonplayerProtectionDomains = FlagValueCalculator.getEffectiveFlagOf(region, Flags.NONPLAYER_PROTECTION_DOMAINS, null);
+
+        if (nonplayerProtectionDomains == null) {
+            return false;
+        }
+
+        if (nonplayerProtectionDomains.stream().anyMatch(owners::containsNonplayer)) {
+            return true;
+        }
+
+        ProtectedRegion curParent = getParent();
+        while (curParent != null) {
+            if (nonplayerProtectionDomains.stream().anyMatch(curParent.getOwners()::containsNonplayer)) {
+                return true;
+            }
+
+            curParent = curParent.getParent();
+        }
+
+        return false;
+    }
+
+    /**
      * Checks whether a player is a member OR OWNER of the region
      * or any of its parents.
      *
@@ -375,6 +408,23 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     }
 
     /**
+     * Checks whether a region is a member OR OWNER of this region
+     * or any of its parents.
+     *
+     * @param region region to check
+     * @return whether an owner or member
+     */
+    public boolean isMember(ProtectedRegion region) {
+        checkNotNull(region);
+
+        if (isOwner(region)) {
+            return true;
+        }
+
+        return isMemberOnly(region);
+    }
+
+    /**
      * Checks whether a player is a member of the region or any of its parents.
      *
      * @param player player to check
@@ -390,6 +440,36 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         ProtectedRegion curParent = getParent();
         while (curParent != null) {
             if (curParent.getMembers().contains(player)) {
+                return true;
+            }
+
+            curParent = curParent.getParent();
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks whether a region is a member of this region or any of its parents.
+     *
+     * @param region region to check
+     * @return whether an member
+     */
+    public boolean isMemberOnly(ProtectedRegion region) {
+        checkNotNull(region);
+        Set<String> nonplayerProtectionDomains = FlagValueCalculator.getEffectiveFlagOf(region, Flags.NONPLAYER_PROTECTION_DOMAINS, null);
+
+        if (nonplayerProtectionDomains == null) {
+            return false;
+        }
+
+        if (nonplayerProtectionDomains.stream().anyMatch(members::containsNonplayer)) {
+            return true;
+        }
+
+        ProtectedRegion curParent = getParent();
+        while (curParent != null) {
+            if (nonplayerProtectionDomains.stream().anyMatch(curParent.getMembers()::containsNonplayer)) {
                 return true;
             }
 
