@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -162,7 +163,11 @@ public class SimpleFlagRegistry implements FlagRegistry {
                     values.put(unk, entry.getValue());
                 }
             } else {
-                values.put(parent.getRegionGroupFlag(), parent.getRegionGroupFlag().unmarshal(entry.getValue()));
+                RegionGroupFlag regionGroupFlag = parent.getRegionGroupFlag();
+
+                if (regionGroupFlag != null) {
+                    values.put(regionGroupFlag, regionGroupFlag.unmarshal(entry.getValue()));
+                }
             }
         }
 
