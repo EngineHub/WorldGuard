@@ -81,7 +81,9 @@ public abstract class FlagValueChangeHandler<T> extends Handler {
     protected abstract boolean onAbsentValue(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, T lastValue, MoveType moveType);
 
     protected void onClearValue(LocalPlayer player, ApplicableRegionSet set) {
-        Location current = player.getLocation();
-        onAbsentValue(player, current, current, set, lastValue, MoveType.OTHER_NON_CANCELLABLE);
+        if (lastValue != null) {
+            Location current = player.getLocation();
+            onAbsentValue(player, current, current, set, lastValue, MoveType.OTHER_NON_CANCELLABLE);
+        }
     }
 }
