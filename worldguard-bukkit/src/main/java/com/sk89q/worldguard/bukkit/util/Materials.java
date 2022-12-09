@@ -55,6 +55,7 @@ public final class Materials {
     private static void putMaterialTag(Tag<Material> tag, Integer value) {
         tag.getValues().forEach(mat -> MATERIAL_FLAGS.put(mat, value));
     }
+    private static Tag<Material> SIGNS_TAG;
 
     static {
         ENTITY_ITEMS.put(EntityType.PAINTING, Material.PAINTING);
@@ -819,6 +820,17 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.ECHO_SHARD, 0);
         MATERIAL_FLAGS.put(Material.REINFORCED_DEEPSLATE, 0);
 
+        // 1.19.3: Try to register those things
+        try {
+            SIGNS_TAG = Tag.ALL_SIGNS;
+
+            MATERIAL_FLAGS.put(Material.BAMBOO_MOSAIC, 0);
+            MATERIAL_FLAGS.put(Material.BAMBOO_BLOCK, 0);
+            MATERIAL_FLAGS.put(Material.STRIPPED_BAMBOO_BLOCK, 0);
+        } catch (NoSuchFieldError ignored) {
+            SIGNS_TAG = Tag.SIGNS;
+        }
+
         // Generated via tag
         putMaterialTag(Tag.WOODEN_DOORS, MODIFIED_ON_RIGHT);
         putMaterialTag(Tag.WOODEN_TRAPDOORS, MODIFIED_ON_RIGHT);
@@ -837,7 +849,7 @@ public final class Materials {
         putMaterialTag(Tag.BUTTONS, MODIFIED_ON_RIGHT);
         putMaterialTag(Tag.FLOWER_POTS, MODIFIED_ON_RIGHT);
         putMaterialTag(Tag.WALLS, 0);
-        putMaterialTag(Tag.ALL_SIGNS, 0);
+        putMaterialTag(SIGNS_TAG, 0);
         putMaterialTag(Tag.SMALL_FLOWERS, 0);
         putMaterialTag(Tag.BEDS, MODIFIED_ON_RIGHT);
         putMaterialTag(Tag.ITEMS_MUSIC_DISCS, 0);
@@ -1382,7 +1394,7 @@ public final class Materials {
                 if (isWaxedCopper(targetMaterial)) return true;
                 if (Tag.LOGS.isTagged(targetMaterial)) return true;
                 return switch (targetMaterial) {
-                    case OAK_WOOD, DARK_OAK_WOOD, ACACIA_WOOD, BIRCH_WOOD, SPRUCE_WOOD, PUMPKIN,
+                    case OAK_WOOD, DARK_OAK_WOOD, ACACIA_WOOD, BIRCH_WOOD, SPRUCE_WOOD, PUMPKIN, BAMBOO_BLOCK,
                             JUNGLE_WOOD, CRIMSON_STEM, WARPED_STEM, CRIMSON_HYPHAE, WARPED_HYPHAE ->
                             true;
                     default -> false;
@@ -1420,7 +1432,7 @@ public final class Materials {
             case YELLOW_DYE:
             case GLOW_INK_SAC:
             case INK_SAC:
-                return Tag.ALL_SIGNS.isTagged(targetMaterial);
+                return SIGNS_TAG.isTagged(targetMaterial);
             case HONEYCOMB:
                 return isUnwaxedCopper(targetMaterial);
             default:
