@@ -1197,9 +1197,12 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         // Handle created spawn eggs
-        if (item != null && Materials.isSpawnEgg(item.getType())) {
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), Materials.getEntitySpawnEgg(item.getType())));
-            return;
+        if (item != null) {
+            EntityType possibleEntityType = Materials.getEntitySpawnEgg(item.getType());
+            if (possibleEntityType != null) {
+                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), possibleEntityType));
+                return;
+            }
         }
 
         // handle water/lava placement
