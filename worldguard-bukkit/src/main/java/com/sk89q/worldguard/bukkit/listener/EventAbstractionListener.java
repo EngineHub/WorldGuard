@@ -165,17 +165,6 @@ public class EventAbstractionListener extends AbstractListener {
     private final EventDebounce<BlockPistonRetractKey> pistonRetractDebounce = EventDebounce.create(5000);
     private final EventDebounce<BlockPistonExtendKey> pistonExtendDebounce = EventDebounce.create(5000);
 
-    private static final boolean HAS_SNAPSHOT_INVHOLDER;
-    static {
-        boolean temp;
-        try {
-            Inventory.class.getMethod("getHolder", boolean.class);
-            temp = true;
-        } catch (NoSuchMethodException e) {
-            temp = false;
-        }
-        HAS_SNAPSHOT_INVHOLDER = temp;
-    }
     /**
      * Construct the listener.
      *
@@ -964,7 +953,7 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
         InventoryHolder causeHolder;
-        if (HAS_SNAPSHOT_INVHOLDER) {
+        if (PaperLib.isPaper()) {
             causeHolder = event.getInitiator().getHolder(false);
         } else {
             causeHolder = event.getInitiator().getHolder();
@@ -984,13 +973,13 @@ public class EventAbstractionListener extends AbstractListener {
         if ((entry = moveItemDebounce.tryDebounce(event)) != null) {
             InventoryHolder sourceHolder;
             InventoryHolder targetHolder;
-            /*if (HAS_SNAPSHOT_INVHOLDER) {
+            if (PaperLib.isPaper()) {
                 sourceHolder = event.getSource().getHolder(false);
                 targetHolder = event.getDestination().getHolder(false);
-            } else {*/
+            } else {
                 sourceHolder = event.getSource().getHolder();
                 targetHolder = event.getDestination().getHolder();
-            //}
+            }
 
             Cause cause;
 
