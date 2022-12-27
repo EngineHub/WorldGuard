@@ -30,6 +30,7 @@
       <allow pkg="org.bstats.charts"/>
       <allow pkg="io.papermc.lib"/>
       <allow pkg="com.destroystokyo.paper"/>
+      <allow pkg="io.papermc.paper"/>
       <allow pkg="co.aikar.timings.lib" />
       <allow pkg="org.spigotmc" />
     </subpackage>
