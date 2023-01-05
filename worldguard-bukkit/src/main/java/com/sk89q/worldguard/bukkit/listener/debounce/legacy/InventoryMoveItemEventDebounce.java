@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.listener.debounce.legacy;
 
 import com.sk89q.worldguard.bukkit.listener.debounce.legacy.InventoryMoveItemEventDebounce.Key;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -44,9 +45,9 @@ public class InventoryMoveItemEventDebounce extends AbstractEventDebounce<Key> {
         private final Object target;
 
         public Key(InventoryMoveItemEvent event) {
-            cause = transform(event.getInitiator().getHolder());
-            source = transform(event.getSource().getHolder());
-            target = transform(event.getDestination().getHolder());
+            cause = transform(PaperLib.getHolder(event.getInitiator(), false).getHolder());
+            source = transform(PaperLib.getHolder(event.getSource(), false).getHolder());
+            target = transform(PaperLib.getHolder(event.getDestination(), false).getHolder());
         }
 
         private Object transform(InventoryHolder holder) {
