@@ -22,8 +22,6 @@ package com.sk89q.worldguard.bukkit.listener;
 import static com.sk89q.worldguard.bukkit.cause.Cause.create;
 
 import com.destroystokyo.paper.event.entity.EntityZapEvent;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.DelegateEvent;
@@ -142,7 +140,6 @@ import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
@@ -952,12 +949,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
-        InventoryHolder causeHolder;
-        if (PaperLib.isPaper()) {
-            causeHolder = event.getInitiator().getHolder(false);
-        } else {
-            causeHolder = event.getInitiator().getHolder();
-        }
+        InventoryHolder causeHolder = PaperLib.getHolder(event.getInitiator(), false).getHolder();
 
         WorldConfiguration wcfg = null;
         if (causeHolder instanceof Hopper
@@ -971,15 +963,8 @@ public class EventAbstractionListener extends AbstractListener {
         Entry entry;
 
         if ((entry = moveItemDebounce.tryDebounce(event)) != null) {
-            InventoryHolder sourceHolder;
-            InventoryHolder targetHolder;
-            if (PaperLib.isPaper()) {
-                sourceHolder = event.getSource().getHolder(false);
-                targetHolder = event.getDestination().getHolder(false);
-            } else {
-                sourceHolder = event.getSource().getHolder();
-                targetHolder = event.getDestination().getHolder();
-            }
+            InventoryHolder sourceHolder = PaperLib.getHolder(event.getSource(), false).getHolder();
+            InventoryHolder targetHolder = PaperLib.getHolder(event.getDestination(), false).getHolder();
 
             Cause cause;
 
