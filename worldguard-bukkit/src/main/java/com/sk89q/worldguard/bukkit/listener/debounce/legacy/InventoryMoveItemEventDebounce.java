@@ -51,12 +51,12 @@ public class InventoryMoveItemEventDebounce extends AbstractEventDebounce<Key> {
         }
 
         private Object transform(InventoryHolder holder) {
-            if (holder instanceof BlockState) {
-                return new BlockMaterialKey(((BlockState) holder).getBlock());
-            } else if (holder instanceof DoubleChest) {
-                InventoryHolder left = ((DoubleChest) holder).getLeftSide();
-                if (left instanceof Chest) {
-                    return new BlockMaterialKey(((Chest) left).getBlock());
+            if (holder instanceof BlockState blockState) {
+                return new BlockMaterialKey(blockState);
+            } else if (holder instanceof DoubleChest doubleChest) {
+                InventoryHolder left = doubleChest.getLeftSide();
+                if (left instanceof Chest chest) {
+                    return new BlockMaterialKey(chest);
                 } else {
                     return holder;
                 }
@@ -95,8 +95,8 @@ public class InventoryMoveItemEventDebounce extends AbstractEventDebounce<Key> {
         private final Block block;
         private final Material material;
 
-        private BlockMaterialKey(Block block) {
-            this.block = block;
+        private BlockMaterialKey(BlockState block) {
+            this.block = block.getBlock();
             material = block.getType();
         }
 
