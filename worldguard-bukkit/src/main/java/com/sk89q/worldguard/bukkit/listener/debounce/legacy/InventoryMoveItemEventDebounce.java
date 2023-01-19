@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.listener.debounce.legacy;
 
 import com.sk89q.worldguard.bukkit.listener.debounce.legacy.InventoryMoveItemEventDebounce.Key;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -44,18 +45,18 @@ public class InventoryMoveItemEventDebounce extends AbstractEventDebounce<Key> {
         private final Object target;
 
         public Key(InventoryMoveItemEvent event) {
-            cause = transform(event.getInitiator().getHolder());
-            source = transform(event.getSource().getHolder());
-            target = transform(event.getDestination().getHolder());
+            cause = transform(PaperLib.getHolder(event.getInitiator(), false).getHolder());
+            source = transform(PaperLib.getHolder(event.getSource(), false).getHolder());
+            target = transform(PaperLib.getHolder(event.getDestination(), false).getHolder());
         }
 
         private Object transform(InventoryHolder holder) {
-            if (holder instanceof BlockState) {
-                return new BlockMaterialKey(((BlockState) holder).getBlock());
-            } else if (holder instanceof DoubleChest) {
-                InventoryHolder left = ((DoubleChest) holder).getLeftSide();
-                if (left instanceof Chest) {
-                    return new BlockMaterialKey(((Chest) left).getBlock());
+            if (holder instanceof BlockState blockState) {
+                return new BlockMaterialKey(blockState);
+            } else if (holder instanceof DoubleChest doubleChest) {
+                InventoryHolder left = doubleChest.getLeftSide();
+                if (left instanceof Chest chest) {
+                    return new BlockMaterialKey(chest);
                 } else {
                     return holder;
                 }
@@ -94,8 +95,8 @@ public class InventoryMoveItemEventDebounce extends AbstractEventDebounce<Key> {
         private final Block block;
         private final Material material;
 
-        private BlockMaterialKey(Block block) {
-            this.block = block;
+        private BlockMaterialKey(BlockState block) {
+            this.block = block.getBlock();
             material = block.getType();
         }
 
