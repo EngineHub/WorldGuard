@@ -33,7 +33,7 @@ public class IntegerFlag extends NumberFlag<Integer> {
     }
 
     @Override
-    public Integer parseInput(FlagContext context) throws InvalidFlagFormat {
+    public Integer parseInput(FlagContext context) throws InvalidFlagFormatException {
         return context.getUserInputAsInt();
     }
 

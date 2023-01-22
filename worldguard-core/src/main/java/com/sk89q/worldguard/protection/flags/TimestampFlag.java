@@ -48,7 +48,7 @@ public class TimestampFlag extends Flag<Instant> {
     }
 
     @Override
-    public Instant parseInput(FlagContext context) throws InvalidFlagFormat {
+    public Instant parseInput(FlagContext context) throws InvalidFlagFormatException {
         String input = context.getUserInput();
         if ("now".equalsIgnoreCase(input)) {
             return Instant.now();
@@ -61,10 +61,10 @@ public class TimestampFlag extends Flag<Instant> {
                 } else if (parsed instanceof ZonedDateTime) {
                     return ((ZonedDateTime) parsed).toInstant();
                 } else {
-                    throw new InvalidFlagFormat("Unrecognized input.");
+                    throw new InvalidFlagFormatException("Unrecognized input.");
                 }
             } catch (DateTimeParseException ignored) {
-                throw new InvalidFlagFormat("Expected 'now' or ISO 8601 formatted input.");
+                throw new InvalidFlagFormatException("Expected 'now' or ISO 8601 formatted input.");
             }
         }
     }

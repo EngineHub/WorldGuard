@@ -33,7 +33,7 @@ public class BooleanFlag extends Flag<Boolean> {
     }
 
     @Override
-    public Boolean parseInput(FlagContext context) throws InvalidFlagFormat {
+    public Boolean parseInput(FlagContext context) throws InvalidFlagFormatException {
         String input = context.getUserInput();
         
         if (input.equalsIgnoreCase("true") || input.equalsIgnoreCase("yes")
@@ -45,7 +45,7 @@ public class BooleanFlag extends Flag<Boolean> {
                 || input.equalsIgnoreCase("0")) {
             return false;
         } else {
-            throw new InvalidFlagFormat("Not a yes/no value: " + input);
+            throw new InvalidFlagFormatException("Not a yes/no value: " + input);
         }
     }
 

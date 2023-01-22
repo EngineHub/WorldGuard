@@ -27,7 +27,7 @@ import com.sk89q.worldguard.commands.CommandInputContext;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public final class FlagContext extends CommandInputContext<InvalidFlagFormat> {
+public final class FlagContext extends CommandInputContext<InvalidFlagFormatException> {
 
     private FlagContext(Actor sender, String input, Map<String, Object> values) {
         super(sender, input, values);
@@ -59,8 +59,8 @@ public final class FlagContext extends CommandInputContext<InvalidFlagFormat> {
     }
 
     @Override
-    protected InvalidFlagFormat createException(String str) {
-        return new InvalidFlagFormat(str);
+    protected InvalidFlagFormatException createException(String str) {
+        return new InvalidFlagFormatException(str);
     }
 
     public static class FlagContextBuilder {
