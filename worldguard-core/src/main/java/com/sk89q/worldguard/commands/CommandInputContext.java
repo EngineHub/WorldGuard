@@ -21,7 +21,6 @@ package com.sk89q.worldguard.commands;
 
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 
 import javax.annotation.Nullable;
 import java.util.Map;

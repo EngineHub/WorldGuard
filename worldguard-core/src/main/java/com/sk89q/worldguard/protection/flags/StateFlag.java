@@ -78,7 +78,7 @@ public class StateFlag extends Flag<StateFlag.State> {
     }
 
     @Override
-    public State parseInput(FlagContext context) throws InvalidFlagFormat {
+    public State parseInput(FlagContext context) throws InvalidFlagFormatException {
         String input = context.getUserInput();
 
         if (input.equalsIgnoreCase("allow")) {
@@ -88,7 +88,7 @@ public class StateFlag extends Flag<StateFlag.State> {
         } else if (input.equalsIgnoreCase("none")) {
             return null;
         } else {
-            throw new InvalidFlagFormat("Expected none/allow/deny but got '" + input + "'");
+            throw new InvalidFlagFormatException("Expected none/allow/deny but got '" + input + "'");
         }
     }
 
