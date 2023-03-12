@@ -24,6 +24,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.util.Locations;
@@ -59,6 +60,7 @@ public class WorldGuardVehicleListener extends AbstractListener {
             // Did we move a block?
             if (Locations.isDifferentBlock(BukkitAdapter.adapt(event.getFrom()), BukkitAdapter.adapt(event.getTo()))) {
                 for (Player player : playerPassengers) {
+                    if (Entities.isNPC(player)) continue;
                     LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
                     Location lastValid;
                     if ((lastValid = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer)

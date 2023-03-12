@@ -25,6 +25,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
+import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
@@ -118,24 +119,24 @@ public class RegionFlagsListener extends AbstractListener {
         World world = entity.getWorld();
         if (!isRegionSupportEnabled(world)) return; // Region support disabled
 
+        if (Entities.isNPC(entity)) return;
+        if (!(entity instanceof Player player)) return;
+
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
-        if (entity instanceof Player && event.getCause() == DamageCause.FALL) {
-            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer((Player) entity);
+        if (event.getCause() == DamageCause.FALL) {
+            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
             if (!query.testState(BukkitAdapter.adapt(entity.getLocation()), localPlayer, Flags.FALL_DAMAGE)) {
                 event.setCancelled(true);
                 return;
             }
-        } else {
-            if (entity instanceof Player && event.getCause() == DamageCause.FLY_INTO_WALL) {
-                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer((Player) entity);
-                if (!query.testState(BukkitAdapter.adapt(entity.getLocation()), localPlayer, Flags.FALL_DAMAGE)) {
-                    event.setCancelled(true);
-                    return;
-                }
+        } else if (event.getCause() == DamageCause.FLY_INTO_WALL) {
+            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+            if (!query.testState(BukkitAdapter.adapt(entity.getLocation()), localPlayer, Flags.FALL_DAMAGE)) {
+                event.setCancelled(true);
+                return;
             }
         }
-
     }
 
     /**

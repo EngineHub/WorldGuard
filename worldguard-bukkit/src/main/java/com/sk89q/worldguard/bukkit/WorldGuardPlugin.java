@@ -419,8 +419,9 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
 
     public Actor wrapCommandSender(CommandSender sender) {
-        if (sender instanceof Player) {
-            return wrapPlayer((Player) sender);
+        if (sender instanceof Player player) {
+            if (player.hasMetadata("NPC")) return null;
+            return wrapPlayer(player);
         }
 
         try {
