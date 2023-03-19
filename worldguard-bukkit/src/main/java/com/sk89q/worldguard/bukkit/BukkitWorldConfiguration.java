@@ -281,6 +281,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         disableCropGrowth = getBoolean("dynamics.disable-crop-growth", false);
         disableSoilDehydration = getBoolean("dynamics.disable-soil-dehydration", false);
         disableCoralBlockFade = getBoolean("dynamics.disable-coral-block-fade", false);
+        disableCopperBlockFade = getBoolean("dynamics.disable-copper-block-fade", false);
         allowedSnowFallOver = new HashSet<>(convertLegacyBlocks(getStringList("dynamics.snow-fall-blocks", null)));
 
         useRegions = getBoolean("regions.enable", true);
