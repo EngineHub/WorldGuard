@@ -3,9 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 applyLibrariesConfiguration()
 
 dependencies {
-    "shade"("org.enginehub:squirrelid:${Versions.SQUIRRELID}") {
-        exclude(group = "com.destroystokyo.paper", module = "paper-api")
-    }
+    "shade"("org.enginehub:squirrelid:${Versions.SQUIRRELID}")
     "shade"("org.khelekore:prtree:1.5.0")
 }
 
