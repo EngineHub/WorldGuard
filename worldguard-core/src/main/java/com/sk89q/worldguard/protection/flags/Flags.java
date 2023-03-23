@@ -125,6 +125,7 @@ public final class Flags {
     public static final StateFlag CROP_GROWTH = register(new StateFlag("crop-growth", true));
     public static final StateFlag SOIL_DRY = register(new StateFlag("soil-dry", true));
     public static final StateFlag CORAL_FADE = register(new StateFlag("coral-fade", true));
+    public static final StateFlag COPPER_FADE = register(new StateFlag("copper-fade", true));
     public static final StateFlag WATER_FLOW = register(new StateFlag("water-flow", true));
     public static final StateFlag LAVA_FLOW = register(new StateFlag("lava-flow", true));
 
