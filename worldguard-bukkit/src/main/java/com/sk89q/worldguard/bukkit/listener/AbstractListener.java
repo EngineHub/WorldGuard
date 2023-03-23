@@ -29,6 +29,7 @@ import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
+import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.DelayedRegionOverlapAssociation;
@@ -124,13 +125,12 @@ class AbstractListener implements Listener {
 
         if (!cause.isKnown()) {
             return Associables.constant(Association.NON_MEMBER);
-        } else if (rootCause instanceof Player) {
-            return getPlugin().wrapPlayer((Player) rootCause);
-        } else if (rootCause instanceof OfflinePlayer) {
-            return getPlugin().wrapOfflinePlayer((OfflinePlayer) rootCause);
-        } else if (rootCause instanceof Entity) {
+        } else if (rootCause instanceof Player player && !Entities.isNPC(player)) {
+            return getPlugin().wrapPlayer(player);
+        } else if (rootCause instanceof OfflinePlayer offlinePlayer) {
+            return getPlugin().wrapOfflinePlayer(offlinePlayer);
+        } else if (rootCause instanceof Entity entity) {
             RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
-            final Entity entity = (Entity) rootCause;
             BukkitWorldConfiguration config = getWorldConfig(entity.getWorld());
             Location loc;
             if (PaperLib.isPaper()  && config.usePaperEntityOrigin) {
@@ -144,9 +144,9 @@ class AbstractListener implements Listener {
             }
             return new DelayedRegionOverlapAssociation(query, BukkitAdapter.adapt(loc),
                     config.useMaxPriorityAssociation);
-        } else if (rootCause instanceof Block) {
+        } else if (rootCause instanceof Block block) {
             RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
-            Location loc = ((Block) rootCause).getLocation();
+            Location loc = block.getLocation();
             return new DelayedRegionOverlapAssociation(query, BukkitAdapter.adapt(loc),
                     getWorldConfig(loc.getWorld()).useMaxPriorityAssociation);
         } else {

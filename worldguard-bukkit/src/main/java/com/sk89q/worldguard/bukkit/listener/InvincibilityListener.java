@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit.listener;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.util.Entities;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -57,9 +58,9 @@ public class InvincibilityListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
         Entity victim = event.getEntity();
+        if (Entities.isNPC(victim)) return;
 
-        if (victim instanceof Player) {
-            Player player = (Player) victim;
+        if (victim instanceof Player player) {
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
             if (isInvincible(localPlayer)) {
@@ -87,9 +88,9 @@ public class InvincibilityListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityCombust(EntityCombustEvent event) {
         Entity entity = event.getEntity();
+        if (Entities.isNPC(entity)) return;
 
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
             if (isInvincible(localPlayer)) {
@@ -100,8 +101,9 @@ public class InvincibilityListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
+        if (Entities.isNPC(event.getEntity())) return;
+
+        if (event.getEntity() instanceof Player player) {
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
             if (event.getFoodLevel() < player.getFoodLevel() && isInvincible(localPlayer)) {

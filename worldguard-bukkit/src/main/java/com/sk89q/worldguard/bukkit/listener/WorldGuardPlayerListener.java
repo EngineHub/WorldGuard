@@ -314,6 +314,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
+        if (com.sk89q.worldguard.bukkit.util.Entities.isNPC(player)) return;
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
 
         if (wcfg.useRegions) {
@@ -348,6 +349,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
+        if (com.sk89q.worldguard.bukkit.util.Entities.isNPC(player)) return;
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         ConfigurationManager cfg = getConfig();
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());

@@ -70,7 +70,7 @@ public final class InteropUtils {
         UUID uuid = player.getUniqueId();
         String name = player.getName();
 
-        if (player.hasMetadata("NPC")) {
+        if (Entities.isNPC(player)) {
             return true;
         }
 
