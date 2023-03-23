@@ -135,7 +135,7 @@ public final class Cause {
     @Nullable
     public Player getFirstPlayer() {
         for (Object object : causes) {
-            if (object instanceof Player p && !p.hasMetadata("NPC")) {
+            if (object instanceof Player p && !Entities.isNPC(p)) {
                 return p;
             }
         }

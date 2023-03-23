@@ -60,6 +60,7 @@ import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
 import com.sk89q.worldguard.bukkit.listener.WorldRulesListener;
 import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.bukkit.util.ClassSourceValidator;
+import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.commands.GeneralCommands;
 import com.sk89q.worldguard.commands.ProtectionCommands;
@@ -420,7 +421,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     public Actor wrapCommandSender(CommandSender sender) {
         if (sender instanceof Player player) {
-            if (player.hasMetadata("NPC")) return null;
+            if (Entities.isNPC(player)) return null;
             return wrapPlayer(player);
         }
 
