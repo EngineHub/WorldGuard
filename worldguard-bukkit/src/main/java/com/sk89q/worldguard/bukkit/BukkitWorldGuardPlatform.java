@@ -34,6 +34,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.profile.resolver.PaperPlayerService;
 import com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent;
 import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
+import com.sk89q.worldguard.bukkit.util.report.DatapackReport;
 import com.sk89q.worldguard.bukkit.util.report.PerformanceReport;
 import com.sk89q.worldguard.bukkit.util.report.PluginReport;
 import com.sk89q.worldguard.bukkit.util.report.SchedulerReport;
@@ -239,6 +240,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
         report.add(new ServicesReport());
         report.add(new WorldReport());
         report.add(new PerformanceReport());
+        if (PaperLib.isPaper()) report.add(new DatapackReport());
     }
 
     @Override
