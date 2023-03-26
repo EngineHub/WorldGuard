@@ -42,7 +42,7 @@ public class ServerReport extends DataReport {
             onlineMode.append("BungeeCord support?", Bukkit.spigot().getConfig().getBoolean("settings.bungeecord", false));
         }
         if (PaperLib.isPaper()) {
-            onlineMode.append("Velocity support?", Bukkit.spigot().getPaperConfig().getBoolean("settings.velocity-support.enabled", false));
+            onlineMode.append("Velocity support?", Bukkit.spigot().getPaperConfig().getBoolean("proxies.velocity.enabled", false));
         }
         append(onlineMode.getTitle(), onlineMode);
 

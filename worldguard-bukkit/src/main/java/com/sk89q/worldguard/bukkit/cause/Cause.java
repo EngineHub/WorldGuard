@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.internal.WGMetadata;
+import com.sk89q.worldguard.bukkit.util.Entities;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -134,8 +135,8 @@ public final class Cause {
     @Nullable
     public Player getFirstPlayer() {
         for (Object object : causes) {
-            if (object instanceof Player) {
-                return (Player) object;
+            if (object instanceof Player p && !Entities.isNPC(p)) {
+                return p;
             }
         }
 
@@ -145,8 +146,8 @@ public final class Cause {
     @Nullable
     public Entity getFirstEntity() {
         for (Object object : causes) {
-            if (object instanceof Entity) {
-                return (Entity) object;
+            if (object instanceof Entity e) {
+                return e;
             }
         }
 
@@ -156,8 +157,8 @@ public final class Cause {
     @Nullable
     public Entity getFirstNonPlayerEntity() {
         for (Object object : causes) {
-            if (object instanceof Entity && !(object instanceof Player)) {
-                return (Entity) object;
+            if (object instanceof Entity e && (!(object instanceof Player) || Entities.isNPC(e))) {
+                return e;
             }
         }
 
@@ -167,8 +168,8 @@ public final class Cause {
     @Nullable
     public Block getFirstBlock() {
         for (Object object : causes) {
-            if (object instanceof Block) {
-                return (Block) object;
+            if (object instanceof Block b) {
+                return b;
             }
         }
 

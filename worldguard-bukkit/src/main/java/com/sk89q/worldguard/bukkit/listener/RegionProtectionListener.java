@@ -522,8 +522,7 @@ public class RegionProtectionListener extends AbstractListener {
         if (!isRegionSupportEnabled(vehicle.getWorld())) return; // Region support disabled
         Entity exited = event.getExited();
 
-        if (vehicle instanceof Tameable && exited instanceof Player) {
-            Player player = (Player) exited;
+        if (vehicle instanceof Tameable && exited instanceof Player player && !Entities.isNPC(player)) {
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
             if (!isWhitelisted(Cause.create(player), vehicle.getWorld(), false)) {
                 RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();

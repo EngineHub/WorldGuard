@@ -10,11 +10,7 @@ applyShadowConfiguration()
 repositories {
     maven {
         name = "paper"
-        url = uri("https://papermc.io/repo/repository/maven-public/")
-    }
-    maven {
-        name = "bstats"
-        url = uri("https://repo.codemc.org/repository/maven-public")
+        url = uri("https://repo.papermc.io/repository/maven-public/")
     }
     maven {
         name = "aikar-timings"
@@ -28,15 +24,15 @@ configurations {
 
 dependencies {
     "api"(project(":worldguard-core"))
-    "compileOnly"("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
-    "runtimeOnly"("org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT") {
+    "compileOnly"("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
+    "runtimeOnly"("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
     }
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
     "compileOnly"("com.sk89q:commandbook:2.3") { isTransitive = false }
-    "shadeOnly"("io.papermc:paperlib:1.0.7")
-    "shadeOnly"("org.bstats:bstats-bukkit:2.1.0")
+    "shadeOnly"("io.papermc:paperlib:1.0.8")
+    "shadeOnly"("org.bstats:bstats-bukkit:3.0.1")
     "shadeOnly"("co.aikar:minecraft-timings:1.0.4")
 }
 
