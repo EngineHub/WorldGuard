@@ -34,6 +34,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
@@ -682,7 +683,10 @@ public class WorldGuardEntityListener extends AbstractListener {
             }
             ProtectedCuboidRegion target = new ProtectedCuboidRegion("__portal_check", true, min, max);
             final ApplicableRegionSet regions = regionManager.getApplicableRegions(target);
-            if (!regions.testState(createRegionAssociable(cause), Flags.BUILD, Flags.BLOCK_PLACE)) {
+            RegionAssociable associable = createRegionAssociable(cause);
+            final State buildState = StateFlag.denyToNone(regions.queryState(associable, Flags.BUILD));
+            if (!StateFlag.test(buildState, regions.queryState(associable, Flags.BLOCK_BREAK))
+                    || !StateFlag.test(buildState, regions.queryState(associable, Flags.BLOCK_PLACE))) {
                 if (localPlayer != null && !cause.isIndirect()) {
                     // NB there is no way to cancel the teleport without PTA (since PlayerPortal doesn't have block info)
                     // removing PTA was a mistake
