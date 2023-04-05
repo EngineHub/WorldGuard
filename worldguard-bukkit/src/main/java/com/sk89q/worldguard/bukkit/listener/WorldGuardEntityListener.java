@@ -25,7 +25,9 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.util.Entities;
+import com.sk89q.worldguard.bukkit.util.InteropUtils;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -653,17 +655,21 @@ public class WorldGuardEntityListener extends AbstractListener {
     public void onCreatePortal(PortalCreateEvent event) {
         WorldConfiguration wcfg = getWorldConfig(event.getWorld());
 
-        if (wcfg.regionNetherPortalProtection
+        if (wcfg.useRegions && wcfg.regionNetherPortalProtection
                 && event.getReason() == PortalCreateEvent.CreateReason.NETHER_PAIR
                 && !event.getBlocks().isEmpty()) {
             final com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(event.getWorld());
             final RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer()
                     .get(world);
             if (regionManager == null) return;
-            LocalPlayer associable = null;
-            if (event.getEntity() instanceof Player player) {
-                associable = getPlugin().wrapPlayer(player);
-                if (WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(associable, world)) {
+            LocalPlayer localPlayer = null;
+            final Cause cause = Cause.create(event.getEntity());
+            if (cause.getRootCause() instanceof Player player) {
+                if (wcfg.fakePlayerBuildOverride && InteropUtils.isFakePlayer(player)) {
+                    return;
+                }
+                localPlayer = getPlugin().wrapPlayer(player);
+                if (WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, world)) {
                     return;
                 }
             }
@@ -676,12 +682,12 @@ public class WorldGuardEntityListener extends AbstractListener {
             }
             ProtectedCuboidRegion target = new ProtectedCuboidRegion("__portal_check", true, min, max);
             final ApplicableRegionSet regions = regionManager.getApplicableRegions(target);
-            if (!regions.testState(associable, Flags.BUILD, Flags.BLOCK_PLACE)) {
-                if (associable != null) {
+            if (!regions.testState(createRegionAssociable(cause), Flags.BUILD, Flags.BLOCK_PLACE)) {
+                if (localPlayer != null && !cause.isIndirect()) {
                     // NB there is no way to cancel the teleport without PTA (since PlayerPortal doesn't have block info)
                     // removing PTA was a mistake
-                    String message = regions.queryValue(associable, Flags.DENY_MESSAGE);
-                    RegionProtectionListener.formatAndSendDenyMessage("create portals", associable, message);
+                    String message = regions.queryValue(localPlayer, Flags.DENY_MESSAGE);
+                    RegionProtectionListener.formatAndSendDenyMessage("create portals", localPlayer, message);
                 }
                 event.setCancelled(true);
             }
