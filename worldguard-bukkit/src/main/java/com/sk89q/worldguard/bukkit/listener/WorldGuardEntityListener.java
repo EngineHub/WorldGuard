@@ -31,6 +31,7 @@ import com.sk89q.worldguard.bukkit.util.InteropUtils;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.FailedLoadRegionSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -660,9 +661,6 @@ public class WorldGuardEntityListener extends AbstractListener {
                 && event.getReason() == PortalCreateEvent.CreateReason.NETHER_PAIR
                 && !event.getBlocks().isEmpty()) {
             final com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(event.getWorld());
-            final RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer()
-                    .get(world);
-            if (regionManager == null) return;
             LocalPlayer localPlayer = null;
             final Cause cause = Cause.create(event.getEntity());
             if (cause.getRootCause() instanceof Player player) {
@@ -674,15 +672,22 @@ public class WorldGuardEntityListener extends AbstractListener {
                     return;
                 }
             }
-            BlockVector3 min = null;
-            BlockVector3 max = null;
-            for (BlockState block : event.getBlocks()) {
-                BlockVector3 loc = BlockVector3.at(block.getX(), block.getY(), block.getZ());
-                min = min == null ? loc : loc.getMinimum(min);
-                max = max == null ? loc : loc.getMaximum(max);
+            final RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer()
+                    .get(world);
+            ApplicableRegionSet regions;
+            if (regionManager == null) {
+                regions = FailedLoadRegionSet.getInstance();
+            } else {
+                BlockVector3 min = null;
+                BlockVector3 max = null;
+                for (BlockState block : event.getBlocks()) {
+                    BlockVector3 loc = BlockVector3.at(block.getX(), block.getY(), block.getZ());
+                    min = min == null ? loc : loc.getMinimum(min);
+                    max = max == null ? loc : loc.getMaximum(max);
+                }
+                ProtectedCuboidRegion target = new ProtectedCuboidRegion("__portal_check", true, min, max);
+                regions = regionManager.getApplicableRegions(target);
             }
-            ProtectedCuboidRegion target = new ProtectedCuboidRegion("__portal_check", true, min, max);
-            final ApplicableRegionSet regions = regionManager.getApplicableRegions(target);
             RegionAssociable associable = createRegionAssociable(cause);
             final State buildState = StateFlag.denyToNone(regions.queryState(associable, Flags.BUILD));
             if (!StateFlag.test(buildState, regions.queryState(associable, Flags.BLOCK_BREAK))
