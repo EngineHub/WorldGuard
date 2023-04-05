@@ -661,8 +661,8 @@ public class WorldGuardEntityListener extends AbstractListener {
                 && event.getReason() == PortalCreateEvent.CreateReason.NETHER_PAIR
                 && !event.getBlocks().isEmpty()) {
             final com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(event.getWorld());
-            LocalPlayer localPlayer = null;
             final Cause cause = Cause.create(event.getEntity());
+            LocalPlayer localPlayer = null;
             if (cause.getRootCause() instanceof Player player) {
                 if (wcfg.fakePlayerBuildOverride && InteropUtils.isFakePlayer(player)) {
                     return;
@@ -688,7 +688,7 @@ public class WorldGuardEntityListener extends AbstractListener {
                 ProtectedCuboidRegion target = new ProtectedCuboidRegion("__portal_check", true, min, max);
                 regions = regionManager.getApplicableRegions(target);
             }
-            RegionAssociable associable = createRegionAssociable(cause);
+            final RegionAssociable associable = createRegionAssociable(cause);
             final State buildState = StateFlag.denyToNone(regions.queryState(associable, Flags.BUILD));
             if (!StateFlag.test(buildState, regions.queryState(associable, Flags.BLOCK_BREAK))
                     || !StateFlag.test(buildState, regions.queryState(associable, Flags.BLOCK_PLACE))) {
