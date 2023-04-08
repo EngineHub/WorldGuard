@@ -148,11 +148,4 @@ public abstract class Handler {
         return null;
     }
 
-    /**
-     * Get the handler wrapped by this handler object, if applicable, or just return this if no handler is wrapped.
-     * @return any wrapped handler, or this handler itself
-     */
-    public Handler getWrappedHandler() {
-        return this;
-    }
 }

@@ -139,7 +139,6 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
         sessionManager = new BukkitSessionManager();
         configuration = new BukkitConfigurationManager(WorldGuardPlugin.inst());
         configuration.load();
-        sessionManager.setUsingTimings(configuration.timedSessionHandlers);
         regionContainer = new BukkitRegionContainer(WorldGuardPlugin.inst());
         regionContainer.initialize();
         debugHandler = new BukkitDebugHandler(WorldGuardPlugin.inst());

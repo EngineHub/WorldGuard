@@ -12,10 +12,6 @@ repositories {
         name = "paper"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
-    maven {
-        name = "aikar-timings"
-        url = uri("https://repo.aikar.co/nexus/content/groups/aikar/")
-    }
 }
 
 configurations {
@@ -33,7 +29,6 @@ dependencies {
     "compileOnly"("com.sk89q:commandbook:2.3") { isTransitive = false }
     "shadeOnly"("io.papermc:paperlib:1.0.8")
     "shadeOnly"("org.bstats:bstats-bukkit:3.0.1")
-    "shadeOnly"("co.aikar:minecraft-timings:1.0.4")
 }
 
 tasks.named<Copy>("processResources") {
