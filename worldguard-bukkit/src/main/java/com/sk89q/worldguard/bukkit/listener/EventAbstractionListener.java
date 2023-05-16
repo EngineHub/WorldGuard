@@ -113,6 +113,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
@@ -917,6 +918,12 @@ public class EventAbstractionListener extends AbstractListener {
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
         Item item = event.getItem();
         pickupDebounce.debounce(event.getPlayer(), item, event, new DestroyEntityEvent(event, create(event.getPlayer()), event.getItem()));
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityPickupItem(EntityPickupItemEvent event) {
+        Item item = event.getItem();
+        pickupDebounce.debounce(event.getEntity(), item, event, new DestroyEntityEvent(event, create(event.getEntity()), event.getItem()));
     }
 
     @EventHandler(ignoreCancelled = true)

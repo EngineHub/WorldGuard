@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.util;
 
+import org.bukkit.entity.Allay;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
@@ -218,6 +219,7 @@ public final class Entities {
         return entity instanceof Hanging
                 || entity instanceof ArmorStand
                 || entity instanceof EnderCrystal
+                || entity instanceof Allay
                 || entity instanceof Minecart && entity instanceof InventoryHolder;
     }
 
