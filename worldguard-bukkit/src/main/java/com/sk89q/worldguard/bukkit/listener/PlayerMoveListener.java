@@ -28,8 +28,8 @@ import com.sk89q.worldguard.session.Session;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -99,7 +99,7 @@ public class PlayerMoveListener extends AbstractListener {
             moveType = MoveType.GLIDE;
         } else if (event.getPlayer().isSwimming()) {
             moveType = MoveType.SWIM;
-        } else if (event.getPlayer().getVehicle() != null && event.getPlayer().getVehicle() instanceof Horse) {
+        } else if (event.getPlayer().getVehicle() != null && event.getPlayer().getVehicle() instanceof AbstractHorse) {
             moveType = MoveType.RIDE;
         }
         com.sk89q.worldedit.util.Location weLocation = session.testMoveTo(localPlayer, BukkitAdapter.adapt(to), moveType);
