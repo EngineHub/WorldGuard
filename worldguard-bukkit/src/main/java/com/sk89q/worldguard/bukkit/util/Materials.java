@@ -1317,6 +1317,7 @@ public final class Materials {
         return type == Material.REPEATER
             || type == Material.COMPARATOR
             || type == Material.CAKE
+            || type == Material.DRAGON_EGG
             || Tag.FLOWER_POTS.isTagged(type)
             || Tag.CANDLES.isTagged(type)
             || Tag.CANDLE_CAKES.isTagged(type);
