@@ -53,6 +53,9 @@ import com.sk89q.worldguard.commands.task.RegionManagerSaver;
 import com.sk89q.worldguard.commands.task.RegionRemover;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
+import com.sk89q.worldguard.domains.CustomDomain;
+import com.sk89q.worldguard.domains.registry.CustomDomainContext;
+import com.sk89q.worldguard.domains.registry.InvalidDomainFormat;
 import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.FlagValueCalculator;
@@ -83,7 +86,9 @@ import com.sk89q.worldguard.util.Enums;
 import com.sk89q.worldguard.util.logging.LoggerToChatHandler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
@@ -160,7 +165,7 @@ public final class RegionCommands extends RegionCommandsBase {
             region = checkRegionFromSelection(sender, id);
         }
 
-        RegionAdder task = new RegionAdder(manager, region);
+        RegionAdder task = new RegionAdder(manager, region, sender);
         task.addOwnersFromCommand(args, 2);
 
         final String description = String.format("Adding region '%s'", region.getId());
@@ -214,7 +219,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         region.copyFrom(existing);
 
-        RegionAdder task = new RegionAdder(manager, region);
+        RegionAdder task = new RegionAdder(manager, region, sender);
 
         final String description = String.format("Updating region '%s'", region.getId());
         AsyncCommandBuilder.wrap(task, sender)
@@ -328,6 +333,19 @@ public final class RegionCommands extends RegionCommandsBase {
                     throw new CommandException(e.getMessage());
                 }
             }
+        }
+
+        if (wcfg.nonplayerBorderBypassOnClaim) {
+            CustomDomain customDomain = WorldGuard.getInstance().getDomainRegistry().createDomain("nonplayer-protection-domains");
+
+            try {
+                customDomain.parseInput(CustomDomainContext.create().setInput(player.getUniqueId().toString()).build());
+            } catch (InvalidDomainFormat e) {
+                throw new CommandException(e.getMessage());
+            }
+
+            region.getOwners().addCustomDomain(customDomain);
+            region.setFlag(Flags.NONPLAYER_PROTECTION_DOMAINS, new HashSet<>(Arrays.asList(player.getUniqueId().toString())));
         }
 
         region.getOwners().addPlayer(player);

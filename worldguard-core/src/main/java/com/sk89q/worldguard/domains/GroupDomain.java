@@ -121,6 +121,11 @@ public class GroupDomain implements Domain, ChangeTracked {
     }
 
     @Override
+    public boolean containsNonplayer(String nonplayerProtectionDomain) {
+        return false; // GroupDomains can't contain non-players.
+    }
+
+    @Override
     public int size() {
         return groups.size();
     }

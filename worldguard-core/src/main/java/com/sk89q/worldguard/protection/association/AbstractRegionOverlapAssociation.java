@@ -22,13 +22,9 @@ package com.sk89q.worldguard.protection.association;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldguard.domains.Association;
-import com.sk89q.worldguard.protection.FlagValueCalculator;
-import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,39 +60,22 @@ public abstract class AbstractRegionOverlapAssociation implements RegionAssociab
         this.maxPriorityRegions = bestRegions;
     }
 
-    private boolean checkNonplayerProtectionDomains(Iterable<? extends ProtectedRegion> source, Collection<?> domains) {
-        if (source == null || domains == null || domains.isEmpty()) {
-            return false;
-        }
-
-        for (ProtectedRegion region : source) {
-            // Potential endless recurrence? No, because there is no region group flag.
-            Set<String> regionDomains = FlagValueCalculator.getEffectiveFlagOf(region, Flags.NONPLAYER_PROTECTION_DOMAINS, this);
-
-            if (regionDomains == null || regionDomains.isEmpty()) {
-                continue;
-            }
-
-            if (!Collections.disjoint(regionDomains, domains)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     @Override
     public Association getAssociation(List<ProtectedRegion> regions) {
         checkNotNull(source);
+        boolean member = false;
+
         for (ProtectedRegion region : regions) {
-            while (region != null) {
-                if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty())) {
+            ProtectedRegion current = region;
+
+            while (current != null) {
+                if ((current.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty())) {
                     return Association.OWNER;
                 }
 
-                if (source.contains(region)) {
+                if (source.contains(current)) {
                     if (useMaxPriorityAssociation) {
-                        int priority = region.getPriority();
+                        int priority = current.getPriority();
                         if (priority == maxPriority) {
                             return Association.OWNER;
                         }
@@ -105,23 +84,24 @@ public abstract class AbstractRegionOverlapAssociation implements RegionAssociab
                     }
                 }
 
-                Set<ProtectedRegion> source;
+                current = current.getParent();
+            }
 
-                if (useMaxPriorityAssociation) {
-                    source = maxPriorityRegions;
-                } else {
-                    source = this.source;
-                }
+            Set<ProtectedRegion> source;
 
-                // Potential endless recurrence? No, because there is no region group flag.
-                if (checkNonplayerProtectionDomains(source, FlagValueCalculator.getEffectiveFlagOf(region, Flags.NONPLAYER_PROTECTION_DOMAINS, this))) {
-                    return Association.OWNER;
-                }
+            if (useMaxPriorityAssociation) {
+                source = maxPriorityRegions;
+            } else {
+                source = this.source;
+            }
 
-                region = region.getParent();
+            if (source.stream().anyMatch(region::isOwner)) {
+                return Association.OWNER;
+            } else if (!member && source.stream().anyMatch(region::isMember)) {
+                member = true;
             }
         }
 
-        return Association.NON_MEMBER;
+        return member ? Association.MEMBER : Association.NON_MEMBER;
     }
 }

@@ -25,16 +25,27 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.domains.registry.DomainFactory;
+import com.sk89q.worldguard.domains.registry.DomainRegistry;
+import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.DomainInputResolver;
 import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class MemberCommands extends RegionCommandsBase {
@@ -67,6 +78,8 @@ public class MemberCommands extends RegionCommandsBase {
         DomainInputResolver resolver = new DomainInputResolver(
                 WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
         resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
+        resolver.setActor(sender);
+        resolver.setRegion(region);
 
 
         final String description = String.format("Adding members to the region '%s' on '%s'", region.getId(), world.getName());
@@ -101,7 +114,8 @@ public class MemberCommands extends RegionCommandsBase {
         DomainInputResolver resolver = new DomainInputResolver(
                 WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
         resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
-
+        resolver.setActor(sender);
+        resolver.setRegion(region);
 
         final String description = String.format("Adding owners to the region '%s' on '%s'", region.getId(), world.getName());
         AsyncCommandBuilder.wrap(checkedAddOwners(sender, manager, region, world, resolver), sender)
@@ -174,6 +188,8 @@ public class MemberCommands extends RegionCommandsBase {
             DomainInputResolver resolver = new DomainInputResolver(
                     WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
             resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_AND_NAME);
+            resolver.setActor(sender);
+            resolver.setRegion(region);
 
             callable = resolver;
         }
@@ -217,6 +233,8 @@ public class MemberCommands extends RegionCommandsBase {
             DomainInputResolver resolver = new DomainInputResolver(
                     WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
             resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_AND_NAME);
+            resolver.setActor(sender);
+            resolver.setRegion(region);
 
             callable = resolver;
         }
@@ -228,5 +246,61 @@ public class MemberCommands extends RegionCommandsBase {
                 .onSuccess(String.format("Region '%s' updated with owners removed.", region.getId()), region.getOwners()::removeAll)
                 .onFailure("Failed to remove owners", worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
+    }
+
+    // TODO: Implement a list for available domains. Maybe /rg domains? or /rg addmembers/addowners/delmembers/delowners?
+    private static class DomainListBuilder implements Callable<Component> {
+        private final DomainRegistry domainRegistry;
+        private final RegionPermissionModel permModel;
+        private final ProtectedRegion existing;
+        private final World world;
+        private final String regionId;
+        private final Actor sender;
+        private final boolean isOwner;
+        private final String domainName;
+
+        DomainListBuilder(DomainRegistry domainRegistry, RegionPermissionModel permModel, ProtectedRegion existing,
+                          World world, String regionId, Actor sender, String domainName, boolean isOwner) {
+            this.domainRegistry = domainRegistry;
+            this.permModel = permModel;
+            this.existing = existing;
+            this.world = world;
+            this.regionId = regionId;
+            this.sender = sender;
+            this.domainName = domainName;
+            this.isOwner = isOwner;
+        }
+
+        @Override
+        public Component call() {
+            ArrayList<String> domainList = new ArrayList<>();
+
+            // Need to build a list
+            for (Map.Entry<String, DomainFactory<?>> domainEntry : domainRegistry.getAll().entrySet()) {
+                if (!permModel.mayModifyCustomDomain(existing, isOwner, domainEntry.getKey())) {
+                    continue;
+                }
+                domainList.add(domainEntry.getKey());
+            }
+            Collections.sort(domainList);
+
+            final TextComponent.Builder builder = TextComponent.builder("Available domains: ");
+
+            final HoverEvent clickToSet = HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set"));
+            for (int i = 0; i < domainList.size(); i++) {
+                String domainName = domainList.get(i);
+
+                builder.append(TextComponent.of(domainName, i % 2 == 0 ? TextColor.GRAY : TextColor.WHITE)
+                        .hoverEvent(clickToSet).clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
+                                "/rg " + (isOwner ? "addowner" : "addmember") +" -w \"" + world.getName() + "\" " + regionId + " " + domainName + ":")));
+                if (i < domainList.size() + 1) {
+                    builder.append(TextComponent.of(", "));
+                }
+            }
+
+            return ErrorFormat.wrap("Unknown domain specified: " + domainName)
+                    .append(TextComponent.newline())
+                    .append(builder.build());
+        }
     }
 }
