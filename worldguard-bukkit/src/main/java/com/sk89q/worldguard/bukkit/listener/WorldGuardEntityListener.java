@@ -603,7 +603,7 @@ public class WorldGuardEntityListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(event.getEntity().getWorld());
 
         // allow spawning of creatures from plugins
-        if (!wcfg.blockPluginSpawning && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) {
+        if (!wcfg.blockPluginSpawning && Entities.isPluginSpawning(event.getSpawnReason())) {
             return;
         }
 
