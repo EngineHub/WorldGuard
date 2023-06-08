@@ -139,6 +139,8 @@ public abstract class WorldConfiguration {
     public boolean disablePlayerCropTrampling;
     public boolean disableCreatureTurtleEggTrampling;
     public boolean disablePlayerTurtleEggTrampling;
+    public boolean disableCreatureSnifferEggTrampling;
+    public boolean disablePlayerSnifferEggTrampling;
     public boolean preventLightningFire;
     public Set<String> disallowedLightningBlocks;
     public boolean disableThunder;

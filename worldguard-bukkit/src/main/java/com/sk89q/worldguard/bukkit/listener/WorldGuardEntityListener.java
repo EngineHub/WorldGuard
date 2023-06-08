@@ -120,6 +120,10 @@ public class WorldGuardEntityListener extends AbstractListener {
             event.setCancelled(true);
             return;
         }
+        if (block.getType() == Material.SNIFFER_EGG && wcfg.disableCreatureSnifferEggTrampling) {
+            event.setCancelled(true);
+            return;
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)

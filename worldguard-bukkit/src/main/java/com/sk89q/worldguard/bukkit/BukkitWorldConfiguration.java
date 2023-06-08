@@ -256,6 +256,8 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
         disableCreatureTurtleEggTrampling = getBoolean("turtle-egg.disable-creature-trampling", false);
         disablePlayerTurtleEggTrampling = getBoolean("turtle-egg.disable-player-trampling", false);
+        disableCreatureSnifferEggTrampling = getBoolean("sniffer-egg.disable-creature-trampling", false);
+        disablePlayerSnifferEggTrampling = getBoolean("sniffer-egg.disable-player-trampling", false);
 
         disallowedLightningBlocks = new HashSet<>(convertLegacyBlocks(getStringList("weather.prevent-lightning-strike-blocks", null)));
         preventLightningFire = getBoolean("weather.disable-lightning-strike-fire", false);
