@@ -20,8 +20,8 @@ configurations {
 
 dependencies {
     "api"(project(":worldguard-core"))
-    "compileOnly"("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
-    "runtimeOnly"("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT") {
+    "compileOnly"("io.papermc.paper:paper-api:1.20-R0.1-SNAPSHOT")
+    "runtimeOnly"("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
     }
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
