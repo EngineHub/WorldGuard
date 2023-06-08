@@ -454,7 +454,9 @@ public class EventAbstractionListener extends AbstractListener {
         switch (event.getAction()) {
             case PHYSICAL:
                 if (event.useInteractedBlock() != Result.DENY) {
-                    if (clicked.getType() == Material.FARMLAND || clicked.getType() == Material.TURTLE_EGG) {
+                    if (clicked.getType() == Material.FARMLAND ||
+                            clicked.getType() == Material.TURTLE_EGG ||
+                            clicked.getType() == Material.SNIFFER_EGG) {
                         BreakBlockEvent breakDelagate = new BreakBlockEvent(event, cause, clicked);
                         breakDelagate.setSilent(true);
                         breakDelagate.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
@@ -600,9 +602,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSignChange(SignChangeEvent event) {
-        Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), event.getBlock()));
-
-        if (event.isCancelled()) {
+        if (Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()), event.getBlock()))) {
             playDenyEffect(event.getPlayer(), event.getBlock().getLocation().add(0.5, 0.5, 0.5));
         }
     }
