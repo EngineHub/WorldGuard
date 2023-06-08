@@ -990,8 +990,7 @@ public class EventAbstractionListener extends AbstractListener {
             handleInventoryHolderUse(event, cause, targetHolder);
 
             if (event.isCancelled() && causeHolder instanceof Hopper && wcfg.breakDeniedHoppers) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(),
-                        () -> ((Hopper) causeHolder).getBlock().breakNaturally());
+                getPlugin().getScheduler().runAtRegion(((Hopper) causeHolder).getLocation(), () -> ((Hopper) causeHolder).getBlock().breakNaturally());
             } else {
                 entry.setCancelled(event.isCancelled());
             }

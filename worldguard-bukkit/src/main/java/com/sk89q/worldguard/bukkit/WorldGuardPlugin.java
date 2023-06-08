@@ -58,6 +58,9 @@ import com.sk89q.worldguard.bukkit.listener.WorldGuardVehicleListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardWeatherListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
 import com.sk89q.worldguard.bukkit.listener.WorldRulesListener;
+import com.sk89q.worldguard.bukkit.scheduler.BukkitSchedulerAdapter;
+import com.sk89q.worldguard.bukkit.scheduler.FoliaSchedulerAdapter;
+import com.sk89q.worldguard.bukkit.scheduler.SchedulerAdapter;
 import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.bukkit.util.ClassSourceValidator;
 import com.sk89q.worldguard.bukkit.util.Entities;
@@ -107,6 +110,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     private static WorldGuardPlugin inst;
     private static BukkitWorldGuardPlatform platform;
     private final CommandsManager<Actor> commands;
+    private final SchedulerAdapter scheduler = FoliaSchedulerAdapter.isSupported()
+            ? new FoliaSchedulerAdapter(this) : new BukkitSchedulerAdapter(this);
     private PlayerMoveListener playerMoveListener;
 
     private static final int BSTATS_PLUGIN_ID = 3283;
@@ -164,7 +169,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             reg.register(GeneralCommands.class);
         }
 
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
+        getScheduler().runAsyncRate(sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
 
         // Register events
         getServer().getPluginManager().registerEvents(sessionManager, this);
@@ -205,10 +210,12 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
-        Bukkit.getScheduler().runTask(this, () -> {
+        getScheduler().runAsync(() -> {
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                ProcessPlayerEvent event = new ProcessPlayerEvent(player);
-                Events.fire(event);
+                getScheduler().runAtEntity(player, () -> {
+                    ProcessPlayerEvent event = new ProcessPlayerEvent(player);
+                    Events.fire(event);
+                });
             }
         });
 
@@ -266,7 +273,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         WorldGuard.getInstance().disable();
-        this.getServer().getScheduler().cancelTasks(this);
+        getScheduler().cancelTasks();
     }
 
     @Override
@@ -526,4 +533,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         return playerMoveListener;
     }
 
+    public SchedulerAdapter getScheduler() {
+        return scheduler;
+    }
 }
