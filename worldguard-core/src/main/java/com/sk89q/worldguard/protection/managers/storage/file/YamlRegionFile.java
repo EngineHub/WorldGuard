@@ -192,7 +192,7 @@ public class YamlRegionFile implements RegionDatabase {
     }
 
     @Override
-    public void saveAll(Set<ProtectedRegion> regions) throws StorageException {
+    public synchronized void saveAll(Set<ProtectedRegion> regions) throws StorageException {
         checkNotNull(regions);
 
         File tempFile = new File(file.getParentFile(), file.getName() + ".tmp");
