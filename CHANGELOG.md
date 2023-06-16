@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.0.9
+* Add support for MC 1.20
+* Made entities spawned via the `/summon` command get treated as plugin-spawned entities
+* Add sniffer egg trample protection options
+
 ## 7.0.8
 * Add support for MC 1.19
 * Add skulk-growth flag and config option
