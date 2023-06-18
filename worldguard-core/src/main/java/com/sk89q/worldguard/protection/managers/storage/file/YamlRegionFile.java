@@ -43,6 +43,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.parser.ParserException;
@@ -91,7 +92,7 @@ public class YamlRegionFile implements RegionDatabase {
         options.setIndent(4);
         options.setDefaultFlowStyle(FlowStyle.AUTO);
 
-        ERROR_DUMP_YAML = new Yaml(new SafeConstructor(), new Representer(), options);
+        ERROR_DUMP_YAML = new Yaml(new SafeConstructor(new LoaderOptions()), new Representer(new DumperOptions()), options);
     }
 
     /**
@@ -338,7 +339,7 @@ public class YamlRegionFile implements RegionDatabase {
     }
 
     /**
-     * Create a YAML processer instance.
+     * Create a YAML processor instance.
      *
      * @param file the file
      * @return a processor instance
@@ -352,7 +353,7 @@ public class YamlRegionFile implements RegionDatabase {
      * Dump the given object as YAML for debugging purposes.
      *
      * @param object the object
-     * @return the YAML string or an error string if dumping fals
+     * @return the YAML string or an error string if dumping fails
      */
     private static String toYamlOutput(Object object) {
         try {

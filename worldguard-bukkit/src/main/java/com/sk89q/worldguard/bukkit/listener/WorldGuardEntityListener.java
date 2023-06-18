@@ -120,6 +120,10 @@ public class WorldGuardEntityListener extends AbstractListener {
             event.setCancelled(true);
             return;
         }
+        if (block.getType() == Material.SNIFFER_EGG && wcfg.disableCreatureSnifferEggTrampling) {
+            event.setCancelled(true);
+            return;
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -603,7 +607,7 @@ public class WorldGuardEntityListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(event.getEntity().getWorld());
 
         // allow spawning of creatures from plugins
-        if (!wcfg.blockPluginSpawning && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) {
+        if (!wcfg.blockPluginSpawning && Entities.isPluginSpawning(event.getSpawnReason())) {
             return;
         }
 

@@ -32,6 +32,7 @@ import com.sk89q.worldguard.util.io.Closer;
 import com.sk89q.worldguard.util.sql.DataSourceConfig;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.representer.Representer;
@@ -191,11 +192,11 @@ class SQLRegionDatabase implements RegionDatabase {
         DumperOptions options = new DumperOptions();
         options.setIndent(2);
         options.setDefaultFlowStyle(FlowStyle.FLOW);
-        Representer representer = new Representer();
+        Representer representer = new Representer(options);
         representer.setDefaultFlowStyle(FlowStyle.FLOW);
 
         // We have to use this in order to properly save non-string values
-        return new Yaml(new SafeConstructor(), new Representer(), options);
+        return new Yaml(new SafeConstructor(new LoaderOptions()), representer, options);
     }
 
     @Override
