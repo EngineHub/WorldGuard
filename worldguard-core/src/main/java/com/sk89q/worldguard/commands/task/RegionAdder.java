@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.commands.task;
 
 import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -39,6 +40,7 @@ public class RegionAdder implements Callable<ProtectedRegion> {
 
     private final RegionManager manager;
     private final ProtectedRegion region;
+    private final Actor actor;
     @Nullable
     private String[] ownersInput;
     private UserLocatorPolicy locatorPolicy = UserLocatorPolicy.UUID_ONLY;
@@ -46,15 +48,26 @@ public class RegionAdder implements Callable<ProtectedRegion> {
     /**
      * Create a new instance.
      *
-     * @param manager the manage
+     * @param manager the manager
      * @param region the region
      */
     public RegionAdder(RegionManager manager, ProtectedRegion region) {
+        this(manager, region, null);
+    }
+
+    /**
+     * Create a new instance.
+     * @param manager the manager
+     * @param region the region
+     * @param actor the actor
+     */
+    public RegionAdder(RegionManager manager, ProtectedRegion region, Actor actor) {
         checkNotNull(manager);
         checkNotNull(region);
 
         this.manager = manager;
         this.region = region;
+        this.actor = actor;
     }
 
     /**
@@ -75,6 +88,9 @@ public class RegionAdder implements Callable<ProtectedRegion> {
         if (ownersInput != null) {
             DomainInputResolver resolver = new DomainInputResolver(WorldGuard.getInstance().getProfileService(), ownersInput);
             resolver.setLocatorPolicy(locatorPolicy);
+            resolver.setActor(actor);
+            resolver.setRegion(region);
+
             DefaultDomain domain = resolver.call();
             region.getOwners().addAll(domain);
         }

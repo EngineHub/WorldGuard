@@ -17,68 +17,68 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection.flags;
+package com.sk89q.worldguard.domains.registry;
 
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.commands.CommandInputContext;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public final class FlagContext extends CommandInputContext<InvalidFlagFormatException> {
+public final class CustomDomainContext extends CommandInputContext<InvalidDomainFormatException> {
 
-    private FlagContext(Actor sender, String input, Map<String, Object> values) {
+    private CustomDomainContext(Actor sender, String input, Map<String, Object> values) {
         super(sender, input, values);
     }
 
-    public static FlagContext.FlagContextBuilder create() {
-        return new FlagContextBuilder();
+
+    public static CustomDomainContext.CustomDomainContextBuilder create() {
+        return new CustomDomainContext.CustomDomainContextBuilder();
     }
 
     /**
-     * Create a copy of this FlagContext, with optional substitutions for values
+     * Create a copy of this CustomDomainContext, with optional substitutions for values
      *
      * <p>If any supplied variable is null, it will be ignored.
-     * If a map is supplied, it will override this FlagContext's values of the same key,
+     * If a map is supplied, it will override this CustomDomainContext's values of the same key,
      * but unprovided keys will not be overriden and will be returned as shallow copies.</p>
      *
-     * @param commandSender CommandSender for the new FlagContext to run under
-     * @param s String of the user input for the new FlagContext
-     * @param values map of values to override from the current FlagContext
-     * @return a copy of this FlagContext
+     * @param commandSender CommandSender for the new CustomDomainContext to run under
+     * @param s String of the user input for the new CustomDomainContext
+     * @param values map of values to override from the current CustomDomainContext
+     * @return a copy of this CustomDomainContext
      */
-    public FlagContext copyWith(@Nullable Actor commandSender, @Nullable String s, @Nullable Map<String, Object> values) {
+    public CustomDomainContext copyWith(@Nullable Actor commandSender, @Nullable String s, @Nullable Map<String, Object> values) {
         Map<String, Object> map = Maps.newHashMap();
         map.putAll(context);
         if (values != null) {
             map.putAll(values);
         }
-        return new FlagContext(commandSender == null ? this.sender : commandSender, s == null ? this.input : s, map);
+        return new CustomDomainContext(commandSender == null ? this.sender : commandSender, s == null ? this.input : s, map);
     }
 
     @Override
-    protected InvalidFlagFormatException createException(String str) {
-        return new InvalidFlagFormatException(str);
+    protected InvalidDomainFormatException createException(String str) {
+        return new InvalidDomainFormatException(str);
     }
 
-    public static class FlagContextBuilder {
+    public static class CustomDomainContextBuilder {
         private Actor sender;
         private String input;
         private Map<String, Object> map = Maps.newHashMap();
 
-        public FlagContextBuilder setSender(Actor sender) {
+        public CustomDomainContextBuilder setSender(Actor sender) {
             this.sender = sender;
             return this;
         }
 
-        public FlagContextBuilder setInput(String input) {
+        public CustomDomainContextBuilder setInput(String input) {
             this.input = input;
             return this;
         }
 
-        public FlagContextBuilder setObject(String key, Object value) {
+        public CustomDomainContextBuilder setObject(String key, Object value) {
             this.map.put(key, value);
             return this;
         }
@@ -89,11 +89,10 @@ public final class FlagContext extends CommandInputContext<InvalidFlagFormatExce
             return true;
         }
 
-        public FlagContext build() {
-            WorldGuard.getInstance().getPlatform().notifyFlagContextCreate(this);
-
-            return new FlagContext(sender, input, map);
+        public CustomDomainContext build() {
+            return new CustomDomainContext(sender, input, map);
         }
     }
 
 }
+

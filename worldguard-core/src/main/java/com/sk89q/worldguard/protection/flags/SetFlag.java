@@ -58,7 +58,7 @@ public class SetFlag<T> extends Flag<Set<T>> {
     }
 
     @Override
-    public Set<T> parseInput(FlagContext context) throws InvalidFlagFormat {
+    public Set<T> parseInput(FlagContext context) throws InvalidFlagFormatException {
         String input = context.getUserInput();
         if (input.isEmpty()) {
             return Sets.newHashSet();

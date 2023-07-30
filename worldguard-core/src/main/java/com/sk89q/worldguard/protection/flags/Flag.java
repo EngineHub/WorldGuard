@@ -181,9 +181,9 @@ public abstract class Flag<T> {
      *
      * @param context the {@link FlagContext}
      * @return The coerced type
-     * @throws InvalidFlagFormat Raised if the input is invalid
+     * @throws InvalidFlagFormatException Raised if the input is invalid
      */
-    public abstract T parseInput(FlagContext context) throws InvalidFlagFormat;
+    public abstract T parseInput(FlagContext context) throws InvalidFlagFormatException;
 
     /**
      * Convert a raw type that was loaded (from a YAML file, for example)

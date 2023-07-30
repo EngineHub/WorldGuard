@@ -17,39 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection.flags;
+package com.sk89q.worldguard.domains.registry;
 
-/**
- * Stores doubles.
- */
-public class DoubleFlag extends NumberFlag<Double> {
-
-    public DoubleFlag(String name, RegionGroup defaultGroup) {
-        super(name, defaultGroup);
-    }
-
-    public DoubleFlag(String name) {
-        super(name);
-    }
-
-    @Override
-    public Double parseInput(FlagContext context) throws InvalidFlagFormatException {
-        return context.getUserInputAsDouble();
-    }
-
-    @Override
-    public Double unmarshal(Object o) {
-        if (o instanceof Double) {
-            return (Double) o;
-        } else if (o instanceof Number) {
-            return ((Number) o).doubleValue();
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public Object marshal(Double o) {
-        return o;
+public class DomainConflictException extends RuntimeException {
+    public DomainConflictException(String message) {
+        super(message);
     }
 }

@@ -40,12 +40,12 @@ public class GameModeTypeFlag extends Flag<GameMode> {
     }
 
     @Override
-    public GameMode parseInput(FlagContext context) throws InvalidFlagFormat {
+    public GameMode parseInput(FlagContext context) throws InvalidFlagFormatException {
         String input = context.getUserInput();
         input = input.trim();
         GameMode gamemode = unmarshal(input);
         if (gamemode == null) {
-            throw new InvalidFlagFormat("Unknown game mode: " + input);
+            throw new InvalidFlagFormatException("Unknown game mode: " + input);
         }
         return gamemode;
     }

@@ -19,6 +19,10 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+/**
+ * @deprecated replaced by {@link InvalidFlagFormatException}. Will be removed in WorldGuard 8
+ */
+@Deprecated(forRemoval = true)
 public class InvalidFlagFormat extends Exception {
     
     private static final long serialVersionUID = 8101615074524004172L;

@@ -59,7 +59,7 @@ import com.sk89q.worldguard.protection.FlagValueCalculator;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormatException;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
@@ -160,7 +160,7 @@ public final class RegionCommands extends RegionCommandsBase {
             region = checkRegionFromSelection(sender, id);
         }
 
-        RegionAdder task = new RegionAdder(manager, region);
+        RegionAdder task = new RegionAdder(manager, region, sender);
         task.addOwnersFromCommand(args, 2);
 
         final String description = String.format("Adding region '%s'", region.getId());
@@ -214,7 +214,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         region.copyFrom(existing);
 
-        RegionAdder task = new RegionAdder(manager, region);
+        RegionAdder task = new RegionAdder(manager, region, sender);
 
         final String description = String.format("Updating region '%s'", region.getId());
         AsyncCommandBuilder.wrap(task, sender)
@@ -587,7 +587,7 @@ public final class RegionCommands extends RegionCommandsBase {
             // the [value] part throws an error.
             try {
                 groupValue = groupFlag.parseInput(FlagContext.create().setSender(sender).setInput(group).setObject("region", existing).build());
-            } catch (InvalidFlagFormat e) {
+            } catch (InvalidFlagFormatException e) {
                 throw new CommandException(e.getMessage());
             }
 
@@ -598,7 +598,7 @@ public final class RegionCommands extends RegionCommandsBase {
             // Set the flag if [value] was given even if [-g group] was given as well
             try {
                 value = setFlag(existing, foundFlag, sender, value).toString();
-            } catch (InvalidFlagFormat e) {
+            } catch (InvalidFlagFormatException e) {
                 throw new CommandException(e.getMessage());
             }
 

@@ -17,39 +17,48 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection.flags;
+package com.sk89q.worldguard.domains;
 
-/**
- * Stores doubles.
- */
-public class DoubleFlag extends NumberFlag<Double> {
+import com.sk89q.worldguard.domains.registry.CustomDomainContext;
+import com.sk89q.worldguard.domains.registry.InvalidDomainFormatException;
 
-    public DoubleFlag(String name, RegionGroup defaultGroup) {
-        super(name, defaultGroup);
-    }
+import java.util.Objects;
+import java.util.UUID;
 
-    public DoubleFlag(String name) {
+public class CustomUUIDDomain extends CustomDomain {
+    private UUID test;
+
+    public CustomUUIDDomain(String name, UUID test) {
         super(name);
+        this.test = test;
     }
 
     @Override
-    public Double parseInput(FlagContext context) throws InvalidFlagFormatException {
-        return context.getUserInputAsDouble();
+    public void parseInput(CustomDomainContext context) throws InvalidDomainFormatException {
+        throw new InvalidDomainFormatException("not supported");
     }
 
     @Override
-    public Double unmarshal(Object o) {
-        if (o instanceof Double) {
-            return (Double) o;
-        } else if (o instanceof Number) {
-            return ((Number) o).doubleValue();
-        } else {
-            return null;
-        }
+    public void unmarshal(Object o) {
     }
 
     @Override
-    public Object marshal(Double o) {
-        return o;
+    public Object marshal() {
+        return null;
+    }
+
+    @Override
+    public boolean contains(UUID uniqueId) {
+        return Objects.equals(test, uniqueId);
+    }
+
+    @Override
+    public boolean contains(String playerName) {
+        return false;
+    }
+
+    @Override
+    public void clear() {
+        test = null;
     }
 }

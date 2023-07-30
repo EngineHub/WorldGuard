@@ -1,6 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
@@ -52,22 +53,22 @@ fun Project.applyLibrariesConfiguration() {
     }
     val altConfigFiles = { artifactType: String ->
         val deps = configurations["shade"].incoming.dependencies
-                .filterIsInstance<ModuleDependency>()
-                .map { it.copy() }
-                .map { dependency ->
-                    dependency.artifact {
-                        name = dependency.name
-                        type = artifactType
-                        extension = "jar"
-                        classifier = artifactType
-                    }
-                    dependency
+            .filterIsInstance<ModuleDependency>()
+            .map { it.copy() }
+            .map { dependency ->
+                dependency.artifact {
+                    name = dependency.name
+                    type = artifactType
+                    extension = "jar"
+                    classifier = artifactType
                 }
+                dependency
+            }
 
         files(configurations.detachedConfiguration(*deps.toTypedArray())
-                .resolvedConfiguration.lenientConfiguration.artifacts
-                .filter { it.classifier == artifactType }
-                .map { zipTree(it.file) })
+            .resolvedConfiguration.lenientConfiguration.artifacts
+            .filter { it.classifier == artifactType }
+            .map { zipTree(it.file) })
     }
     tasks.register<Jar>("sourcesJar") {
         from({
@@ -161,11 +162,26 @@ fun Project.applyLibrariesConfiguration() {
     applyCommonArtifactoryConfig()
 }
 
+// A horrible hack because `softwareComponentFactory` has to be gotten via plugin
+// gradle why
 internal open class LibsConfigPluginHack @Inject constructor(
-        private val softwareComponentFactory: SoftwareComponentFactory
+    private val softwareComponentFactory: SoftwareComponentFactory
 ) : Plugin<Project> {
     override fun apply(project: Project) {
         val libsComponents = softwareComponentFactory.adhoc("libs")
         project.components.add(libsComponents)
+    }
+}
+
+fun Project.constrainDependenciesToLibsCore() {
+    evaluationDependsOn(":worldguard-libs:core")
+    val coreDeps = project(":worldguard-libs:core").configurations["shade"].dependencies
+        .filterIsInstance<ExternalModuleDependency>()
+    dependencies.constraints {
+        for (coreDep in coreDeps) {
+            add("shade", "${coreDep.group}:${coreDep.name}:${coreDep.version}") {
+                because("libs should align with libs:core")
+            }
+        }
     }
 }
