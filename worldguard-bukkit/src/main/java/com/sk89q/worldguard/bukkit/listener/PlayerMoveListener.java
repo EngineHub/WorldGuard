@@ -26,7 +26,6 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
 import io.papermc.lib.PaperLib;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Entity;
@@ -132,7 +131,7 @@ public class PlayerMoveListener extends AbstractListener {
 
                 player.teleport(override.clone().add(0, 1, 0));
 
-                Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleport(override.clone().add(0, 1, 0)), 1);
+                getPlugin().getScheduler().runAtEntityDelayed(player, () -> player.teleport(override.clone().add(0, 1, 0)), 1);
             }
         }
     }

@@ -60,8 +60,7 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     @EventHandler
     public void onPlayerProcess(ProcessPlayerEvent event) {
         // Pre-load a session
-        LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
-        get(player).initialize(player);
+        get(WorldGuardPlugin.inst().wrapPlayer(event.getPlayer()));
     }
 
     @Override

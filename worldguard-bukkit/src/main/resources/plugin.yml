@@ -4,3 +4,5 @@ version: "${internalVersion}"
 depend: [WorldEdit]
 softdepend: [CommandBook]
 api-version: 1.19
+
+folia-supported: true

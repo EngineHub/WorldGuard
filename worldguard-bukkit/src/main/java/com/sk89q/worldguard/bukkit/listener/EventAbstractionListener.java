@@ -47,7 +47,6 @@ import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.flags.Flags;
 import io.papermc.lib.PaperLib;
-import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -988,13 +987,6 @@ public class EventAbstractionListener extends AbstractListener {
             }
 
             handleInventoryHolderUse(event, cause, targetHolder);
-
-            if (event.isCancelled() && causeHolder instanceof Hopper && wcfg.breakDeniedHoppers) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(),
-                        () -> ((Hopper) causeHolder).getBlock().breakNaturally());
-            } else {
-                entry.setCancelled(event.isCancelled());
-            }
         }
     }
 
