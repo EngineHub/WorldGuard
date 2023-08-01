@@ -27,6 +27,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 public class BukkitSchedulerAdapter implements SchedulerAdapter {
 
     private final Plugin plugin;
+    @SuppressWarnings("deprecation")
     private final BukkitScheduler scheduler;
 
     public BukkitSchedulerAdapter(final Plugin plugin) {
@@ -35,32 +36,27 @@ public class BukkitSchedulerAdapter implements SchedulerAdapter {
     }
 
     @Override
-    public void runAsync(final Runnable runnable) {
-        scheduler.runTaskAsynchronously(plugin, runnable);
-    }
-
-    @Override
     public void runAsyncRate(Runnable runnable, long delay, long period) {
         scheduler.runTaskTimerAsynchronously(plugin, runnable, delay, period);
     }
 
     @Override
-    public void runAtEntity(Entity entity, Runnable runnable) {
-
+    public void executeAtEntity(Entity entity, Runnable runnable) {
+        scheduler.runTask(plugin, runnable);
     }
 
     @Override
-    public void runAtEntityLater(final Entity entity, final Runnable runnable, final long delay) {
+    public void runAtEntityDelayed(final Entity entity, final Runnable runnable, final long delay) {
         scheduler.runTaskLater(plugin, runnable, delay);
     }
 
     @Override
-    public void runAtRegion(Location location, Runnable runnable) {
-
+    public void executeAtRegion(Location location, Runnable runnable) {
+        scheduler.runTask(plugin, runnable);
     }
 
     @Override
     public void cancelTasks() {
-
+        scheduler.cancelTasks(plugin);
     }
 }

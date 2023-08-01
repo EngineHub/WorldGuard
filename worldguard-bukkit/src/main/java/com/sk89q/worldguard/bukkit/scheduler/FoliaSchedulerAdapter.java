@@ -54,27 +54,22 @@ public class FoliaSchedulerAdapter implements SchedulerAdapter {
     }
 
     @Override
-    public void runAsync(final Runnable runnable) {
-        asyncScheduler.runNow(plugin, task -> runnable.run());
-    }
-
-    @Override
     public void runAsyncRate(final Runnable runnable, final long delay, final long period) {
         asyncScheduler.runAtFixedRate(plugin, task -> runnable.run(), delay * 50, period * 50, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public void runAtEntity(final Entity entity, final Runnable runnable) {
+    public void executeAtEntity(final Entity entity, final Runnable runnable) {
         entity.getScheduler().run(plugin, task -> runnable.run(), null);
     }
 
     @Override
-    public void runAtEntityLater(final Entity entity, final Runnable runnable, final long delay) {
+    public void runAtEntityDelayed(final Entity entity, final Runnable runnable, final long delay) {
         entity.getScheduler().execute(plugin, runnable, null, delay);
     }
 
     @Override
-    public void runAtRegion(final Location location, final Runnable runnable) {
+    public void executeAtRegion(final Location location, final Runnable runnable) {
         regionScheduler.execute(plugin, location, runnable);
     }
 

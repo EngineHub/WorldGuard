@@ -24,15 +24,59 @@ import org.bukkit.entity.Entity;
 
 public interface SchedulerAdapter {
 
-  void runAsync(Runnable runnable);
+    /**
+     * Schedules the specified task to be executed asynchronously after the delay has passed,
+     * and then periodically executed with the specified period.
+     *
+     * @param runnable The task to execute.
+     * @param delay    The time delay to pass before the task should be executed.
+     * @param period   The time between task executions after the first execution of the task.
+     */
+    void runAsyncRate(Runnable runnable, long delay, long period);
 
-  void runAsyncRate(Runnable runnable, long delay, long period);
+    /**
+     * Schedules a task. If the task failed to schedule because the scheduler is retired (entity removed),
+     * then returns {@code false}. Otherwise, either the run callback will be invoked after the specified delay,
+     * or the retired callback will be invoked if the scheduler is retired.
+     * Note that the retired callback is invoked in critical code, so it should not attempt to remove the entity,
+     * remove other entities, load chunks, load worlds, modify ticket levels, etc.
+     *
+     * <p>
+     * It is guaranteed that the task and retired callback are invoked on the region which owns the entity.
+     * </p>
+     *
+     * @param entity   The entity relative to which the scheduler is obtained.
+     * @param runnable The task to execute.
+     */
+    void executeAtEntity(Entity entity, Runnable runnable);
 
-  void runAtEntity(Entity entity, Runnable runnable);
+    /**
+     * Schedules a task with the given delay. If the task failed to schedule because the scheduler is retired (entity removed),
+     * then returns {@code false}. Otherwise, either the run callback will be invoked after the specified delay,
+     * or the retired callback will be invoked if the scheduler is retired.
+     * Note that the retired callback is invoked in critical code, so it should not attempt to remove the entity,
+     * remove other entities, load chunks, load worlds, modify ticket levels, etc.
+     *
+     * <p>
+     * It is guaranteed that the task and retired callback are invoked on the region which owns the entity.
+     * </p>
+     *
+     * @param entity   The entity relative to which the scheduler is obtained.
+     * @param runnable The task to execute.
+     * @param delay    The time delay to pass before the task should be executed, in ticks.
+     */
+    void runAtEntityDelayed(Entity entity, Runnable runnable, long delay);
 
-  void runAtEntityLater(Entity entity, Runnable runnable, long delay);
+    /**
+     * Schedules a task to be executed on the region which owns the location.
+     *
+     * @param location The location at which the region executing should own.
+     * @param runnable The task to execute.
+     */
+    void executeAtRegion(Location location, Runnable runnable);
 
-  void runAtRegion(Location location, Runnable runnable);
-
-  void cancelTasks();
+    /**
+     * Attempts to cancel all tasks scheduled by the plugin.
+     */
+    void cancelTasks();
 }
