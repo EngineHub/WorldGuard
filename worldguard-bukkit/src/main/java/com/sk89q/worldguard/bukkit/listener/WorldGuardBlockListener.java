@@ -470,7 +470,6 @@ public class WorldGuardBlockListener extends AbstractListener {
     public void onBlockForm(BlockFormEvent event) {
         ConfigurationManager cfg = getConfig();
 
-
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
             return;
@@ -517,6 +516,18 @@ public class WorldGuardBlockListener extends AbstractListener {
             }
             if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
                     .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.SNOW_FALL))) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        if (Materials.isUnwaxedCopper(event.getBlock().getType())) {
+            if (wcfg.disableCopperBlockFade) {
+                event.setCancelled(true);
+                return;
+            }
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.COPPER_FADE))) {
                 event.setCancelled(true);
                 return;
             }
@@ -694,16 +705,6 @@ public class WorldGuardBlockListener extends AbstractListener {
             }
             if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
                     .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.CORAL_FADE))) {
-                event.setCancelled(true);
-                return;
-            }
-        } else if (Materials.isUnwaxedCopper(event.getBlock().getType())) {
-            if (wcfg.disableCopperBlockFade) {
-                event.setCancelled(true);
-                return;
-            }
-            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
-                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.COPPER_FADE))) {
                 event.setCancelled(true);
                 return;
             }
