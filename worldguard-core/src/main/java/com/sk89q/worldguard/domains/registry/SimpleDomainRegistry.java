@@ -25,9 +25,8 @@ import com.google.common.collect.Maps;
 import com.sk89q.worldguard.domains.CustomDomain;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
@@ -139,20 +138,20 @@ public class SimpleDomainRegistry implements DomainRegistry {
         return null;
     }
 
-    public List<CustomDomain> unmarshal(Map<String, Object> rawValues, boolean createUnknown) {
+    public Map<String, CustomDomain> unmarshal(Map<String, Object> rawValues, boolean createUnknown) {
         checkNotNull(rawValues, "rawValues");
 
-        List<CustomDomain> domainList = new ArrayList<>();
+        Map<String, CustomDomain> domains = new HashMap<>();
 
         for (Map.Entry<String, Object> entry : rawValues.entrySet()) {
             try {
                 CustomDomain domain = getOrCreate(entry.getKey(), entry.getValue(), createUnknown);
-                domainList.add(domain);
+                domains.put(domain.getName(), domain);
             } catch (Throwable e) {
                 log.log(Level.WARNING, "Failed to unmarshal domain for " + entry.getKey(), e);
             }
         }
-        return domainList;
+        return domains;
     }
 
     @Override

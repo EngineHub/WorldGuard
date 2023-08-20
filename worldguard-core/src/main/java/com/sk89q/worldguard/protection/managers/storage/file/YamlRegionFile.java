@@ -289,7 +289,7 @@ public class YamlRegionFile implements RegionDatabase {
 
         YAMLNode apiDomains = node.getNode("custom");
         if (apiDomains != null) {
-            List<CustomDomain> parsedDomains = WorldGuard.getInstance().getDomainRegistry().unmarshal(apiDomains.getMap(), true);
+            Map<String, CustomDomain> parsedDomains = WorldGuard.getInstance().getDomainRegistry().unmarshal(apiDomains.getMap(), true);
             domain.setCustomDomains(parsedDomains);
         }
 
