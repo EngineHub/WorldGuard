@@ -83,7 +83,7 @@ public interface DomainRegistry extends Iterable<DomainFactory<?>> {
      * @param createUnknown Whether "just in time" domains should be created for unknown domains
      * @return The unmarshalled domain list
      */
-    List<CustomDomain> unmarshal(Map<String, Object> rawValues, boolean createUnknown);
+    Map<String, CustomDomain> unmarshal(Map<String, Object> rawValues, boolean createUnknown);
 
     /**
      * Get the number of registered domains.
