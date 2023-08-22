@@ -99,6 +99,7 @@ public final class Flags {
     public static final StateFlag RAVAGER_RAVAGE = register(new StateFlag("ravager-grief", true));
     public static final StateFlag ENTITY_PAINTING_DESTROY = register(new StateFlag("entity-painting-destroy", true));
     public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = register(new StateFlag("entity-item-frame-destroy", true));
+    public static final StateFlag ENTITY_ARMOR_STAND_DESTROY = register(new StateFlag("entity-armor-stand-destroy", true));
 
     // mob spawning related
     public static final StateFlag MOB_SPAWNING = register(new StateFlag("mob-spawning", true));

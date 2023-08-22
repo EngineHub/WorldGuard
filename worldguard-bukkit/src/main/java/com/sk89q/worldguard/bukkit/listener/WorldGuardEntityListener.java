@@ -215,8 +215,8 @@ public class WorldGuardEntityListener extends AbstractListener {
                 event.setCancelled(true);
                 return;
             }
-        } else if (defender instanceof ArmorStand && !(attacker instanceof Player)) {
-            if (wcfg.blockEntityArmorStandDestroy) {
+        } else if (defender instanceof ArmorStand) {
+            if (checkArmorStandProtection(attacker, (ArmorStand) defender)) {
                 event.setCancelled(true);
                 return;
             }
@@ -339,9 +339,10 @@ public class WorldGuardEntityListener extends AbstractListener {
                 event.setCancelled(true);
                 return;
             }
-        } else if (defender instanceof ArmorStand && Entities.isNonPlayerCreature(attacker)) {
-            if (wcfg.blockEntityArmorStandDestroy) {
+        } else if (defender instanceof ArmorStand) {
+            if (checkArmorStandProtection(attacker, (ArmorStand) defender)) {
                 event.setCancelled(true);
+                return;
             }
         }
 
@@ -867,4 +868,27 @@ public class WorldGuardEntityListener extends AbstractListener {
         return false;
     }
 
+    /**
+     * Checks regions and config settings to protect items from being knocked
+     * out of armor stand.
+     * @param attacker attacking entity
+     * @param defender armor stand being damaged
+     * @return true if the event should be cancelled
+     */
+    private boolean checkArmorStandProtection(Entity attacker, ArmorStand defender) {
+        World world = defender.getWorld();
+        WorldConfiguration wcfg = getWorldConfig(world);
+        if (wcfg.useRegions) {
+            // bukkit throws this event when a player attempts to remove an item from a frame
+            if (!(attacker instanceof Player)) {
+                if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(defender.getLocation()), (RegionAssociable) null, Flags.ENTITY_ARMOR_STAND_DESTROY))) {
+                    return true;
+                }
+            }
+        }
+        if (wcfg.blockEntityArmorStandDestroy && !(attacker instanceof Player)) {
+            return true;
+        }
+        return false;
+    }
 }
