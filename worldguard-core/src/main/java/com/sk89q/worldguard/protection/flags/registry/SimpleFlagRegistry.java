@@ -24,6 +24,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.RegionGroup;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag.State;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -162,7 +166,23 @@ public class SimpleFlagRegistry implements FlagRegistry {
                     values.put(unk, entry.getValue());
                 }
             } else {
-                values.put(parent.getRegionGroupFlag(), parent.getRegionGroupFlag().unmarshal(entry.getValue()));
+                RegionGroupFlag regionGroupFlag = parent.getRegionGroupFlag();
+
+                if (regionGroupFlag != null) {
+                    values.put(regionGroupFlag, regionGroupFlag.unmarshal(entry.getValue()));
+                } else {
+                    log.warning("Found non-existent region group flag '" + entry.getKey() + "' with value '" + entry.getValue() + "' for flag '" + parent.getName() + "'");
+                    log.warning("The region group flag '" + entry.getKey() + "' with value '" + entry.getValue() + "' will be removed");
+                    regionGroupFlag = new RegionGroupFlag("dummy", RegionGroup.ALL);
+                    RegionGroup regionGroup = regionGroupFlag.unmarshal(entry.getValue());
+
+                    if (regionGroup != null && regionGroup != RegionGroup.ALL) {
+                        if (!(parent instanceof StateFlag) || values.get(parent) == State.ALLOW) {
+                            log.warning("For safety reasons the flag '" + parent.getName() + "' with value '" + values.get(parent) + "' will also be removed");
+                            values.remove(parent);
+                        }
+                    }
+                }
             }
         }
 
