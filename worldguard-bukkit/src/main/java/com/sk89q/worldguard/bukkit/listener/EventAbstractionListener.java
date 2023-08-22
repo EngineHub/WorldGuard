@@ -47,6 +47,7 @@ import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.flags.Flags;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
@@ -1265,6 +1266,14 @@ public class EventAbstractionListener extends AbstractListener {
         @EventHandler(ignoreCancelled = true)
         public void onEntityTransform(EntityZapEvent event) {
             Events.fireToCancel(event, new DamageEntityEvent(event, create(event.getBolt()), event.getEntity()));
+        }
+
+        @EventHandler(ignoreCancelled = true)
+        public void onSignOpen(PlayerOpenSignEvent event) {
+            if (event.getCause() == PlayerOpenSignEvent.Cause.INTERACT) {
+                // other cases are handled by other events
+                Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), event.getSign().getBlock()));
+            }
         }
     }
 }
