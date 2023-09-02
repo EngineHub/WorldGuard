@@ -24,7 +24,6 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.MapFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -32,14 +31,13 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * A region set that is to be used when region data has failed. Operations
  * are blocked.
  */
-public class FailedLoadRegionSet extends AbstractRegionSet {
+public class FailedLoadRegionSet extends AbstractRegionSet implements DefaultFlagQuery {
 
     private static final FailedLoadRegionSet INSTANCE = new FailedLoadRegionSet();
 
@@ -56,40 +54,14 @@ public class FailedLoadRegionSet extends AbstractRegionSet {
     }
 
     @SuppressWarnings("unchecked")
-    @Nullable
     @Override
-    public <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag) {
-        if (flag == Flags.BUILD) {
-            return (V) State.DENY;
-        } else if (flag == Flags.DENY_MESSAGE) {
-            return (V) denyMessage;
-        }
-        return flag.getDefault();
-    }
-
-    @Nullable
-    @Override
-    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key) {
-        return queryMapValue(subject, flag, key, null);
-    }
-
-    @Nullable
-    @Override
-    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, @Nullable Flag<V> fallback) {
-        Map<K, V> defaultVal = flag.getDefault();
-        return defaultVal != null ? defaultVal.get(key) : fallback != null ? fallback.getDefault() : null;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag) {
+    public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag, boolean acceptOne) {
         if (flag == Flags.BUILD) {
             return (Collection<V>) ImmutableList.of(State.DENY);
         } else if (flag == Flags.DENY_MESSAGE) {
             return (Collection<V>) denyMessageCollection;
         }
-        V fallback = flag.getDefault();
-        return fallback != null ? ImmutableList.of(fallback) : (Collection<V>) ImmutableList.of();
+        return DefaultFlagQuery.super.queryAllValues(subject, flag, acceptOne);
     }
 
     @Override

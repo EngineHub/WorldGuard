@@ -19,34 +19,6 @@
 
 package com.sk89q.worldguard.protection;
 
-import static com.sk89q.worldguard.protection.flags.StateFlag.test;
-
-import com.sk89q.worldguard.protection.association.RegionAssociable;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag.State;
-
-import javax.annotation.Nullable;
-
 public abstract class AbstractRegionSet implements ApplicableRegionSet {
-
-    @Override
-    public boolean testState(@Nullable RegionAssociable subject, StateFlag... flags) {
-        return test(queryState(subject, flags));
-    }
-
-    @Nullable
-    @Override
-    public State queryState(@Nullable RegionAssociable subject, StateFlag... flags) {
-        State value = null;
-
-        for (StateFlag flag : flags) {
-            value = StateFlag.combine(value, queryValue(subject, flag));
-            if (value == State.DENY) {
-                break;
-            }
-        }
-
-        return value;
-    }
 
 }

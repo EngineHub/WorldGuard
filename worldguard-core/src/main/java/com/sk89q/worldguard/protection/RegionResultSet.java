@@ -24,8 +24,6 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.MapFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.NormativeOrders;
 
@@ -98,31 +96,13 @@ public class RegionResultSet extends AbstractRegionSet {
     }
 
     @Override
-    @Nullable
-    public State queryState(@Nullable RegionAssociable subject, StateFlag... flags) {
-        return flagValueCalculator.queryState(subject, flags);
+    public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag, boolean acceptOne) {
+        return flagValueCalculator.queryAllValues(subject, flag, acceptOne);
     }
 
     @Override
     @Nullable
-    public <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag) {
-        return flagValueCalculator.queryValue(subject, flag);
-    }
-
-    @Override
-    public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag) {
-        return flagValueCalculator.queryAllValues(subject, flag);
-    }
-
-    @Override
-    @Nullable
-    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key) {
-        return flagValueCalculator.queryMapValue(subject, flag, key, null);
-    }
-
-    @Override
-    @Nullable
-    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, Flag<V> fallback) {
+    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, @Nullable Flag<V> fallback) {
         return flagValueCalculator.queryMapValue(subject, flag, key, fallback);
     }
 

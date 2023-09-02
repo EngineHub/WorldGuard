@@ -20,18 +20,9 @@
 package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.protection.association.RegionAssociable;
-import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.MapFlag;
-import com.sk89q.worldguard.protection.flags.RegionGroup;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -41,7 +32,7 @@ import java.util.Set;
  * <p>An instance of this can be created using the spatial query methods
  * available on {@link RegionManager}.</p>
  */
-public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
+public interface ApplicableRegionSet extends FlagQuery, Iterable<ProtectedRegion> {
 
     /**
      * Return whether this region set is a virtual set. A virtual set
@@ -60,127 +51,6 @@ public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
      * @see FailedLoadRegionSet
      */
     boolean isVirtual();
-
-    /**
-     * Test whether the (effective) value for a list of state flags equals
-     * {@code ALLOW}.
-     *
-     * <p>{@code subject} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The subject argument is required if the
-     * {@link Flags#BUILD} flag is in the list of flags.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region groups that apply
-     * @param flags a list of flags to check
-     * @return true if the result was {@code ALLOW}
-     * @see #queryState(RegionAssociable, StateFlag...)
-     */
-    boolean testState(@Nullable RegionAssociable subject, StateFlag... flags);
-
-    /**
-     * Get the (effective) value for a list of state flags. The rules of
-     * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
-     * and {@code ALLOW} overrides {@code NONE}. One flag may override another.
-     *
-     * <p>{@code subject} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The subject argument is required if the
-     * {@link Flags#BUILD} flag is in the list of flags.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region groups that apply
-     * @param flags a list of flags to check
-     * @return a state
-     */
-    @Nullable
-    State queryState(@Nullable RegionAssociable subject, StateFlag... flags);
-
-    /**
-     * Get the effective value for a flag. If there are multiple values
-     * (for example, multiple overlapping regions with
-     * the same priority may have the same flag set), then the selected
-     * (or "winning") value will depend on the flag type.
-     *
-     * <p>Only some flag types actually have a strategy for picking the
-     * "best value." For most types, the actual value that is chosen to be
-     * returned is undefined (it could be any value). As of writing, the only
-     * type of flag that actually has a strategy for picking a value is the
-     * {@link StateFlag}.</p>
-     *
-     * <p>{@code subject} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The subject argument is required if the
-     * {@link Flags#BUILD} flag is the flag being queried.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flag the flag
-     * @return a value, which could be {@code null}
-     */
-    @Nullable
-    <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag);
-
-    /**
-     * Get the effective value for a key in a {@link MapFlag}. If there are multiple values
-     * (for example, if there are multiple regions with the same priority
-     * but with different farewell messages set, there would be multiple
-     * completing values), then the selected (or "winning") value will be undefined.
-     *
-     * <p>A subject can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * subject is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the subject, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flag the flag of type {@link MapFlag}
-     * @param key the key for the map flag
-     * @return a value, which could be {@code null}
-     */
-    @Nullable
-    <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key);
-
-    /**
-     * Get the effective value for a key in a {@link MapFlag}. If there are multiple values
-     * (for example, if there are multiple regions with the same priority
-     * but with different farewell messages set, there would be multiple
-     * completing values), then the selected (or "winning") value will be undefined.
-     *
-     * <p>A subject can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * subject is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the subject, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flag the flag of type {@link MapFlag}
-     * @param key the key for the map flag
-     * @return a value, which could be {@code null}
-     */
-    @Nullable
-    <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, @Nullable Flag<V> fallback);
-
-    /**
-     * Get the effective values for a flag, returning a collection of all
-     * values. It is up to the caller to determine which value, if any,
-     * from the collection will be used.
-     *
-     * <p>{@code subject} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The subject argument is required if the
-     * {@link Flags#BUILD} flag is the flag being queried.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flag the flag
-     * @return a collection of values
-     */
-    <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag);
 
     /**
      * Test whether a player is an owner of all regions in this set.
