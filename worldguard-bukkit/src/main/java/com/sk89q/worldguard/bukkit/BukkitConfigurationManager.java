@@ -37,6 +37,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
 
     private boolean hasCommandBookGodMode;
     boolean extraStats;
+    private boolean hasEssentialsGodMode;
 
     /**
      * Construct the object.
@@ -123,5 +124,13 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
 
     public boolean hasCommandBookGodMode() {
         return hasCommandBookGodMode;
+    }
+
+    public void updateEssentialsGodMode() {
+        hasEssentialsGodMode = plugin.getServer().getPluginManager().isPluginEnabled("Essentials");
+    }
+
+    public boolean hasEssentialsGodMode() {
+        return hasEssentialsGodMode;
     }
 }
