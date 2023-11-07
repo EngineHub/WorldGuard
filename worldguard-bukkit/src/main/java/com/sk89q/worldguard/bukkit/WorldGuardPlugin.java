@@ -63,6 +63,7 @@ import com.sk89q.worldguard.bukkit.util.ClassSourceValidator;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.commands.GeneralCommands;
+import com.sk89q.worldguard.commands.GeneralCompatibleCommands;
 import com.sk89q.worldguard.commands.ProtectionCommands;
 import com.sk89q.worldguard.commands.ToggleCommands;
 import com.sk89q.worldguard.domains.registry.SimpleDomainRegistry;
@@ -165,6 +166,8 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         if (!platform.getGlobalStateManager().hasCommandBookGodMode() && !platform.getGlobalStateManager().hasEssentialsGodMode()) {
             reg.register(GeneralCommands.class);
+        }else{
+            reg.register(GeneralCompatibleCommands.class);
         }
 
         getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);

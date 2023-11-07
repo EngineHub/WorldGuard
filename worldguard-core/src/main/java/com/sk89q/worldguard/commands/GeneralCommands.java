@@ -39,7 +39,7 @@ public class GeneralCommands {
         this.worldGuard = worldGuard;
     }
     
-    @Command(aliases = {"god"}, usage = "[player]",
+    @Command(aliases = {"god", "wggod"}, usage = "[player]",
             desc = "Enable godmode on a player", flags = "s", max = 1)
     public void god(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
         Iterable<? extends LocalPlayer> targets = null;
@@ -84,7 +84,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"ungod"}, usage = "[player]",
+    @Command(aliases = {"ungod", "wgungod"}, usage = "[player]",
             desc = "Disable godmode on a player", flags = "s", max = 1)
     public void ungod(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
         Iterable<? extends LocalPlayer> targets;
@@ -127,7 +127,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"heal"}, usage = "[player]", desc = "Heal a player", flags = "s", max = 1)
+    @Command(aliases = {"heal", "wgheal"}, usage = "[player]", desc = "Heal a player", flags = "s", max = 1)
     public void heal(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
 
         Iterable<? extends LocalPlayer> targets = null;
@@ -171,7 +171,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"slay"}, usage = "[player]", desc = "Slay a player", flags = "s", max = 1)
+    @Command(aliases = {"slay", "wgslay"}, usage = "[player]", desc = "Slay a player", flags = "s", max = 1)
     public void slay(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
         
         Iterable<? extends LocalPlayer> targets = Lists.newArrayList();
@@ -212,7 +212,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"locate"}, usage = "[player]", desc = "Locate a player", max = 1)
+    @Command(aliases = {"locate", "locate"}, usage = "[player]", desc = "Locate a player", max = 1)
     @CommandPermissions({"worldguard.locate"})
     public void locate(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
@@ -229,7 +229,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"stack", ";"}, usage = "", desc = "Stack items", max = 0)
+    @Command(aliases = {"stack", "wgstack", ";"}, usage = "", desc = "Stack items", max = 0)
     @CommandPermissions({"worldguard.stack"})
     public void stack(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
@@ -238,4 +238,6 @@ public class GeneralCommands {
 
         player.print("Items compacted into stacks!");
     }
+
+
 }
