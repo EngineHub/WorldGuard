@@ -34,7 +34,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
 
     @Unreported private WorldGuardPlugin plugin;
     @Unreported private ConcurrentMap<String, BukkitWorldConfiguration> worlds = new ConcurrentHashMap<>();
-
+    private boolean isFreshInstall;
     private boolean hasCommandBookGodMode;
     boolean disableGeneralCommands;
     boolean extraStats;
@@ -57,7 +57,8 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
     public void load() {
         super.load();
         this.extraStats = getConfig().getBoolean("custom-metrics-charts", true);
-        this.disableGeneralCommands = getConfig().getBoolean("disable-general-commands", false);
+        // Disable legacy commands for fresh installs
+        this.disableGeneralCommands = getConfig().getBoolean("disable-general-commands", isFreshInstall);
     }
 
     @Override
@@ -68,7 +69,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
     @Override
     public void copyDefaults() {
         // Create the default configuration file
-        plugin.createDefaultConfiguration(new File(plugin.getDataFolder(), "config.yml"), "config.yml");
+        isFreshInstall = plugin.createDefaultConfiguration(new File(plugin.getDataFolder(), "config.yml"), "config.yml");
     }
 
     @Override

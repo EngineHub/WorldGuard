@@ -488,7 +488,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param actual The destination file
      * @param defaultName The name of the file inside the jar's defaults folder
      */
-    public void createDefaultConfiguration(File actual, String defaultName) {
+    public boolean createDefaultConfiguration(File actual, String defaultName) {
 
         // Make parent directories
         File parent = actual.getParentFile();
@@ -497,7 +497,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         if (actual.exists()) {
-            return;
+            return false;
         }
 
         try (InputStream stream = getResource("defaults/" + defaultName)){
@@ -506,7 +506,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         } catch (IOException e) {
             getLogger().severe("Unable to read default configuration: " + defaultName);
         }
-
+        return true;
     }
 
     private void copyDefaultConfig(InputStream input, File actual, String name) {
