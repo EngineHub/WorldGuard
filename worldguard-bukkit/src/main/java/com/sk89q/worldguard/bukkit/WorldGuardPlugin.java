@@ -160,7 +160,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         reg.register(ToggleCommands.class);
         reg.register(ProtectionCommands.class);
 
-        if (!platform.getGlobalStateManager().hasCommandBookGodMode()) {
+        if (!platform.getGlobalStateManager().disableGeneralCommands && !platform.getGlobalStateManager().hasCommandBookGodMode()) {
             reg.register(GeneralCommands.class);
         }
 

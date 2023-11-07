@@ -36,6 +36,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
     @Unreported private ConcurrentMap<String, BukkitWorldConfiguration> worlds = new ConcurrentHashMap<>();
 
     private boolean hasCommandBookGodMode;
+    boolean disableGeneralCommands;
     boolean extraStats;
 
     /**
@@ -56,6 +57,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
     public void load() {
         super.load();
         this.extraStats = getConfig().getBoolean("custom-metrics-charts", true);
+        this.disableGeneralCommands = getConfig().getBoolean("disable-general-commands", false);
     }
 
     @Override
