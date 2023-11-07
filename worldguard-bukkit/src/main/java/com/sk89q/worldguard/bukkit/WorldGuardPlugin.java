@@ -160,7 +160,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         reg.register(ToggleCommands.class);
         reg.register(ProtectionCommands.class);
 
-        if (!platform.getGlobalStateManager().hasCommandBookGodMode()) {
+        platform.getGlobalStateManager().updateCommandBookGodMode();
+        platform.getGlobalStateManager().updateEssentialsGodMode();
+
+        if (!platform.getGlobalStateManager().hasCommandBookGodMode() && !platform.getGlobalStateManager().hasEssentialsGodMode()) {
             reg.register(GeneralCommands.class);
         }
 
@@ -191,8 +194,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         if ("true".equalsIgnoreCase(System.getProperty("worldguard.debug.listener"))) {
             (new DebuggingListener(this, WorldGuard.logger)).registerEvents();
         }
-
-        platform.getGlobalStateManager().updateCommandBookGodMode();
 
         if (getServer().getPluginManager().isPluginEnabled("CommandBook")) {
             getServer().getPluginManager().registerEvents(new WorldGuardCommandBookListener(this), this);
