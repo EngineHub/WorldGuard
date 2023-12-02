@@ -254,7 +254,7 @@ public class RegionProtectionListener extends AbstractListener {
 
             /* Saplings, etc. */
             if (Materials.isConsideredBuildingIfUsed(type)) {
-                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.USE));
                 what = "use that";
 
             /* Inventory */
