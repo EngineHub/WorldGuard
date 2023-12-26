@@ -24,6 +24,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.util.report.DataReport;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -52,19 +53,22 @@ public class SchedulerReport extends DataReport {
     public SchedulerReport() {
         super("Scheduler");
 
-        List<BukkitTask> tasks = Bukkit.getServer().getScheduler().getPendingTasks();
+        append("Error", "MODDED FOLIA VERSION - DO NOT REPORT TO WORLDGUARD");
 
-        append("Pending Task Count", tasks.size());
-
-        for (BukkitTask task : tasks) {
-            Class<?> taskClass = getTaskClass(task);
-
-            DataReport report = new DataReport("Task: #" + task.getTaskId());
-            report.append("Owner", task.getOwner().getName());
-            report.append("Runnable", taskClass != null ? taskClass.getName() : "<Unknown>");
-            report.append("Synchronous?", task.isSync());
-            append(report.getTitle(), report);
-        }
+//        List<BukkitTask> tasks = Bukkit.getServer().getScheduler().getPendingTasks();
+////        WorldGuardPlugin.inst().foliaLib.getImpl().
+//
+//        append("Pending Task Count", tasks.size());
+//
+//        for (BukkitTask task : tasks) {
+//            Class<?> taskClass = getTaskClass(task);
+//
+//            DataReport report = new DataReport("Task: #" + task.getTaskId());
+//            report.append("Owner", task.getOwner().getName());
+//            report.append("Runnable", taskClass != null ? taskClass.getName() : "<Unknown>");
+//            report.append("Synchronous?", task.isSync());
+//            append(report.getTitle(), report);
+//        }
     }
 
     @SuppressWarnings("unchecked")

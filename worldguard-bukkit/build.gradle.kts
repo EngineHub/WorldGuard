@@ -12,6 +12,10 @@ repositories {
         name = "paper"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
+    maven {
+        name = "devmart-other"
+        url = uri("https://nexuslite.gcnt.net/repos/other/")
+    }
 }
 
 configurations {
@@ -26,6 +30,7 @@ dependencies {
     }
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
+    "implementation"("com.tcoded:FoliaLib:0.2.3")
     "compileOnly"("com.sk89q:commandbook:2.3") { isTransitive = false }
     "shadeOnly"("io.papermc:paperlib:1.0.8")
     "shadeOnly"("org.bstats:bstats-bukkit:3.0.1")
@@ -60,6 +65,9 @@ tasks.named<ShadowJar>("shadowJar") {
         }
         relocate ("co.aikar.timings.lib", "com.sk89q.worldguard.bukkit.timingslib") {
             include(dependency("co.aikar:minecraft-timings"))
+        }
+        relocate ("com.tcoded.folialib", "com.sk89q.worldguard.bukkit.folialib") {
+            include(dependency("com.tcoded:FoliaLib"))
         }
     }
 }

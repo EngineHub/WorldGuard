@@ -42,6 +42,7 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 import org.spigotmc.event.entity.EntityMountEvent;
+import java.util.concurrent.TimeUnit;
 
 public class PlayerMoveListener extends AbstractListener {
 
@@ -132,7 +133,10 @@ public class PlayerMoveListener extends AbstractListener {
 
                 player.teleport(override.clone().add(0, 1, 0));
 
-                Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleport(override.clone().add(0, 1, 0)), 1);
+                getPlugin().foliaLib.getImpl().runAtEntityLater(player, () -> {
+                    player.teleport(override.clone().add(0, 1, 0));
+                }, 50, TimeUnit.MILLISECONDS);
+//                Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleport(override.clone().add(0, 1, 0)), 1);
             }
         }
     }

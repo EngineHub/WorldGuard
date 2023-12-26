@@ -11,6 +11,7 @@
   <allow pkg="junit.framework"/>
   <allow pkg="com.sk89q"/>
   <allow pkg="com.google.common"/>
+  <allow pkg="com.tcoded.folialib"/>
 
   <subpackage name="worldguard">
     <allow pkg="org.khelekore"/>
