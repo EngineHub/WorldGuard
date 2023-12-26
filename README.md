@@ -37,6 +37,11 @@ Please read CONTRIBUTING.md for important guidelines to follow.
 
 Submissions must be licensed under the GNU Lesser General Public License v3.
 
+# Folia Inquisitors 
+[<img src="https://github.com/Folia-Inquisitors.png" width=80 alt="Folia-Inquisitors">](https://github.com/orgs/Folia-Inquisitors/repositories)
+[<img src="https://github.com/TechnicallyCoded.png" width=80 alt="TechnicallyCoded">](https://github.com/TechnicallyCoded)
+[<img src="https://github.com/Yomamaeatstoes.png" width=80 alt="Yomamaeatstoes">](https://github.com/Yomamaeatstoes)
+
 Links
 -----
 
