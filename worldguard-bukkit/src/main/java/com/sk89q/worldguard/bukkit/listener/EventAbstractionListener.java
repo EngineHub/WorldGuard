@@ -994,7 +994,7 @@ public class EventAbstractionListener extends AbstractListener {
                 Hopper hopperCauseHolder = (Hopper) causeHolder;
                 Location location = hopperCauseHolder.getLocation();
 
-                getPlugin().foliaLib.getImpl().runAtLocationLater(location, () -> {
+                getPlugin().getFoliaLib().getImpl().runAtLocationLater(location, () -> {
                     Block block = location.getBlock();
                     if (block.getType() == Material.HOPPER) {
                         block.breakNaturally();

@@ -25,6 +25,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.util.report.DataReport;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -53,7 +54,7 @@ public class SchedulerReport extends DataReport {
     public SchedulerReport() {
         super("Scheduler");
 
-        append("Error", "MODDED FOLIA VERSION - DO NOT REPORT TO WORLDGUARD");
+        append("Error", "FOLIA VERSION - PLEASE REPORT TO WORLDGUARD");
 
 //        List<BukkitTask> tasks = Bukkit.getServer().getScheduler().getPendingTasks();
 ////        WorldGuardPlugin.inst().foliaLib.getImpl().
