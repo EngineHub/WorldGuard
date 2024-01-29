@@ -133,7 +133,7 @@ public class PlayerMoveListener extends AbstractListener {
 
                 player.teleport(override.clone().add(0, 1, 0));
 
-                getPlugin().foliaLib.getImpl().runAtEntityLater(player, () -> {
+                getPlugin().getFoliaLib().getImpl().runAtEntityLater(player, () -> {
                     player.teleport(override.clone().add(0, 1, 0));
                 }, 50, TimeUnit.MILLISECONDS);
 //                Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleport(override.clone().add(0, 1, 0)), 1);

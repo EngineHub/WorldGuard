@@ -72,10 +72,10 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
             Session session = get(localPlayer);
 
-            FoliaLib foliaLib = WorldGuardPlugin.inst().foliaLib;
+            FoliaLib foliaLib = WorldGuardPlugin.inst().getFoliaLib();
             ServerImplementation impl = foliaLib.getImpl();
 
-            if (foliaLib.isFolia()) impl.runAtEntity(player, () -> session.tick(localPlayer));
+            if (foliaLib.isFolia()) impl.runAtEntity(player, (task) -> session.tick(localPlayer));
             else session.tick(localPlayer);
         }
     }
