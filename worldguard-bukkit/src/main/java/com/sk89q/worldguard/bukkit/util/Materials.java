@@ -1343,7 +1343,8 @@ public final class Materials {
             || type == Material.DRAGON_EGG
             || Tag.FLOWER_POTS.isTagged(type)
             || Tag.CANDLES.isTagged(type)
-            || Tag.CANDLE_CAKES.isTagged(type);
+            || Tag.CANDLE_CAKES.isTagged(type)
+            || Tag.ALL_SIGNS.isTagged(type);
     }
 
     /**

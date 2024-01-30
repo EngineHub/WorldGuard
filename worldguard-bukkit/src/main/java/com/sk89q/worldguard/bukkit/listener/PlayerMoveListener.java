@@ -60,7 +60,7 @@ public class PlayerMoveListener extends AbstractListener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         LocalPlayer player = getPlugin().wrapPlayer(event.getPlayer());
 
