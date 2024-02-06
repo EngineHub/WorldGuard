@@ -30,7 +30,7 @@ dependencies {
     }
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
-    "implementation"("com.tcoded:FoliaLib:0.3.1")
+    "implementation"("com.tcoded:FoliaLib:0.3.2")
     "compileOnly"("com.sk89q:commandbook:2.3") { isTransitive = false }
     "shadeOnly"("io.papermc:paperlib:1.0.8")
     "shadeOnly"("org.bstats:bstats-bukkit:3.0.1")
