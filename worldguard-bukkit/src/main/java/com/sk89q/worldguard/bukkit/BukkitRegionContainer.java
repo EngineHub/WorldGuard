@@ -40,6 +40,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -94,7 +95,10 @@ public class BukkitRegionContainer extends RegionContainer {
             }
         }, plugin);
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, cache::invalidateAll, CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
+        int interval = CACHE_INVALIDATION_INTERVAL * 50;
+        plugin.getFoliaLib().getImpl().runTimerAsync(cache::invalidateAll, interval, interval, TimeUnit.MILLISECONDS);
+
+//        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, cache::invalidateAll, CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
     }
 
     public void shutdown() {

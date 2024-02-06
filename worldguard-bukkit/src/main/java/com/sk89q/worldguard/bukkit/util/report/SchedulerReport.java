@@ -24,8 +24,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.util.report.DataReport;
-import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitTask;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.tcoded.folialib.FoliaLib;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -34,6 +35,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public class SchedulerReport extends DataReport {
+
+    private FoliaLib foliaLib = WorldGuardPlugin.inst().getFoliaLib();
 
     private LoadingCache<Class<?>, Optional<Field>> taskFieldCache = CacheBuilder.newBuilder()
             .build(new CacheLoader<Class<?>, Optional<Field>>() {
@@ -49,27 +52,78 @@ public class SchedulerReport extends DataReport {
                 }
             });
 
+    private LoadingCache<Class<?>, Optional<Field>> foliaTaskFieldCache = CacheBuilder.newBuilder()
+            .build(new CacheLoader<Class<?>, Optional<Field>>() {
+                @Override
+                public Optional<Field> load(Class<?> clazz) throws Exception {
+                    try {
+                        Field field = clazz.getDeclaredField("run");
+                        field.setAccessible(true);
+                        return Optional.ofNullable(field);
+                    } catch (NoSuchFieldException ignored) {
+                        return Optional.empty();
+                    }
+                }
+            });
+
     public SchedulerReport() {
         super("Scheduler");
 
-        List<BukkitTask> tasks = Bukkit.getServer().getScheduler().getPendingTasks();
+        List<WrappedTask> tasks = foliaLib.getImpl().getAllTasks();
 
         append("Pending Task Count", tasks.size());
 
-        for (BukkitTask task : tasks) {
-            Class<?> taskClass = getTaskClass(task);
+        for (WrappedTask task : tasks) {
+            Object handle = getTaskHandle(task);
+            Class<?> taskClass;
+            if (foliaLib.isFolia()) {
+                taskClass = getFoliaTaskClass(handle);
+            } else {
+                taskClass = getBukkitTaskClass(handle);
+            }
 
-            DataReport report = new DataReport("Task: #" + task.getTaskId());
-            report.append("Owner", task.getOwner().getName());
+            DataReport report = new DataReport("Task: #" + handle.hashCode());
+            report.append("Owner", task.getOwningPlugin().getName());
             report.append("Runnable", taskClass != null ? taskClass.getName() : "<Unknown>");
-            report.append("Synchronous?", task.isSync());
+            report.append("Synchronous?", !task.isAsync());
             append(report.getTitle(), report);
+        }
+    }
+
+    private Object getTaskHandle(WrappedTask task) {
+        try {
+            Field field = task.getClass().getDeclaredField("task");
+            field.setAccessible(true);
+            return field.get(task);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
-    private Class<?> getTaskClass(BukkitTask task) {
+    private Class<?> getFoliaTaskClass(Object task) {
+        try {
+            Class<?> clazz = task.getClass();
+            Set<Class<?>> classes = (Set) TypeToken.of(clazz).getTypes().rawTypes();
+
+            for (Class<?> type : classes) {
+                Optional<Field> field = foliaTaskFieldCache.getUnchecked(type);
+                if (field.isPresent()) {
+                    Object res = field.get().get(task);
+                    return res == null ? null : res.getClass();
+                }
+            }
+        } catch (IllegalAccessException | NoClassDefFoundError ignored) {
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    private Class<?> getBukkitTaskClass(Object task) {
         try {
             Class<?> clazz = task.getClass();
             Set<Class<?>> classes = (Set) TypeToken.of(clazz).getTypes().rawTypes();
