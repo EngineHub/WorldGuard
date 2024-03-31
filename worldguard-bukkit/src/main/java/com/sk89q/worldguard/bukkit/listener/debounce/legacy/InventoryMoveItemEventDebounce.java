@@ -54,7 +54,7 @@ public class InventoryMoveItemEventDebounce extends AbstractEventDebounce<Key> {
             if (holder instanceof BlockState blockState) {
                 return new BlockMaterialKey(blockState);
             } else if (holder instanceof DoubleChest doubleChest) {
-                InventoryHolder left = doubleChest.getLeftSide();
+                InventoryHolder left = PaperLib.isPaper() ? doubleChest.getLeftSide(false) : doubleChest.getLeftSide();
                 if (left instanceof Chest chest) {
                     return new BlockMaterialKey(chest);
                 } else {
