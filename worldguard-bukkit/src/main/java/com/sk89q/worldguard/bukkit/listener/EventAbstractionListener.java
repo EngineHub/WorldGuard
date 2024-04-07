@@ -483,7 +483,7 @@ public class EventAbstractionListener extends AbstractListener {
                         firedEvent.setSilent(true);
                     }
                     interactDebounce.debounce(clicked, event.getPlayer(), event, firedEvent);
-                    if (event.useInteractedBlock() == Result.DENY) {
+                    if (event.useInteractedBlock() == Result.DENY && !firedEvent.isSilent()) {
                         playDenyEffect(player, clicked.getLocation().add(0, 1, 0));
                     }
                 }
