@@ -101,7 +101,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.DETECTOR_RAIL, 0);
         MATERIAL_FLAGS.put(Material.STICKY_PISTON, 0);
         MATERIAL_FLAGS.put(Material.COBWEB, 0);
-        MATERIAL_FLAGS.put(Material.GRASS, 0);
+        MATERIAL_FLAGS.put(Material.SHORT_GRASS, 0);
         MATERIAL_FLAGS.put(Material.DEAD_BUSH, 0);
         MATERIAL_FLAGS.put(Material.PISTON, 0);
         MATERIAL_FLAGS.put(Material.PISTON_HEAD, 0);
