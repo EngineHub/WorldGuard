@@ -95,9 +95,9 @@ public class DatabaseHandler implements LoggerHandler {
             stmt.setString(1, eventType.name());
             stmt.setString(2, worldName);
             stmt.setString(3, player != null ? player.getName() : "");
-            stmt.setInt(4, pos.getBlockX());
-            stmt.setInt(5, pos.getBlockY());
-            stmt.setInt(6, pos.getBlockZ());
+            stmt.setInt(4, pos.x());
+            stmt.setInt(5, pos.y());
+            stmt.setInt(6, pos.z());
             stmt.setString(7, item);
             stmt.setInt(8, (int)(System.currentTimeMillis() / 1000));
             stmt.setString(9, comment);

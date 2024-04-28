@@ -61,6 +61,6 @@ public class RegistryFlag<T extends Keyed> extends Flag<T> {
 
     @Override
     public Object marshal(T o) {
-        return o.getId();
+        return o.id();
     }
 }

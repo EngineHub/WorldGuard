@@ -57,6 +57,6 @@ public class EntityTypeFlag extends Flag<EntityType> {
 
     @Override
     public Object marshal(EntityType o) {
-        return o.getId();
+        return o.id();
     }
 }

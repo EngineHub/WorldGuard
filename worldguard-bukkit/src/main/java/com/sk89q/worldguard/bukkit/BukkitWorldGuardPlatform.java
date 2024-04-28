@@ -266,7 +266,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
                 if (radius > 0) {
                     BlockVector3 spawnLoc = BukkitAdapter.asBlockVector(bWorld.getSpawnLocation());
                     return new ProtectedCuboidRegion("__spawn_protection__",
-                            spawnLoc.subtract(radius, 0, radius).withY(world.getMinimumPoint().getY()),
+                            spawnLoc.subtract(radius, 0, radius).withY(world.getMinimumPoint().y()),
                             spawnLoc.add(radius, 0, radius).withY(world.getMaxY()));
                 }
             }
