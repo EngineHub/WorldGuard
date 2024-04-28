@@ -127,8 +127,8 @@ public final class Entities {
      */
     public static boolean isMinecart(EntityType type) {
         return switch(type) {
-            case MINECART, MINECART_CHEST, MINECART_COMMAND, MINECART_FURNACE,
-                    MINECART_HOPPER, MINECART_MOB_SPAWNER, MINECART_TNT -> true;
+            case MINECART, CHEST_MINECART, COMMAND_BLOCK_MINECART, FURNACE_MINECART,
+                 HOPPER_MINECART, SPAWNER_MINECART, TNT_MINECART -> true;
             default -> false;
         };
     }
