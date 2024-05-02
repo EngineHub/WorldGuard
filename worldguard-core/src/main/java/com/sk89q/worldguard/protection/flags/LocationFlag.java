@@ -137,9 +137,9 @@ public class LocationFlag extends Flag<Location> {
                 return null;
             }
         }
-        vec.put("x", position.getX());
-        vec.put("y", position.getY());
-        vec.put("z", position.getZ());
+        vec.put("x", position.x());
+        vec.put("y", position.y());
+        vec.put("z", position.z());
         vec.put("yaw", o.getYaw());
         vec.put("pitch", o.getPitch());
         return vec;

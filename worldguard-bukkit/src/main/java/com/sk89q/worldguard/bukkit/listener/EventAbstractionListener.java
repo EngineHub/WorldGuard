@@ -146,7 +146,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
@@ -1087,9 +1086,9 @@ public class EventAbstractionListener extends AbstractListener {
     public void onLingeringApply(AreaEffectCloudApplyEvent event) {
         AreaEffectCloud entity = event.getEntity();
         List<PotionEffect> effects = new ArrayList<>();
-        PotionEffectType baseEffectType = entity.getBasePotionData().getType().getEffectType();
-        if (baseEffectType != null) {
-            effects.add(new PotionEffect(baseEffectType, 0, 0));
+        List<PotionEffect> baseEffectTypes = entity.getBasePotionType() == null ? null : entity.getBasePotionType().getPotionEffects();
+        if (baseEffectTypes != null) {
+            effects.addAll(baseEffectTypes);
         }
         if (entity.hasCustomEffects()) {
             effects.addAll(entity.getCustomEffects());
@@ -1174,7 +1173,7 @@ public class EventAbstractionListener extends AbstractListener {
 
         if (item != null && item.getType() == Material.END_CRYSTAL) { /*&& placed.getType() == Material.BEDROCK) {*/ // in vanilla you can only place them on bedrock but who knows what plugins will add
                                                                                                                         // may be overprotective as a result, but better than being underprotective
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.ENDER_CRYSTAL));
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.END_CRYSTAL));
             return;
         }
 
