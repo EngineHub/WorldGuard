@@ -113,12 +113,12 @@ class RegionInserter {
                     BlockVector3 max = region.getMaximumPoint();
 
                     stmt.setString(1, region.getId());
-                    stmt.setInt(2, min.getBlockZ());
-                    stmt.setInt(3, min.getBlockY());
-                    stmt.setInt(4, min.getBlockX());
-                    stmt.setInt(5, max.getBlockZ());
-                    stmt.setInt(6, max.getBlockY());
-                    stmt.setInt(7, max.getBlockX());
+                    stmt.setInt(2, min.z());
+                    stmt.setInt(3, min.y());
+                    stmt.setInt(4, min.x());
+                    stmt.setInt(5, max.z());
+                    stmt.setInt(6, max.y());
+                    stmt.setInt(7, max.x());
                     stmt.addBatch();
                 }
 
@@ -141,8 +141,8 @@ class RegionInserter {
             for (List<ProtectedPolygonalRegion> partition : Lists.partition(polygons, StatementBatch.MAX_BATCH_SIZE)) {
                 for (ProtectedPolygonalRegion region : partition) {
                     stmt.setString(1, region.getId());
-                    stmt.setInt(2, region.getMaximumPoint().getBlockY());
-                    stmt.setInt(3, region.getMinimumPoint().getBlockY());
+                    stmt.setInt(2, region.getMaximumPoint().y());
+                    stmt.setInt(3, region.getMinimumPoint().y());
                     stmt.addBatch();
                 }
 
@@ -167,8 +167,8 @@ class RegionInserter {
             for (ProtectedPolygonalRegion region : polygons) {
                 for (BlockVector2 point : region.getPoints()) {
                     stmt.setString(1, region.getId());
-                    stmt.setInt(2, point.getBlockZ());
-                    stmt.setInt(3, point.getBlockX());
+                    stmt.setInt(2, point.z());
+                    stmt.setInt(3, point.x());
                     batch.addBatch();
                 }
             }

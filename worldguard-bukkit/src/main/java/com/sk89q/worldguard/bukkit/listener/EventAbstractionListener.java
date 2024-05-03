@@ -47,6 +47,7 @@ import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.flags.Flags;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
@@ -145,7 +146,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
@@ -482,7 +482,7 @@ public class EventAbstractionListener extends AbstractListener {
                         firedEvent.setSilent(true);
                     }
                     interactDebounce.debounce(clicked, event.getPlayer(), event, firedEvent);
-                    if (event.useInteractedBlock() == Result.DENY) {
+                    if (event.useInteractedBlock() == Result.DENY && !firedEvent.isSilent()) {
                         playDenyEffect(player, clicked.getLocation().add(0, 1, 0));
                     }
                 }
@@ -1086,9 +1086,9 @@ public class EventAbstractionListener extends AbstractListener {
     public void onLingeringApply(AreaEffectCloudApplyEvent event) {
         AreaEffectCloud entity = event.getEntity();
         List<PotionEffect> effects = new ArrayList<>();
-        PotionEffectType baseEffectType = entity.getBasePotionData().getType().getEffectType();
-        if (baseEffectType != null) {
-            effects.add(new PotionEffect(baseEffectType, 0, 0));
+        List<PotionEffect> baseEffectTypes = entity.getBasePotionType() == null ? null : entity.getBasePotionType().getPotionEffects();
+        if (baseEffectTypes != null) {
+            effects.addAll(baseEffectTypes);
         }
         if (entity.hasCustomEffects()) {
             effects.addAll(entity.getCustomEffects());
@@ -1173,7 +1173,7 @@ public class EventAbstractionListener extends AbstractListener {
 
         if (item != null && item.getType() == Material.END_CRYSTAL) { /*&& placed.getType() == Material.BEDROCK) {*/ // in vanilla you can only place them on bedrock but who knows what plugins will add
                                                                                                                         // may be overprotective as a result, but better than being underprotective
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.ENDER_CRYSTAL));
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.END_CRYSTAL));
             return;
         }
 
@@ -1265,6 +1265,14 @@ public class EventAbstractionListener extends AbstractListener {
         @EventHandler(ignoreCancelled = true)
         public void onEntityTransform(EntityZapEvent event) {
             Events.fireToCancel(event, new DamageEntityEvent(event, create(event.getBolt()), event.getEntity()));
+        }
+
+        @EventHandler(ignoreCancelled = true)
+        public void onSignOpen(PlayerOpenSignEvent event) {
+            if (event.getCause() == PlayerOpenSignEvent.Cause.INTERACT) {
+                // other cases are handled by other events
+                Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), event.getSign().getBlock()));
+            }
         }
     }
 }

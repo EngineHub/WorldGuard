@@ -113,10 +113,10 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     @Override
     public List<BlockVector2> getPoints() {
         List<BlockVector2> pts = new ArrayList<>();
-        int x1 = min.getBlockX();
-        int x2 = max.getBlockX();
-        int z1 = min.getBlockZ();
-        int z2 = max.getBlockZ();
+        int x1 = min.x();
+        int x2 = max.x();
+        int z1 = min.z();
+        int z2 = max.z();
 
         pts.add(BlockVector2.at(x1, z1));
         pts.add(BlockVector2.at(x2, z1));
@@ -128,12 +128,12 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
 
     @Override
     public boolean contains(BlockVector3 pt) {
-        final double x = pt.getX();
-        final double y = pt.getY();
-        final double z = pt.getZ();
-        return x >= min.getBlockX() && x < max.getBlockX() + 1
-                && y >= min.getBlockY() && y < max.getBlockY() + 1
-                && z >= min.getBlockZ() && z < max.getBlockZ() + 1;
+        final double x = pt.x();
+        final double y = pt.y();
+        final double z = pt.z();
+        return x >= min.x() && x < max.x() + 1
+                && y >= min.y() && y < max.y() + 1
+                && z >= min.z() && z < max.z() + 1;
     }
 
     @Override
@@ -143,10 +143,10 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
 
     @Override
     Area toArea() {
-        int x = getMinimumPoint().getBlockX();
-        int z = getMinimumPoint().getBlockZ();
-        int width = getMaximumPoint().getBlockX() - x + 1;
-        int height = getMaximumPoint().getBlockZ() - z + 1;
+        int x = getMinimumPoint().x();
+        int z = getMinimumPoint().z();
+        int width = getMaximumPoint().x() - x + 1;
+        int height = getMaximumPoint().z() - z + 1;
         return new Area(new Rectangle(x, z, width, height));
     }
 
@@ -161,9 +161,9 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
 
     @Override
     public int volume() {
-        int xLength = max.getBlockX() - min.getBlockX() + 1;
-        int yLength = max.getBlockY() - min.getBlockY() + 1;
-        int zLength = max.getBlockZ() - min.getBlockZ() + 1;
+        int xLength = max.x() - min.x() + 1;
+        int yLength = max.y() - min.y() + 1;
+        int zLength = max.z() - min.z() + 1;
 
         try {
             long v = MathUtils.checkedMultiply(xLength, yLength);

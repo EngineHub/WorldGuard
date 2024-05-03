@@ -305,8 +305,8 @@ class RegionCommandsBase {
         // Detect the type of region from WorldEdit
         if (selection instanceof Polygonal2DRegion) {
             Polygonal2DRegion polySel = (Polygonal2DRegion) selection;
-            int minY = polySel.getMinimumPoint().getBlockY();
-            int maxY = polySel.getMaximumPoint().getBlockY();
+            int minY = polySel.getMinimumPoint().y();
+            int maxY = polySel.getMaximumPoint().y();
             return new ProtectedPolygonalRegion(id, polySel.getPoints(), minY, maxY);
         } else if (selection instanceof CuboidRegion) {
             BlockVector3 min = selection.getMinimumPoint();
@@ -345,7 +345,7 @@ class RegionCommandsBase {
         if (region instanceof GlobalProtectedRegion) {
             return;
         }
-        int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
+        int height = region.getMaximumPoint().y() - region.getMinimumPoint().y();
         if (height <= 2) {
             sender.printDebug("(Warning: The height of the region was " + (height + 1) + " block(s).)");
         }

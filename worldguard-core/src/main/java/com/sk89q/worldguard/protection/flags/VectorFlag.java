@@ -82,9 +82,9 @@ public class VectorFlag extends Flag<Vector3> {
     @Override
     public Object marshal(Vector3 o) {
         Map<String, Object> vec = new HashMap<>();
-        vec.put("x", o.getX());
-        vec.put("y", o.getY());
-        vec.put("z", o.getZ());
+        vec.put("x", o.x());
+        vec.put("y", o.y());
+        vec.put("z", o.z());
         return vec;
     }
 

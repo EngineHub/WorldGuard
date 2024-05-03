@@ -65,8 +65,8 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         ImmutableList<BlockVector2> immutablePoints = ImmutableList.copyOf(points);
         setMinMaxPoints(immutablePoints, minY, maxY);
         this.points = immutablePoints;
-        this.minY = min.getBlockY();
-        this.maxY = max.getBlockY();
+        this.minY = min.y();
+        this.maxY = max.y();
     }
 
     /**
@@ -82,7 +82,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         List<BlockVector3> points = new ArrayList<>();
         int y = minY;
         for (BlockVector2 point2D : points2D) {
-            points.add(BlockVector3.at(point2D.getBlockX(), y, point2D.getBlockZ()));
+            points.add(BlockVector3.at(point2D.x(), y, point2D.z()));
             y = maxY;
         }
         setMinMaxPoints(points);
@@ -102,15 +102,15 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
     public boolean contains(BlockVector3 position) {
         checkNotNull(position);
 
-        int targetX = position.getBlockX(); // Width
-        int targetY = position.getBlockY(); // Height
-        int targetZ = position.getBlockZ(); // Depth
+        int targetX = position.x(); // Width
+        int targetY = position.y(); // Height
+        int targetZ = position.z(); // Depth
 
         if (targetY < minY || targetY > maxY) {
             return false;
         }
         //Quick and dirty check.
-        if (targetX < min.getBlockX() || targetX > max.getBlockX() || targetZ < min.getBlockZ() || targetZ > max.getBlockZ()) {
+        if (targetX < min.x() || targetX > max.x() || targetZ < min.z() || targetZ > max.z()) {
             return false;
         }
         boolean inside = false;
@@ -122,12 +122,12 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         long crossproduct;
         int i;
 
-        xOld = points.get(npoints - 1).getBlockX();
-        zOld = points.get(npoints - 1).getBlockZ();
+        xOld = points.get(npoints - 1).x();
+        zOld = points.get(npoints - 1).z();
 
         for (i = 0; i < npoints; i++) {
-            xNew = points.get(i).getBlockX();
-            zNew = points.get(i).getBlockZ();
+            xNew = points.get(i).x();
+            zNew = points.get(i).z();
             //Check for corner
             if (xNew == targetX && zNew == targetZ) {
                 return true;
@@ -173,8 +173,8 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
         int i = 0;
         for (BlockVector2 point : points) {
-            xCoords[i] = point.getBlockX();
-            yCoords[i] = point.getBlockZ();
+            xCoords[i] = point.x();
+            yCoords[i] = point.z();
             i++;
         }
 

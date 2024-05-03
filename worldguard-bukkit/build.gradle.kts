@@ -12,6 +12,11 @@ repositories {
         name = "paper"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
+    maven {
+        // TODO: Remove this once paper updated to adventure release
+        name = "adventure-snapshots"
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    }
 }
 
 configurations {
@@ -20,8 +25,8 @@ configurations {
 
 dependencies {
     "api"(project(":worldguard-core"))
-    "compileOnly"("io.papermc.paper:paper-api:1.20-R0.1-SNAPSHOT")
-    "runtimeOnly"("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT") {
+    "compileOnly"("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
+    "runtimeOnly"("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
     }
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }

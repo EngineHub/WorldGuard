@@ -57,6 +57,6 @@ public class WeatherTypeFlag extends Flag<WeatherType> {
 
     @Override
     public Object marshal(WeatherType o) {
-        return o.getId();
+        return o.id();
     }
 }
