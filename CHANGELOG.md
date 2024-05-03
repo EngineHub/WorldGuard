@@ -2,7 +2,7 @@
 
 ## 7.0.10
 
-* Add support for MC 1.20.5, drop support for other 1.20 versions
+* Add support for MC 1.20.5 and 1.20.6, drop support for other 1.20 versions
 
 ## 7.0.9
 * Add support for MC 1.20, drop support for MC 1.19
