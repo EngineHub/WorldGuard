@@ -57,6 +57,6 @@ public class GameModeTypeFlag extends Flag<GameMode> {
 
     @Override
     public Object marshal(GameMode o) {
-        return o.getId();
+        return o.id();
     }
 }

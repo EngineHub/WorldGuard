@@ -69,7 +69,7 @@ public class PriorityRTreeIndex extends HashMapIndex {
     @Override
     public void applyContaining(BlockVector3 position, Predicate<ProtectedRegion> consumer) {
         Set<ProtectedRegion> seen = new HashSet<>();
-        MBR pointMBR = new SimpleMBR(position.getX(), position.getX(), position.getY(), position.getY(), position.getZ(), position.getZ());
+        MBR pointMBR = new SimpleMBR(position.x(), position.x(), position.y(), position.y(), position.z(), position.z());
 
         for (ProtectedRegion region : tree.find(pointMBR)) {
             if (region.contains(position) && !seen.contains(region)) {
@@ -87,7 +87,7 @@ public class PriorityRTreeIndex extends HashMapIndex {
         BlockVector3 max = region.getMaximumPoint().ceil();
 
         Set<ProtectedRegion> candidates = new HashSet<>();
-        MBR pointMBR = new SimpleMBR(min.getX(), max.getX(), min.getY(), max.getY(), min.getZ(), max.getZ());
+        MBR pointMBR = new SimpleMBR(min.x(), max.x(), min.y(), max.y(), min.z(), max.z());
 
         for (ProtectedRegion found : tree.find(pointMBR)) {
             candidates.add(found);

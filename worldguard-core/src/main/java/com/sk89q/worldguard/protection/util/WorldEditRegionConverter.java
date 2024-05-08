@@ -50,7 +50,7 @@ public final class WorldEditRegionConverter {
         }
         if (region instanceof ProtectedPolygonalRegion) {
             return new Polygonal2DRegion(null, region.getPoints(),
-                    region.getMinimumPoint().getY(), region.getMaximumPoint().getY());
+                    region.getMinimumPoint().y(), region.getMaximumPoint().y());
         }
         return null;
     }
@@ -68,7 +68,7 @@ public final class WorldEditRegionConverter {
         }
         if (region instanceof ProtectedPolygonalRegion) {
             return new Polygonal2DRegionSelector(null, region.getPoints(),
-                    region.getMinimumPoint().getY(), region.getMaximumPoint().getY());
+                    region.getMinimumPoint().y(), region.getMaximumPoint().y());
         }
         return null;
     }

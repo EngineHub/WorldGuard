@@ -221,7 +221,7 @@ public class FileHandler implements LoggerHandler {
      * @return The position's coordinates in human-readable form
      */
     private String getCoordinates(BlockVector3 pos) {
-        return "@" + pos.getBlockX() + "," + pos.getBlockY() + "," + pos.getBlockZ();
+        return "@" + pos.x() + "," + pos.y() + "," + pos.z();
     }
 
     private void logEvent(BlacklistEvent event, String text, Target target, BlockVector3 pos, String comment) {
