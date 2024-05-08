@@ -27,14 +27,7 @@ import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.World;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Hanging;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Painting;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
@@ -89,6 +82,11 @@ public class WorldGuardHangingListener extends AbstractListener {
                         && (wcfg.blockEntityItemFrameDestroy
                         || (wcfg.useRegions
                         && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(hanging.getLocation()), (RegionAssociable) null, Flags.ENTITY_ITEM_FRAME_DESTROY))))) {
+                    event.setCancelled(true);
+                } else if (hanging instanceof ArmorStand
+                        && (wcfg.blockEntityArmorStandDestroy
+                        || (wcfg.useRegions
+                        && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(hanging.getLocation()), (RegionAssociable) null, Flags.ENTITY_ARMOR_STAND_DESTROY))))) {
                     event.setCancelled(true);
                 }
             }
