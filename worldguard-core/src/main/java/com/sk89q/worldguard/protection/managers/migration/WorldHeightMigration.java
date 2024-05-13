@@ -84,8 +84,8 @@ public class WorldHeightMigration extends AbstractMigration {
             if (min == 0 && max == 255) return;
         }
         for (ProtectedRegion region : regions) {
-            if (region.getMinimumPoint().getBlockY() <= 0
-                    && region.getMaximumPoint().getBlockY() >= 255) {
+            if (region.getMinimumPoint().y() <= 0
+                    && region.getMaximumPoint().y() >= 255) {
                 expand(region, min, max);
                 changed++;
             }

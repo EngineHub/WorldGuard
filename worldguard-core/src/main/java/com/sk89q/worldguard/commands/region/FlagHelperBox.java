@@ -378,7 +378,7 @@ class FlagHelperBox extends PaginationBox {
         if (currVal == null) {
             currVal = getInheritedValue(region, flag);
         }
-        String display = currVal == null ? regName : currVal.getId();
+        String display = currVal == null ? regName : currVal.id();
         appendValueText(builder, flag, display, null);
     }
 

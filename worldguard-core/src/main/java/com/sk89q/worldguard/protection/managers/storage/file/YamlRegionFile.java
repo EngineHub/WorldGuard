@@ -216,14 +216,14 @@ public class YamlRegionFile implements RegionDatabase {
             } else if (region instanceof ProtectedPolygonalRegion) {
                 ProtectedPolygonalRegion poly = (ProtectedPolygonalRegion) region;
                 node.setProperty("type", "poly2d");
-                node.setProperty("min-y", poly.getMinimumPoint().getBlockY());
-                node.setProperty("max-y", poly.getMaximumPoint().getBlockY());
+                node.setProperty("min-y", poly.getMinimumPoint().y());
+                node.setProperty("max-y", poly.getMaximumPoint().y());
 
                 List<Map<String, Object>> points = new ArrayList<>();
                 for (BlockVector2 point : poly.getPoints()) {
                     Map<String, Object> data = new HashMap<>();
-                    data.put("x", point.getBlockX());
-                    data.put("z", point.getBlockZ());
+                    data.put("x", point.x());
+                    data.put("z", point.z());
                     points.add(data);
                 }
 

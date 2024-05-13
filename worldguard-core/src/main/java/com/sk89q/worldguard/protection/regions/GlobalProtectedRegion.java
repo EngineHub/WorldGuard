@@ -69,7 +69,7 @@ public class GlobalProtectedRegion extends ProtectedRegion {
     public List<BlockVector2> getPoints() {
         // This doesn't make sense
         List<BlockVector2> pts = new ArrayList<>();
-        pts.add(BlockVector2.at(min.getBlockX(), min.getBlockZ()));
+        pts.add(BlockVector2.at(min.x(), min.z()));
         return pts;
     }
 

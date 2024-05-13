@@ -35,6 +35,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Handles blocked potions.
@@ -50,43 +54,50 @@ public class BlockedPotionsListener extends AbstractListener {
         super(plugin);
     }
 
+    private PotionEffectType getBlockedEffectByArrow(Arrow arrow, BukkitWorldConfiguration wcfg) {
+        List<PotionEffect> effects = new ArrayList<>();
+        PotionType potionType = arrow.getBasePotionType();
+        if (potionType != null) {
+            effects.addAll(potionType.getPotionEffects());
+        }
+        effects.addAll(arrow.getCustomEffects());
+        for (PotionEffect potionEffect : effects) {
+            if (wcfg.blockPotions.contains(potionEffect.getType())) {
+                return potionEffect.getType();
+            }
+        }
+        return null;
+    }
+
+
     @EventHandler
     public void onProjectile(DamageEntityEvent event) {
-        if (event.getOriginalEvent() instanceof EntityDamageByEntityEvent) {
-            EntityDamageByEntityEvent originalEvent = (EntityDamageByEntityEvent) event.getOriginalEvent();
-            if (Entities.isPotionArrow(originalEvent.getDamager())) { // should take care of backcompat
-                BukkitWorldConfiguration wcfg = getWorldConfig(event.getWorld());
-                PotionEffectType blockedEffect = null;
-                if (originalEvent.getDamager() instanceof SpectralArrow) {
-                    if (wcfg.blockPotions.contains(PotionEffectType.GLOWING)) {
-                        blockedEffect = PotionEffectType.GLOWING;
-                    }
-                } else if (originalEvent.getDamager() instanceof Arrow) {
-                    Arrow tippedArrow = (Arrow) originalEvent.getDamager();
-                    PotionEffectType baseEffect = tippedArrow.getBasePotionData().getType().getEffectType();
-                    if (wcfg.blockPotions.contains(baseEffect)) {
-                        blockedEffect = baseEffect;
-                    } else {
-                        for (PotionEffect potionEffect : tippedArrow.getCustomEffects()) {
-                            if (wcfg.blockPotions.contains(potionEffect.getType())) {
-                                blockedEffect = potionEffect.getType();
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (blockedEffect != null) {
-                    Player player = event.getCause().getFirstPlayer();
-                    if (player != null) {
-                        if (getPlugin().hasPermission(player, "worldguard.override.potions")) {
-                            return;
-                        }
-                        player.sendMessage(ChatColor.RED + "Sorry, arrows with "
-                                + blockedEffect.getName() + " are presently disabled.");
-                    }
-                    event.setCancelled(true);
-                }
+        if (!(event.getOriginalEvent() instanceof EntityDamageByEntityEvent originalEvent)) {
+            return;
+        }
+        if (!Entities.isPotionArrow(originalEvent.getDamager())) {
+            return;
+        }
+
+        BukkitWorldConfiguration wcfg = getWorldConfig(event.getWorld());
+        PotionEffectType blockedEffect = null;
+        if (originalEvent.getDamager() instanceof SpectralArrow) {
+            if (wcfg.blockPotions.contains(PotionEffectType.GLOWING)) {
+                blockedEffect = PotionEffectType.GLOWING;
             }
+        } else if (originalEvent.getDamager() instanceof Arrow arrow) {
+            blockedEffect = getBlockedEffectByArrow(arrow, wcfg);
+        }
+        if (blockedEffect != null) {
+            Player player = event.getCause().getFirstPlayer();
+            if (player != null) {
+                if (getPlugin().hasPermission(player, "worldguard.override.potions")) {
+                    return;
+                }
+                player.sendMessage(ChatColor.RED + "Sorry, arrows with "
+                        + blockedEffect.getName() + " are presently disabled.");
+            }
+            event.setCancelled(true);
         }
     }
 
@@ -104,25 +115,20 @@ public class BlockedPotionsListener extends AbstractListener {
         if (!wcfg.blockPotions.isEmpty()) {
             PotionEffectType blockedEffect = null;
 
-            PotionMeta meta;
-            if (item.getItemMeta() instanceof PotionMeta) {
-                meta = ((PotionMeta) item.getItemMeta());
-            } else {
-                return; // ok...?
+            if (!(item.getItemMeta() instanceof PotionMeta meta)) {
+                return;
             }
 
             // Find the first blocked effect
-            PotionEffectType baseEffect = meta.getBasePotionData().getType().getEffectType();
-            if (wcfg.blockPotions.contains(baseEffect)) {
-                blockedEffect = baseEffect;
+            List<PotionEffect> effects = new ArrayList<>();
+            if (meta.getBasePotionType() != null) {
+                effects.addAll(meta.getBasePotionType().getPotionEffects());
             }
-
-            if (blockedEffect == null && meta.hasCustomEffects()) {
-                for (PotionEffect effect : meta.getCustomEffects()) {
-                    if (wcfg.blockPotions.contains(effect.getType())) {
-                        blockedEffect = effect.getType();
-                        break;
-                    }
+            effects.addAll(meta.getCustomEffects());
+            for (PotionEffect potionEffect : effects) {
+                if (wcfg.blockPotions.contains(potionEffect.getType())) {
+                    blockedEffect = potionEffect.getType();
+                    break;
                 }
             }
 

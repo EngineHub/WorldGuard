@@ -30,27 +30,21 @@ public class ProtectedRegionMBRConverter implements MBRConverter<ProtectedRegion
 
     @Override
     public double getMax(int dimension, ProtectedRegion region) {
-        switch (dimension) {
-            case 0:
-                return region.getMaximumPoint().getBlockX();
-            case 1:
-                return region.getMaximumPoint().getBlockY();
-            case 2:
-                return region.getMaximumPoint().getBlockZ();
-        }
-        return 0;
+        return switch (dimension) {
+            case 0 -> region.getMaximumPoint().x();
+            case 1 -> region.getMaximumPoint().y();
+            case 2 -> region.getMaximumPoint().z();
+            default -> 0;
+        };
     }
 
     @Override
     public double getMin(int dimension, ProtectedRegion region) {
-        switch (dimension) {
-            case 0:
-                return region.getMinimumPoint().getBlockX();
-            case 1:
-                return region.getMinimumPoint().getBlockY();
-            case 2:
-                return region.getMinimumPoint().getBlockZ();
-        }
-        return 0;
+        return switch (dimension) {
+            case 0 -> region.getMinimumPoint().x();
+            case 1 -> region.getMinimumPoint().y();
+            case 2 -> region.getMinimumPoint().z();
+            default -> 0;
+        };
     }
 }

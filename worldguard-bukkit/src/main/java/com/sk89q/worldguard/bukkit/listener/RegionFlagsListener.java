@@ -69,7 +69,7 @@ public class RegionFlagsListener extends AbstractListener {
             }
         }
 
-        if (event.getCause().find(EntityType.SNOWMAN) != null) {
+        if (event.getCause().find(EntityType.SNOW_GOLEM) != null) {
             event.filter(testState(query, Flags.SNOWMAN_TRAILS), false);
         }
 
@@ -100,7 +100,7 @@ public class RegionFlagsListener extends AbstractListener {
             event.filter(testState(query, Flags.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
         }
 
-        if (event.getCause().find(EntityType.ENDER_CRYSTAL) != null) { // EnderCrystal
+        if (event.getCause().find(EntityType.END_CRYSTAL) != null) { // EnderCrystal
             event.filter(testState(query, Flags.OTHER_EXPLOSION), config.explosionFlagCancellation);
         }
 
