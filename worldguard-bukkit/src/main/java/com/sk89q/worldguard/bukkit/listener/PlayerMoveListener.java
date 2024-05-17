@@ -127,7 +127,7 @@ public class PlayerMoveListener extends AbstractListener {
 
                 player.teleport(override.clone().add(0, 1, 0));
 
-                getPlugin().getScheduler().runAtEntityLater(player, () -> player.teleport(override.clone().add(0, 1, 0)), 1);
+                getPlugin().getScheduler().runAtEntityDelayed(player, () -> player.teleport(override.clone().add(0, 1, 0)), 1);
             }
         }
     }
