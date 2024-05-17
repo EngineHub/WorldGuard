@@ -12,11 +12,6 @@ repositories {
         name = "paper"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
-    maven {
-        // TODO: Remove this once paper updated to adventure release
-        name = "adventure-snapshots"
-        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-    }
 }
 
 configurations {
