@@ -70,7 +70,7 @@ public class GeneralCommands {
 
                     // Keep track of this
                     included = true;
-                } else {
+                } else if (!args.hasFlag('s')){
                     player.print("God enabled by " + sender.getDisplayName() + ".");
 
                 }
@@ -79,7 +79,7 @@ public class GeneralCommands {
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
-        if (!included && args.hasFlag('s')) {
+        if (!included) {
             sender.print("Players now have god mode.");
         }
     }
@@ -113,7 +113,7 @@ public class GeneralCommands {
 
                     // Keep track of this
                     included = true;
-                } else {
+                } else if (!args.hasFlag('s')){
                     player.print("God disabled by " + sender.getDisplayName() + ".");
 
                 }
@@ -122,7 +122,7 @@ public class GeneralCommands {
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
-        if (!included && args.hasFlag('s')) {
+        if (!included) {
             sender.print("Players no longer have god mode.");
         }
     }
@@ -158,7 +158,7 @@ public class GeneralCommands {
                 
                 // Keep track of this
                 included = true;
-            } else {
+            } else if (!args.hasFlag('s')){
                 player.print("Healed by " + sender.getDisplayName() + ".");
                 
             }
@@ -166,7 +166,7 @@ public class GeneralCommands {
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
-        if (!included && args.hasFlag('s')) {
+        if (!included) {
             sender.print("Players healed.");
         }
     }
@@ -199,7 +199,7 @@ public class GeneralCommands {
                 
                 // Keep track of this
                 included = true;
-            } else {
+            } else if (!args.hasFlag('s')){
                 player.print("Slain by " + sender.getDisplayName() + ".");
                 
             }
@@ -207,7 +207,7 @@ public class GeneralCommands {
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
-        if (!included && args.hasFlag('s')) {
+        if (!included) {
             sender.print("Players slain.");
         }
     }
