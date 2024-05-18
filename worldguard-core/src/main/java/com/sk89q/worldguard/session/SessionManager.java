@@ -91,14 +91,6 @@ public interface SessionManager {
     boolean unregisterHandler(Handler.Factory<? extends Handler> factory);
 
     /**
-     * Create a session for a player.
-     *
-     * @param player The player
-     * @return The new session
-     */
-    Session createSession(LocalPlayer player);
-
-    /**
      * Get a player's session, if one exists.
      *
      * @param player The player
