@@ -70,7 +70,7 @@ public class GeneralCommands {
 
                     // Keep track of this
                     included = true;
-                } else if (!args.hasFlag('s')){
+                } else if (!args.hasFlag('s')) {
                     player.print("God enabled by " + sender.getDisplayName() + ".");
 
                 }
@@ -113,7 +113,7 @@ public class GeneralCommands {
 
                     // Keep track of this
                     included = true;
-                } else if (!args.hasFlag('s')){
+                } else if (!args.hasFlag('s')) {
                     player.print("God disabled by " + sender.getDisplayName() + ".");
 
                 }
@@ -158,7 +158,7 @@ public class GeneralCommands {
                 
                 // Keep track of this
                 included = true;
-            } else if (!args.hasFlag('s')){
+            } else if (!args.hasFlag('s')) {
                 player.print("Healed by " + sender.getDisplayName() + ".");
                 
             }
@@ -199,7 +199,7 @@ public class GeneralCommands {
                 
                 // Keep track of this
                 included = true;
-            } else if (!args.hasFlag('s')){
+            } else if (!args.hasFlag('s')) {
                 player.print("Slain by " + sender.getDisplayName() + ".");
                 
             }
