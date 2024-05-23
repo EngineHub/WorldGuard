@@ -180,6 +180,11 @@ public abstract class AbstractSessionManager implements SessionManager {
         return session;
     }
 
+    @Override
+    public Session createSession(LocalPlayer player) {
+        return get(player);
+    }
+
     private void initializeSession(Session session, LocalPlayer player) {
         for (Handler.Factory<? extends Handler> factory : handlers) {
             session.register(factory.create(session));
