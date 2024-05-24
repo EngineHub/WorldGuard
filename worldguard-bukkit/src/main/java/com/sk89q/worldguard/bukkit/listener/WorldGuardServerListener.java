@@ -35,12 +35,20 @@ public class WorldGuardServerListener extends AbstractListener {
         if (event.getPlugin().getDescription().getName().equalsIgnoreCase("CommandBook")) {
             getConfig().updateCommandBookGodMode();
         }
+
+        if(event.getPlugin().getDescription().getName().equalsIgnoreCase("Essentials")){
+            getConfig().updateEssentialsGodMode();
+        }
     }
 
     @EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
         if (event.getPlugin().getDescription().getName().equalsIgnoreCase("CommandBook")) {
             getConfig().updateCommandBookGodMode();
+        }
+
+        if(event.getPlugin().getDescription().getName().equalsIgnoreCase("Essentials")){
+            getConfig().updateEssentialsGodMode();
         }
     }
 }
