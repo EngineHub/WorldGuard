@@ -370,6 +370,16 @@ public class WorldGuardBlockListener extends AbstractListener {
             return;
         }
 
+        if ((Materials.isConcretePowder(id) && wcfg.noPhysicsConcretePowder)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if ((Materials.isAnvil(id) && wcfg.noPhysicsAnvil)) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (id == Material.NETHER_PORTAL && wcfg.allowPortalAnywhere) {
             event.setCancelled(true);
             return;
