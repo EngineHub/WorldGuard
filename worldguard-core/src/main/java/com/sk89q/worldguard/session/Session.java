@@ -130,8 +130,11 @@ public class Session {
         Location location = player.getLocation();
         ApplicableRegionSet set = query.getApplicableRegions(location);
 
-        for (Handler handler : handlers.values()) {
-            handler.uninitialize(player, location, set);
+        synchronized (this) {
+            for (Handler handler : handlers.values()) {
+                handler.uninitialize(player, location, set);
+            }
+            initialized = false;
         }
     }
 
