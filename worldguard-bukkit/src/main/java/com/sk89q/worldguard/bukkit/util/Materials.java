@@ -835,6 +835,7 @@ public final class Materials {
 
         MATERIAL_FLAGS.put(Material.ARMADILLO_SCUTE, 0);
         MATERIAL_FLAGS.put(Material.WOLF_ARMOR, 0);
+        MATERIAL_FLAGS.put(Material.WIND_CHARGE, 0);
 
         // 1.21
         MATERIAL_FLAGS.put(Material.CHISELED_TUFF, 0);
