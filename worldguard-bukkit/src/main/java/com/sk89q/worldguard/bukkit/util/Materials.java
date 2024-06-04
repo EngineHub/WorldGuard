@@ -842,6 +842,7 @@ public final class Materials {
 
         MATERIAL_FLAGS.put(Material.ARMADILLO_SCUTE, 0);
         MATERIAL_FLAGS.put(Material.WOLF_ARMOR, 0);
+        MATERIAL_FLAGS.put(Material.WIND_CHARGE, 0);
 
         // Generated via tag
         putMaterialTag(Tag.WOODEN_DOORS, MODIFIED_ON_RIGHT);
