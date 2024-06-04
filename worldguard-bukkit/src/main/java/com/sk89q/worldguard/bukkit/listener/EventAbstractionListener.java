@@ -152,6 +152,7 @@ import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -359,7 +360,16 @@ public class EventAbstractionListener extends AbstractListener {
     public void onEntityExplode(EntityExplodeEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof WindCharge) {
-            Events.fireBulkEventToCancel(event, new UseBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR));
+            Iterator<Block> it = event.blockList().iterator();
+            while (it.hasNext()) {
+                Block block = it.next();
+                UseBlockEvent useEvent = new UseBlockEvent(event, create(entity), block);
+                useEvent.setSilent(true);
+                Bukkit.getServer().getPluginManager().callEvent(useEvent);
+                if (useEvent.isCancelled()) {
+                    it.remove();
+                }
+            }
             return;
         }
         Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR));
