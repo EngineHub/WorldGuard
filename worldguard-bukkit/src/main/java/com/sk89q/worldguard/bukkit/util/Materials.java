@@ -864,7 +864,6 @@ public final class Materials {
         putMaterialTag(Tag.ALL_SIGNS, 0);
         putMaterialTag(Tag.SMALL_FLOWERS, 0);
         putMaterialTag(Tag.BEDS, MODIFIED_ON_RIGHT);
-        putMaterialTag(Tag.ITEMS_MUSIC_DISCS, 0);
         putMaterialTag(Tag.ITEMS_BANNERS, 0);
         putMaterialTag(Tag.FENCE_GATES, MODIFIED_ON_RIGHT);
         putMaterialTag(Tag.FENCES, 0);
