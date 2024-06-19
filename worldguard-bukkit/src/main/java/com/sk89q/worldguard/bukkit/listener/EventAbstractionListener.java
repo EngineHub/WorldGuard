@@ -218,8 +218,8 @@ public class EventAbstractionListener extends AbstractListener {
             Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getPlayer()), previousState.getLocation(), previousState.getType()));
         }
 
-        if (!event.isCancelled()) {
-            ItemStack itemStack = new ItemStack(event.getBlockPlaced().getType(), 1);
+        if (!event.isCancelled() && !event.getItemInHand().isEmpty()) {
+            ItemStack itemStack = event.getItemInHand().asQuantity(1);
             Events.fireToCancel(event, new UseItemEvent(event, create(event.getPlayer()), event.getPlayer().getWorld(), itemStack));
         }
 
