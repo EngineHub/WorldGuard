@@ -219,7 +219,7 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         ItemStack itemStack = event.getItemInHand();
-        if (!event.isCancelled() && !itemStack.isEmpty()) {
+        if (!event.isCancelled() && itemStack.getType() != Material.AIR) {
             Events.fireToCancel(event, new UseItemEvent(event, create(event.getPlayer()), event.getPlayer().getWorld(), itemStack));
         }
 
