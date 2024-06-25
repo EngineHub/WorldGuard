@@ -44,6 +44,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.AbstractWindCharge;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderCrystal;
@@ -60,7 +61,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
-import org.bukkit.entity.WindCharge;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.Wolf;
@@ -523,7 +523,7 @@ public class WorldGuardEntityListener extends AbstractListener {
                     }
                 }
             }
-        } else if (ent instanceof WindCharge) {
+        } else if (ent instanceof AbstractWindCharge) {
             if (wcfg.useRegions) {
                 for (Block block : event.blockList()) {
                     if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(block.getLocation())).testState(null, Flags.WIND_CHARGE_BURST)) {
