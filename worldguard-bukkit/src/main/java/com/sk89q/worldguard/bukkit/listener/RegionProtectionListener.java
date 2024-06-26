@@ -244,13 +244,13 @@ public class RegionProtectionListener extends AbstractListener {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
-        final Material type = event.getEffectiveMaterial();
         final RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         final RegionAssociable associable = createRegionAssociable(event.getCause());
 
         event.filter((Predicate<Location>) target -> {
             boolean canUse;
             String what;
+            final Material type = target.getBlock().getType();
 
             /* Saplings, etc. */
             if (Materials.isConsideredBuildingIfUsed(type)) {
