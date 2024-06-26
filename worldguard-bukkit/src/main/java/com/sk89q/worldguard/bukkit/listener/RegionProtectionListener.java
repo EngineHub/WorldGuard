@@ -278,7 +278,7 @@ public class RegionProtectionListener extends AbstractListener {
                 what = "sleep";
 
             /* Respawn Anchors */
-            } else if(target.getBlock().getType() == Material.RESPAWN_ANCHOR) {
+            } else if(type == Material.RESPAWN_ANCHOR) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT, Flags.RESPAWN_ANCHORS));
                 what = "use anchors";
 
