@@ -44,7 +44,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.AbstractWindCharge;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderCrystal;
@@ -517,16 +516,6 @@ public class WorldGuardEntityListener extends AbstractListener {
                 for (Block block : event.blockList()) {
                     if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(block.getLocation()),
                             (RegionAssociable) null, Flags.WITHER_DAMAGE))) {
-                        event.blockList().clear();
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
-        } else if (ent instanceof AbstractWindCharge) {
-            if (wcfg.useRegions) {
-                for (Block block : event.blockList()) {
-                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(block.getLocation())).testState(null, Flags.WIND_CHARGE_BURST)) {
                         event.blockList().clear();
                         event.setCancelled(true);
                         return;

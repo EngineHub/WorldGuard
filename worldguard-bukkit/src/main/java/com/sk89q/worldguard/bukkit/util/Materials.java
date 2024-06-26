@@ -835,7 +835,6 @@ public final class Materials {
 
         MATERIAL_FLAGS.put(Material.ARMADILLO_SCUTE, 0);
         MATERIAL_FLAGS.put(Material.WOLF_ARMOR, 0);
-        MATERIAL_FLAGS.put(Material.WIND_CHARGE, 0);
 
         // 1.21
         MATERIAL_FLAGS.put(Material.CHISELED_TUFF, 0);
@@ -876,6 +875,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.VAULT, 0);
         MATERIAL_FLAGS.put(Material.OMINOUS_BOTTLE, 0);
         MATERIAL_FLAGS.put(Material.BREEZE_ROD, 0);
+        MATERIAL_FLAGS.put(Material.WIND_CHARGE, 0);
 
         putMaterialTag(Tag.SHULKER_BOXES, MODIFIED_ON_RIGHT);
         putMaterialTag(Tag.ITEMS_BOATS, 0);
