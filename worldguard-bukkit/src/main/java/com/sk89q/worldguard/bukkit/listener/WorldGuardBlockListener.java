@@ -727,6 +727,9 @@ public class WorldGuardBlockListener extends AbstractListener {
         }
     }
 
+    /**
+     * Called when the moisture level of a block changes
+     */
     @EventHandler(ignoreCancelled = true)
     public void onMoistureChange(MoistureChangeEvent event) {
         WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
