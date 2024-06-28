@@ -41,21 +41,8 @@ import org.bukkit.entity.Snowman;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.block.BlockFadeEvent;
-import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockGrowEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
-import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.block.EntityBlockFormEvent;
-import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -723,6 +710,23 @@ public class WorldGuardBlockListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
         if (wcfg.blockOtherExplosions) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onMoistureChange(MoistureChangeEvent event) {
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
+
+        if (wcfg.disableSoilMoistureChange) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (wcfg.useRegions) {
+            if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.MOISTURE_CHANGE))) {
+                event.setCancelled(true);
+            }
         }
     }
 

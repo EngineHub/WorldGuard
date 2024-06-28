@@ -166,6 +166,7 @@ public abstract class WorldConfiguration {
     public boolean disableEndermanGriefing;
     public boolean disableSnowmanTrails;
     public boolean disableSoilDehydration;
+    public boolean disableSoilMoistureChange;
     public boolean disableCoralBlockFade;
     public boolean disableCopperBlockFade;
     public Set<String> allowedSnowFallOver;
