@@ -112,7 +112,7 @@ public class Session {
         disableBypass = cfg.disableDefaultBypass;
         if (cfg.announceBypassStatus && player.hasPermission("worldguard.region.toggle-bypass")) {
             player.printInfo(TextComponent.of(
-                    "You are " + (disableBypass ? "not" : "") + " bypassing region protection. " +
+                    "You are " + (disableBypass ? "not " : "") + "bypassing region protection. " +
                     "You can toggle this with /rg bypass", TextColor.DARK_PURPLE));
         }
 
