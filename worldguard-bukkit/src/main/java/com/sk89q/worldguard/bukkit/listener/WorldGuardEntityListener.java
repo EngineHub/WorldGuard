@@ -624,6 +624,8 @@ public class WorldGuardEntityListener extends AbstractListener {
 
         EntityType entityType = event.getEntityType();
 
+        if (entityType.equals(EntityType.UNKNOWN)) return;
+
         com.sk89q.worldedit.world.entity.EntityType weEntityType = BukkitAdapter.adapt(entityType);
 
         if (weEntityType != null && wcfg.blockCreatureSpawn.contains(weEntityType)) {
