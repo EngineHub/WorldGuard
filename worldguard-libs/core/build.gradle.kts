@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
-    "shade"(libs.squirrelid)
+    "shade"(libs.squirrelid) {
+        isTransitive = false
+    }
     "shade"(libs.prtree)
 }

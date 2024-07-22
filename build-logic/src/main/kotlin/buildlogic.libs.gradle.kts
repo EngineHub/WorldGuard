@@ -47,9 +47,6 @@ tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("jar"
         exclude {
             it.moduleGroup == "org.jetbrains.kotlin"
         }
-
-        include(dependency("org.enginehub:squirrelid"))
-        include(dependency("org.khelekore:prtree"))
     }
 
     relocations.forEach { (from, to) ->
@@ -122,7 +119,7 @@ val apiElements = project.configurations.register("apiElements") {
         attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
         attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
         attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
-        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 16)
+        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
     }
     outgoing.artifact(tasks.named("jar"))
 }
@@ -137,7 +134,7 @@ val runtimeElements = project.configurations.register("runtimeElements") {
         attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
         attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
         attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
-        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 16)
+        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
     }
     outgoing.artifact(tasks.named("jar"))
 }

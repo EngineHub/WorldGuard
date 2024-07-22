@@ -8,9 +8,6 @@ plugins {
     id("buildlogic.common")
 }
 
-val commonJava = extensions.create<buildlogic.CommonJavaExtension>("commonJava")
-commonJava.banSlf4j.convention(true)
-
 tasks
     .withType<JavaCompile>()
     .matching { it.name == "compileJava" || it.name == "compileTestJava" }
@@ -40,9 +37,6 @@ dependencies {
     "testImplementation"(platform(stringyLibs.getLibrary("junit-bom")))
     "testImplementation"(stringyLibs.getLibrary("junit-jupiter-api"))
     "testImplementation"(stringyLibs.getLibrary("junit-jupiter-params"))
-    "testImplementation"(platform(stringyLibs.getLibrary("mockito-bom")))
-    "testImplementation"(stringyLibs.getLibrary("mockito-core"))
-    "testImplementation"(stringyLibs.getLibrary("mockito-junit-jupiter"))
     "testRuntimeOnly"(stringyLibs.getLibrary("junit-jupiter-engine"))
 }
 
@@ -64,16 +58,6 @@ tasks.withType<Javadoc>().configureEach {
 configure<JavaPluginExtension> {
     withJavadocJar()
     withSourcesJar()
-}
-
-configurations["compileClasspath"].apply {
-    resolutionStrategy.componentSelection {
-        withModule("org.slf4j:slf4j-api") {
-            if (commonJava.banSlf4j.get()) {
-                reject("No SLF4J allowed on compile classpath")
-            }
-        }
-    }
 }
 
 tasks.named("check").configure {

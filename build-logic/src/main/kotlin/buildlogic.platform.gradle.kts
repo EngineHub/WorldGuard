@@ -10,7 +10,7 @@ tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJ
         include(project(":worldguard-core"))
 
         relocate("org.flywaydb", "com.sk89q.worldguard.internal.flywaydb") {
-            include(dependency("org.flywaydb:flyway-core:3.0"))
+            include(dependency("org.flywaydb:flyway-core"))
         }
         exclude("com.google.code.findbugs:jsr305")
     }

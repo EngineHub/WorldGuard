@@ -5,13 +5,6 @@ plugins {
     id("buildlogic.platform")
 }
 
-repositories {
-    maven {
-        name = "Spigot"
-        url = uri("https://hub.spigotmc.org/nexus/content/groups/public")
-    }
-}
-
 val localImplementation = configurations.create("localImplementation") {
     description = "Dependencies used locally, but provided by the runtime Bukkit implementation"
     isCanBeConsumed = false
@@ -58,11 +51,9 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency(":worldguard-core"))
         include(dependency("org.bstats:"))
         include(dependency("io.papermc:paperlib"))
-        include(dependency("co.aikar:minecraft-timings"))
 
         relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats")
         relocate("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib")
-        relocate("co.aikar.timings.lib", "com.sk89q.worldguard.bukkit.timingslib")
     }
 }
 

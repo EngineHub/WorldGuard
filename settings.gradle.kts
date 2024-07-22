@@ -1,10 +1,6 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        maven {
-            name = "EngineHub"
-            url = uri("https://maven.enginehub.org/repo/")
-        }
     }
 }
 plugins {
