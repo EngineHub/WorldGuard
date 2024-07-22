@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard.bukkit.util;
 
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.StateFlag;
+import org.bukkit.entity.AbstractWindCharge;
 import org.bukkit.entity.Allay;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.ArmorStand;
@@ -28,6 +31,8 @@ import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Flying;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.LivingEntity;
@@ -43,11 +48,13 @@ import org.bukkit.entity.Steerable;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.Wither;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.projectiles.ProjectileSource;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class Entities {
@@ -243,6 +250,21 @@ public final class Entities {
         return switch (spawnReason) {
             case CUSTOM, COMMAND -> true;
             default -> false;
+        };
+    }
+
+    /**
+     * Get the explosion flag relevant for an entity type.
+     * @param entity the entity
+     * @return the relevant StateFlag or OTHER_EXPLOSION if none is matching
+     */
+    public static @Nonnull StateFlag getExplosionFlag(Entity entity) {
+        return switch (entity) {
+            case AbstractWindCharge abstractWindCharge -> Flags.WIND_CHARGE_BURST;
+            case Firework firework -> Flags.FIREWORK_DAMAGE;
+            case Fireball fireball -> Flags.GHAST_FIREBALL;
+            case Wither wither -> Flags.WITHER_DAMAGE;
+            case null, default -> Flags.OTHER_EXPLOSION;
         };
     }
 }

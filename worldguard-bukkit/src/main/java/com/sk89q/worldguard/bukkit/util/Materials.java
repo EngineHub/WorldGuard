@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit.util;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.sk89q.worldguard.protection.flags.Flags;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.entity.EntityType;

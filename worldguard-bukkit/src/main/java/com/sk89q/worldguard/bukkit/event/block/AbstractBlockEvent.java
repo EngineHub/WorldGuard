@@ -45,7 +45,7 @@ import javax.annotation.Nullable;
  * This event is an internal event. We do not recommend handling or throwing
  * this event or its subclasses as the interface is highly subject to change.
  */
-abstract class AbstractBlockEvent extends DelegateEvent implements BulkEvent {
+public abstract class AbstractBlockEvent extends DelegateEvent implements BulkEvent {
 
     private final World world;
     private List<Block> blocks;

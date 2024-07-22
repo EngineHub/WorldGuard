@@ -25,6 +25,7 @@ import com.destroystokyo.paper.event.entity.EntityZapEvent;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.DelegateEvent;
+import com.sk89q.worldguard.bukkit.event.block.AbstractBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
@@ -46,10 +47,12 @@ import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
+import org.bukkit.ExplosionResult;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -65,7 +68,6 @@ import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Dispenser;
-import org.bukkit.entity.AbstractWindCharge;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -358,14 +360,21 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent event) {
         Entity entity = event.getEntity();
-        if (entity instanceof AbstractWindCharge) {
-            UseBlockEvent useEvent = new UseBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR);
-            useEvent.getRelevantFlags().add(Flags.WIND_CHARGE_BURST);
-            useEvent.setSilent(true);
-            Events.fireBulkEventToCancel(event, useEvent);
+        AbstractBlockEvent wgEvent;
+
+        if (event.getExplosionResult() == ExplosionResult.TRIGGER_BLOCK) {
+            wgEvent = new UseBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR);
+        } else if (event.getExplosionResult() == ExplosionResult.DESTROY || event.getExplosionResult() == ExplosionResult.DESTROY_WITH_DECAY) {
+            wgEvent = new BreakBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR);
+        } else {
             return;
         }
-        Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR));
+
+        wgEvent.getRelevantFlags().add(Entities.getExplosionFlag(event.getEntity()));
+
+        wgEvent.setSilent(true);
+        Events.fireBulkEventToCancel(event, wgEvent);
+
         if (entity instanceof Creeper) {
             Cause.untrackParentCause(entity);
         }
@@ -584,7 +593,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockFertilize(BlockFertilizeEvent event) {
-        if (event.getBlocks().isEmpty()) return; 
+        if (event.getBlocks().isEmpty()) return;
         Cause cause = create(event.getPlayer(), event.getBlock());
         Events.fireToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getWorld(), event.getBlocks()));
     }
@@ -750,7 +759,7 @@ public class EventAbstractionListener extends AbstractListener {
             if (event.isCancelled() && remover instanceof Player) {
                 playDenyEffect((Player) remover, event.getEntity().getLocation());
             }
-        } else if (event.getCause() == HangingBreakEvent.RemoveCause.EXPLOSION){
+        } else if (event.getCause() == HangingBreakEvent.RemoveCause.EXPLOSION) {
             DestroyEntityEvent destroyEntityEvent = new DestroyEntityEvent(event, Cause.unknown(), event.getEntity());
             destroyEntityEvent.getRelevantFlags().add(Flags.OTHER_EXPLOSION);
             if (event.getEntity() instanceof ItemFrame) {
@@ -1112,7 +1121,7 @@ public class EventAbstractionListener extends AbstractListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event){
+    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
         onPlayerInteractEntity(event);
     }
 

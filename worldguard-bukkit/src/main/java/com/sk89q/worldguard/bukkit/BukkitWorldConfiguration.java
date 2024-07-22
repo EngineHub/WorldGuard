@@ -215,6 +215,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         blockEnderDragonPortalCreation = getBoolean("mobs.block-enderdragon-portal-creation", false);
         blockFireballExplosions = getBoolean("mobs.block-fireball-explosions", false);
         blockFireballBlockDamage = getBoolean("mobs.block-fireball-block-damage", false);
+        blockWindChargeExplosions = getBoolean("mobs.block-windcharge-explosions", false);
         antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
         allowTamedSpawns = getBoolean("mobs.allow-tamed-spawns", true);
         disableEndermanGriefing = getBoolean("mobs.disable-enderman-griefing", false);
