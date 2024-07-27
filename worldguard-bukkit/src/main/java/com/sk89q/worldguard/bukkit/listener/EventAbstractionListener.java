@@ -68,6 +68,7 @@ import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Dispenser;
+import org.bukkit.entity.AbstractWindCharge;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -117,6 +118,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityKnockbackByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
@@ -355,6 +357,17 @@ public class EventAbstractionListener extends AbstractListener {
             handleFallingBlock(event, denied);
         }
 
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityKnockbackByEntity(EntityKnockbackByEntityEvent event) {
+        Entity damager = event.getSourceEntity();
+
+        final DamageEntityEvent eventToFire = new DamageEntityEvent(event, create(damager), event.getEntity());
+        if (damager instanceof AbstractWindCharge) {
+            eventToFire.getRelevantFlags().add(Flags.WIND_CHARGE_BURST);
+        }
+        Events.fireToCancel(event, eventToFire);
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -330,7 +330,6 @@ public class WorldGuardEntityListener extends AbstractListener {
                         }
                     }
                     if (wcfg.useRegions) {
-                        WorldGuardPlugin.inst().getLogger().info("Getting damager type " + event.getDamager().getType());
                         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
                         if (!query.testState(localPlayer.getLocation(), localPlayer, Entities.getExplosionFlag(event.getDamager())) && wcfg.explosionFlagCancellation) {
                             event.setCancelled(true);
