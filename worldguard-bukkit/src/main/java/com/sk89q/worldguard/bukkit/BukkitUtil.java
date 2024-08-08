@@ -59,23 +59,6 @@ public class BukkitUtil {
      * Get a blacklist target for the given block.
      *
      * @param block the block
-     * @param effectiveMaterial The effective material, if different
-     * @return a target
-     */
-    public static Target createTarget(Block block, Material effectiveMaterial) {
-        checkNotNull(block);
-        checkNotNull(block.getType());
-        if (block.getType() == effectiveMaterial) {
-            return createTarget(block.getType());
-        } else {
-            return createTarget(effectiveMaterial);
-        }
-    }
-
-    /**
-     * Get a blacklist target for the given block.
-     *
-     * @param block the block
      * @return a target
      */
     public static Target createTarget(Block block) {

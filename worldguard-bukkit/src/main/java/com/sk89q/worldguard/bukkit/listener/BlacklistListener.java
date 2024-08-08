@@ -96,7 +96,7 @@ public class BlacklistListener extends AbstractListener {
         event.filter(target -> {
             if (!wcfg.getBlacklist().check(
                     new BlockBreakBlacklistEvent(localPlayer, BukkitAdapter.asBlockVector(target),
-                            createTarget(target.getBlock(), event.getEffectiveMaterial())), false, false)) {
+                            createTarget(target.getBlock())), false, false)) {
                 return false;
             } else if (!wcfg.getBlacklist().check(
                     new ItemDestroyWithBlacklistEvent(localPlayer, BukkitAdapter.asBlockVector(target),
@@ -124,7 +124,7 @@ public class BlacklistListener extends AbstractListener {
 
         final LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         event.filter(target -> wcfg.getBlacklist().check(new BlockPlaceBlacklistEvent(
-                localPlayer, BukkitAdapter.asBlockVector(target), createTarget(target.getBlock(), event.getEffectiveMaterial())), false, false));
+                localPlayer, BukkitAdapter.asBlockVector(target), createTarget(target.getBlock())), false, false));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -143,7 +143,7 @@ public class BlacklistListener extends AbstractListener {
 
         final LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         event.filter(target -> wcfg.getBlacklist().check(new BlockInteractBlacklistEvent(
-                localPlayer, BukkitAdapter.asBlockVector(target), createTarget(target.getBlock(), event.getEffectiveMaterial())), false, false));
+                localPlayer, BukkitAdapter.asBlockVector(target), createTarget(target.getBlock())), false, false));
     }
 
     @EventHandler(ignoreCancelled = true)
