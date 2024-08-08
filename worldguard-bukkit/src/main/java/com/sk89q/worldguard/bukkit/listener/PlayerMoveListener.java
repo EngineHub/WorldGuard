@@ -25,7 +25,6 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Entity;
@@ -40,7 +39,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
-import org.spigotmc.event.entity.EntityMountEvent;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerMoveListener extends AbstractListener {
