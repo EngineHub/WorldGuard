@@ -101,12 +101,14 @@ public class BuildPermissionListener extends AbstractListener {
 
         if (rootCause instanceof Player) {
             final Player player = (Player) rootCause;
-            final Material material = event.getEffectiveMaterial();
 
-            if (!hasBuildPermission(player, "block." + material.name().toLowerCase() + ".interact")
-                    && !hasBuildPermission(player, "block.interact." + material.name().toLowerCase())) {
+            boolean blocked = event.filter(loc -> {
+                String blacklistName = loc.getBlock().getType().name().toLowerCase();
+                return hasBuildPermission(player, "block." + blacklistName + ".interact") ||
+                        hasBuildPermission(player, "block.interact." + blacklistName);
+            }, true);
+            if (blocked && !event.isSilent()) {
                 tellErrorMessage(player, event.getWorld());
-                event.setCancelled(true);
             }
         }
     }

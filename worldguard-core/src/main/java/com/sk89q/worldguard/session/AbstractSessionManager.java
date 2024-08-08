@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.session;
 
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -67,10 +68,9 @@ public abstract class AbstractSessionManager implements SessionManager {
             .expireAfterWrite(2, TimeUnit.SECONDS)
             .build(CacheLoader.from(tuple -> BYPASS_PERMISSION_TEST.test(tuple.getWorld(), tuple.getPlayer())));
 
-    private final LoadingCache<CacheKey, Session> sessions = CacheBuilder.newBuilder()
+    private final Cache<CacheKey, Session> sessions = CacheBuilder.newBuilder()
             .expireAfterAccess(SESSION_LIFETIME, TimeUnit.MINUTES)
-            .build(CacheLoader.from(key ->
-                    createSession(key.playerRef.get())));
+            .build();
 
     private boolean hasCustom = false;
     private List<Handler.Factory<? extends Handler>> handlers = new LinkedList<>();
@@ -152,7 +152,7 @@ public abstract class AbstractSessionManager implements SessionManager {
     @Override
     public void resetState(LocalPlayer player) {
         checkNotNull(player, "player");
-        @Nullable Session session = sessions.getIfPresent(new CacheKey(player));
+        @Nullable Session session = getIfPresentInternal(new CacheKey(player));
         if (session != null) {
             session.resetState(player);
         }
@@ -161,22 +161,35 @@ public abstract class AbstractSessionManager implements SessionManager {
     @Override
     @Nullable
     public Session getIfPresent(LocalPlayer player) {
-        return sessions.getIfPresent(new CacheKey(player));
+        return getIfPresentInternal(new CacheKey(player));
+    }
+
+    private Session getIfPresentInternal(CacheKey cacheKey) {
+        @Nullable Session session = sessions.getIfPresent(cacheKey);
+        if (session != null) {
+            session.ensureInitialized(cacheKey.playerRef.get(), this::initializeSession);
+            return session;
+        }
+        return null;
     }
 
     @Override
     public Session get(LocalPlayer player) {
-        return sessions.getUnchecked(new CacheKey(player));
+        Session session = sessions.asMap().computeIfAbsent(new CacheKey(player), (k) -> new Session(this));
+        session.ensureInitialized(player, this::initializeSession);
+        return session;
     }
 
     @Override
     public Session createSession(LocalPlayer player) {
-        Session session = new Session(this);
+        return get(player);
+    }
+
+    private void initializeSession(Session session, LocalPlayer player) {
         for (Handler.Factory<? extends Handler> factory : handlers) {
             session.register(factory.create(session));
         }
         session.initialize(player);
-        return session;
     }
 
     protected static final class CacheKey {

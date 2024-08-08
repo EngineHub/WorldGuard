@@ -173,7 +173,7 @@ public class RegionProtectionListener extends AbstractListener {
             /* Flint and steel, fire charge, etc. */
             if (Materials.isFire(type)) {
                 Block block = event.getCause().getFirstBlock();
-                boolean fire = block != null && Materials.isFire(type);
+                boolean fire = block != null && Materials.isFire(block.getType());
                 boolean lava = block != null && Materials.isLava(block.getType());
                 List<StateFlag> flags = new ArrayList<>();
                 flags.add(Flags.BLOCK_PLACE);
@@ -244,13 +244,13 @@ public class RegionProtectionListener extends AbstractListener {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
-        final Material type = event.getEffectiveMaterial();
         final RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         final RegionAssociable associable = createRegionAssociable(event.getCause());
 
         event.filter((Predicate<Location>) target -> {
             boolean canUse;
             String what;
+            final Material type = target.getBlock().getType();
 
             /* Saplings, etc. */
             if (Materials.isConsideredBuildingIfUsed(type)) {

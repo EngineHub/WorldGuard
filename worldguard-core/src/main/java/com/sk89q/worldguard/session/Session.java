@@ -38,6 +38,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -52,6 +53,7 @@ public class Session {
     private Location lastValid;
     private Set<ProtectedRegion> lastRegionSet;
     private final AtomicBoolean needRefresh = new AtomicBoolean(false);
+    private boolean initialized;
 
     /**
      * Create a new session.
@@ -110,7 +112,7 @@ public class Session {
         disableBypass = cfg.disableDefaultBypass;
         if (cfg.announceBypassStatus && player.hasPermission("worldguard.region.toggle-bypass")) {
             player.printInfo(TextComponent.of(
-                    "You are " + (disableBypass ? "not" : "") + " bypassing region protection. " +
+                    "You are " + (disableBypass ? "not " : "") + "bypassing region protection. " +
                     "You can toggle this with /rg bypass", TextColor.DARK_PURPLE));
         }
 
@@ -118,6 +120,14 @@ public class Session {
         for (Handler handler : handlers.values()) {
             handler.initialize(player, location, set);
         }
+    }
+
+    synchronized void ensureInitialized(LocalPlayer player, BiConsumer<Session, LocalPlayer> initializer) {
+        if (initialized) {
+            return;
+        }
+        initialized = true;
+        initializer.accept(this, player);
     }
 
     /**

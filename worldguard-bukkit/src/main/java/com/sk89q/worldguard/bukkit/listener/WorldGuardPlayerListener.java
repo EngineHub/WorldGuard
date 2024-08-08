@@ -350,6 +350,11 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
+        if (event.getTo() == null) {
+            // The target location for PlayerTeleportEvents can be null.
+            // Those events will be ignored by the server, so we can ignore them too.
+            return;
+        }
         Player player = event.getPlayer();
         if (com.sk89q.worldguard.bukkit.util.Entities.isNPC(player)) return;
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);

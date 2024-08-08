@@ -93,6 +93,7 @@ public final class Flags {
     public static final StateFlag ENDERDRAGON_BLOCK_DAMAGE = register(new StateFlag("enderdragon-block-damage", true));
     public static final StateFlag GHAST_FIREBALL = register(new StateFlag("ghast-fireball", true));
     public static final StateFlag OTHER_EXPLOSION = register(new StateFlag("other-explosion", true));
+    public static final StateFlag WIND_CHARGE_BURST = register(new StateFlag("wind-charge-burst", true));
     public static final StateFlag WITHER_DAMAGE = register(new StateFlag("wither-damage", true));
     public static final StateFlag ENDER_BUILD = register(new StateFlag("enderman-grief", true));
     public static final StateFlag SNOWMAN_TRAILS = register(new StateFlag("snowman-trails", true));
