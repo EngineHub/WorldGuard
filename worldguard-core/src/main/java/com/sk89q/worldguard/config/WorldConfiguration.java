@@ -101,6 +101,7 @@ public abstract class WorldConfiguration {
     public boolean blockEnderDragonPortalCreation;
     public boolean blockFireballExplosions;
     public boolean blockFireballBlockDamage;
+    public boolean blockWindChargeExplosions;
     public boolean blockOtherExplosions;
     public boolean blockEntityPaintingDestroy;
     public boolean blockEntityItemFrameDestroy;
