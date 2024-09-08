@@ -1495,6 +1495,9 @@ public final class Materials {
                     case SUSPICIOUS_GRAVEL, SUSPICIOUS_SAND -> true;
                     default -> false;
                 };
+            case WRITTEN_BOOK:
+            case WRITABLE_BOOK:
+                return targetMaterial == Material.LECTERN;
             default:
                 return false;
         }
