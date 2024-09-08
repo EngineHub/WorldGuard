@@ -1315,8 +1315,8 @@ public final class Materials {
      */
     public static boolean isUseFlagApplicable(Material material) {
         if (Tag.BUTTONS.isTagged(material)
-                || Tag.WOODEN_DOORS.isTagged(material)
-                || Tag.WOODEN_TRAPDOORS.isTagged(material)
+                || Tag.DOORS.isTagged(material)
+                || Tag.TRAPDOORS.isTagged(material)
                 || Tag.FENCE_GATES.isTagged(material)
                 || Tag.PRESSURE_PLATES.isTagged(material)) {
             return true;
