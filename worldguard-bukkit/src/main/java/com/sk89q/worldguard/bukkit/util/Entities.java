@@ -21,11 +21,11 @@ package com.sk89q.worldguard.bukkit.util;
 
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
-import org.bukkit.entity.AbstractWindCharge;
 import org.bukkit.entity.Allay;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.BreezeWindCharge;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EnderDragon;
@@ -48,6 +48,7 @@ import org.bukkit.entity.Steerable;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.WindCharge;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -260,7 +261,8 @@ public final class Entities {
      */
     public static @Nonnull StateFlag getExplosionFlag(Entity entity) {
         return switch (entity) {
-            case AbstractWindCharge abstractWindCharge -> Flags.WIND_CHARGE_BURST;
+            case BreezeWindCharge breezeWindCharge -> Flags.BREEZE_WIND_CHARGE;
+            case WindCharge windCharge -> Flags.WIND_CHARGE_BURST;
             case Firework firework -> Flags.FIREWORK_DAMAGE;
             case Fireball fireball -> Flags.GHAST_FIREBALL;
             case Wither wither -> Flags.WITHER_DAMAGE;

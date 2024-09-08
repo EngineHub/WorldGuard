@@ -47,7 +47,6 @@ import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import org.bukkit.Bukkit;
@@ -68,8 +67,8 @@ import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Dispenser;
-import org.bukkit.entity.AbstractWindCharge;
 import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.BreezeWindCharge;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -83,6 +82,7 @@ import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.WindCharge;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -328,10 +328,10 @@ public class EventAbstractionListener extends AbstractListener {
 
         // Fire two events: one as BREAK and one as PLACE
         if (toType != Material.AIR && fromType != Material.AIR) {
-            BreakBlockEvent breakDelagate = new BreakBlockEvent(event, cause, block);
-            setDelegateEventMaterialOptions(breakDelagate, fromType, toType);
+            BreakBlockEvent breakDelegate = new BreakBlockEvent(event, cause, block);
+            setDelegateEventMaterialOptions(breakDelegate, fromType, toType);
             boolean denied;
-            if (!(denied = Events.fireToCancel(event, breakDelagate))) {
+            if (!(denied = Events.fireToCancel(event, breakDelegate))) {
                 PlaceBlockEvent placeDelegate = new PlaceBlockEvent(event, cause, block.getLocation(), toType);
                 setDelegateEventMaterialOptions(placeDelegate, fromType, toType);
                 denied = Events.fireToCancel(event, placeDelegate);
@@ -364,7 +364,9 @@ public class EventAbstractionListener extends AbstractListener {
         Entity damager = event.getSourceEntity();
 
         final DamageEntityEvent eventToFire = new DamageEntityEvent(event, create(damager), event.getEntity());
-        if (damager instanceof AbstractWindCharge) {
+        if (damager instanceof BreezeWindCharge) {
+            eventToFire.getRelevantFlags().add(Flags.BREEZE_WIND_CHARGE);
+        } else if (damager instanceof WindCharge) {
             eventToFire.getRelevantFlags().add(Flags.WIND_CHARGE_BURST);
         }
         Events.fireToCancel(event, eventToFire);
