@@ -130,6 +130,7 @@ public final class Flags {
     public static final StateFlag COPPER_FADE = register(new StateFlag("copper-fade", true));
     public static final StateFlag WATER_FLOW = register(new StateFlag("water-flow", true));
     public static final StateFlag LAVA_FLOW = register(new StateFlag("lava-flow", true));
+    public static final StateFlag MOISTURE_CHANGE = register(new StateFlag("moisture-change", true));
 
     public static final RegistryFlag<WeatherType> WEATHER_LOCK = register(new RegistryFlag<>("weather-lock", WeatherType.REGISTRY));
     public static final StringFlag TIME_LOCK = register(new StringFlag("time-lock"));
