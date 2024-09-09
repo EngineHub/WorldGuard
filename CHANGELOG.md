@@ -1,5 +1,17 @@
 # Changelog
 
+## 7.0.11
+
+* Add support for MC 1.21.
+* Add wind-charge-burst flag which is checked along with `use` (for the interaction) or `pvp` (for the knockback).
+* Add breeze-charge-explosion flag for breeze charges (i.e. from the mob, not player wind charges).
+* Add moisture-change flag and config options.
+* Fix an error if a player logged in to an unloaded world.
+* Fix chest boat usage always being counted as ride.
+* Consider potions thrown by mobs as mob-damage.
+* Workaround spigot no longer sending block change events when a book is placed on a lectern.
+* Improve accuracy of target blocks in blacklist/build-perms events.
+
 ## 7.0.10
 
 * Add support for MC 1.20.5 and 1.20.6, drop support for other 1.20 versions
