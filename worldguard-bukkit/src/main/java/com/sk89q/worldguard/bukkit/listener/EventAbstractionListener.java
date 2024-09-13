@@ -1241,9 +1241,9 @@ public class EventAbstractionListener extends AbstractListener {
                     useBlockEvent.setAllowed(true);
                 }
                 Events.fireToCancel(originalEvent, useBlockEvent);
-            } else if (holder instanceof DoubleChest) {
-                InventoryHolder left = ((DoubleChest) holder).getLeftSide();
-                InventoryHolder right = ((DoubleChest) holder).getRightSide();
+            } else if (holder instanceof DoubleChest doubleChest) {
+                InventoryHolder left = PaperLib.isPaper() ? doubleChest.getLeftSide(false) : doubleChest.getLeftSide();
+                InventoryHolder right = PaperLib.isPaper() ? doubleChest.getRightSide(false) : doubleChest.getRightSide();
                 if (left instanceof Chest) {
                     Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((Chest) left).getBlock()));
                 }
