@@ -246,7 +246,7 @@ public final class Entities {
      * This is true for custom creations or the summon command.
      *
      * @param spawnReason the reason
-     * @return true if considerd plugin spawning
+     * @return true if considered plugin spawning
      */
     public static boolean isPluginSpawning(CreatureSpawnEvent.SpawnReason spawnReason) {
         return switch (spawnReason) {

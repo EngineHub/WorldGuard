@@ -61,6 +61,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
+import org.bukkit.entity.WindCharge;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.Wolf;
@@ -503,6 +504,16 @@ public class WorldGuardEntityListener extends AbstractListener {
                     return;
                 }
             }
+            if (wcfg.useRegions && !(ent instanceof WindCharge)) {
+                for (Block block : event.blockList()) {
+                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                            .testState(BukkitAdapter.adapt(block.getLocation()), null, Entities.getExplosionFlag(ent))) {
+                        event.blockList().clear();
+                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
         } else if (ent instanceof Wither) {
             if (wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
@@ -512,11 +523,31 @@ public class WorldGuardEntityListener extends AbstractListener {
                 event.blockList().clear();
                 return;
             }
+            if (wcfg.useRegions) {
+                for (Block block : event.blockList()) {
+                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                            .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.WITHER_DAMAGE)) {
+                        event.blockList().clear();
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
         } else {
             // unhandled entity
             if (wcfg.blockOtherExplosions) {
                 event.setCancelled(true);
                 return;
+            }
+            if (wcfg.useRegions) {
+                for (Block block : event.blockList()) {
+                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                            .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.OTHER_EXPLOSION)) {
+                        event.blockList().clear();
+                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
+                        return;
+                    }
+                }
             }
         }
 
