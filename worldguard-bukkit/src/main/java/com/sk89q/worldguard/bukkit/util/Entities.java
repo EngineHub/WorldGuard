@@ -27,6 +27,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.BreezeWindCharge;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
@@ -266,6 +267,10 @@ public final class Entities {
             case Firework firework -> Flags.FIREWORK_DAMAGE;
             case Fireball fireball -> Flags.GHAST_FIREBALL;
             case Wither wither -> Flags.WITHER_DAMAGE;
+            case Creeper creeper -> Flags.CREEPER_EXPLOSION;
+            case TNTPrimed tnt -> Flags.TNT;
+            case ExplosiveMinecart minecart -> Flags.TNT;
+            case EnderDragon dragon -> Flags.ENDERDRAGON_BLOCK_DAMAGE;
             case null, default -> Flags.OTHER_EXPLOSION;
         };
     }
