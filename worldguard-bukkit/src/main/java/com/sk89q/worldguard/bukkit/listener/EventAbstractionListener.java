@@ -67,6 +67,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.BreezeWindCharge;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -913,11 +914,19 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityCombust(EntityCombustEvent event) {
-        if (event instanceof EntityCombustByBlockEvent) {
+        if (event instanceof EntityCombustByBlockEvent combustByBlockEvent) {
             // at the time of writing, spigot is throwing null for the event's combuster. this causes lots of issues downstream.
             // whenever (i mean if ever) it is fixed, use getCombuster again instead of the current block
-            Events.fireToCancel(event, new DamageEntityEvent(event, create(event.getEntity().getLocation().getBlock()), event.getEntity()));
+            Block combuster = combustByBlockEvent.getCombuster();
+            Events.fireToCancel(event, new DamageEntityEvent(event,
+                    create(combuster == null ? event.getEntity().getLocation().getBlock() : combuster), event.getEntity()));
         } else if (event instanceof EntityCombustByEntityEvent) {
+            if (event.getEntity() instanceof Arrow) {
+                // this only happens from the Flame enchant. igniting arrows in other ways (eg with lava) doesn't even
+                // throw the combust event, not even the CombustByBlock event... they're also very buggy and don't even
+                // show as lit on the client consistently
+                return;
+            }
             Events.fireToCancel(event, new DamageEntityEvent(event, create(((EntityCombustByEntityEvent) event).getCombuster()), event.getEntity()));
         }
     }
