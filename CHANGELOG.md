@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.12
+
+* Fix a change in the default behavior of explosion flag handling.
+
 ## 7.0.11
 
 * Add support for MC 1.21.
