@@ -1532,4 +1532,23 @@ public final class Materials {
     public static boolean isSculkGrowth(Material mat) {
         return mat == Material.SCULK || mat == Material.SCULK_VEIN;
     }
+
+    public static boolean isConcretePowder(Material mat) {
+        return mat == Material.BLACK_CONCRETE_POWDER
+                || mat == Material.BLUE_CONCRETE_POWDER
+                || mat == Material.BROWN_CONCRETE_POWDER
+                || mat == Material.CYAN_CONCRETE_POWDER
+                || mat == Material.GRAY_CONCRETE_POWDER
+                || mat == Material.GREEN_CONCRETE_POWDER
+                || mat == Material.LIGHT_BLUE_CONCRETE_POWDER
+                || mat == Material.YELLOW_CONCRETE_POWDER
+                || mat == Material.LIGHT_GRAY_CONCRETE_POWDER
+                || mat == Material.LIME_CONCRETE_POWDER
+                || mat == Material.MAGENTA_CONCRETE_POWDER
+                || mat == Material.ORANGE_CONCRETE_POWDER
+                || mat == Material.PINK_CONCRETE_POWDER
+                || mat == Material.PURPLE_CONCRETE_POWDER
+                || mat == Material.RED_CONCRETE_POWDER
+                || mat == Material.WHITE_CONCRETE_POWDER;
+    }
 }

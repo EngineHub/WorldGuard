@@ -28,6 +28,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.InteropUtils;
+import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -822,6 +823,16 @@ public class WorldGuardEntityListener extends AbstractListener {
             }
 
             if ((id == Material.SAND || id == Material.RED_SAND) && wcfg.noPhysicsSand) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if ((Materials.isConcretePowder(id) && wcfg.noPhysicsConcretePowder)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if ((Materials.isAnvil(id) && wcfg.noPhysicsAnvil)) {
                 event.setCancelled(true);
                 return;
             }
