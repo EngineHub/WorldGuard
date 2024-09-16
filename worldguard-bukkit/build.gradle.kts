@@ -2,38 +2,40 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     `java-library`
+    id("buildlogic.platform")
 }
 
-applyPlatformAndCoreConfiguration()
-applyShadowConfiguration()
-
-repositories {
-    maven {
-        name = "paper"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
-    maven {
-        // TODO: Remove this once paper updated to adventure release
-        name = "adventure-snapshots"
-        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-    }
+val localImplementation = configurations.create("localImplementation") {
+    description = "Dependencies used locally, but provided by the runtime Bukkit implementation"
+    isCanBeConsumed = false
+    isCanBeResolved = false
 }
-
-configurations {
-    compileClasspath.get().extendsFrom(create("shadeOnly"))
-}
+configurations["compileOnly"].extendsFrom(localImplementation)
+configurations["testImplementation"].extendsFrom(localImplementation)
 
 dependencies {
     "api"(project(":worldguard-core"))
-    "compileOnly"("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
-    "runtimeOnly"("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT") {
+    "api"(libs.worldedit.bukkit) { isTransitive = false }
+    "compileOnly"(libs.commandbook) { isTransitive = false }
+    // Technically this is api, but everyone should already have some form of the bukkit API
+    // Avoid pulling in another one, especially one so outdated.
+    "localImplementation"(libs.spigot) {
         exclude("junit", "junit")
     }
-    "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
-    "implementation"("com.google.guava:guava:${Versions.GUAVA}")
-    "compileOnly"("com.sk89q:commandbook:2.3") { isTransitive = false }
-    "shadeOnly"("io.papermc:paperlib:1.0.8")
-    "shadeOnly"("org.bstats:bstats-bukkit:3.0.1")
+
+    "compileOnly"(libs.jetbrains.annotations) {
+        because("Resolving Spigot annotations")
+    }
+    "testCompileOnly"(libs.jetbrains.annotations) {
+        because("Resolving Spigot annotations")
+    }
+    "compileOnly"(libs.paperApi) {
+        exclude("org.slf4j", "slf4j-api")
+        exclude("junit", "junit")
+    }
+
+    "implementation"(libs.paperLib)
+    "implementation"(libs.bstats.bukkit)
 }
 
 tasks.named<Copy>("processResources") {
@@ -44,31 +46,23 @@ tasks.named<Copy>("processResources") {
     }
 }
 
-tasks.named<Jar>("jar") {
-    val projectVersion = project.version
-    inputs.property("projectVersion", projectVersion)
-    manifest {
-        attributes("Implementation-Version" to projectVersion)
-    }
-}
-
 tasks.named<ShadowJar>("shadowJar") {
-    configurations = listOf(project.configurations["shadeOnly"], project.configurations["runtimeClasspath"])
-
     dependencies {
         include(dependency(":worldguard-core"))
-        relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats") {
-            include(dependency("org.bstats:"))
-        }
-        relocate ("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib") {
-            include(dependency("io.papermc:paperlib"))
-        }
-        relocate ("co.aikar.timings.lib", "com.sk89q.worldguard.bukkit.timingslib") {
-            include(dependency("co.aikar:minecraft-timings"))
-        }
+        include(dependency("org.bstats:"))
+        include(dependency("io.papermc:paperlib"))
+
+        relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats")
+        relocate("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib")
     }
 }
 
 tasks.named("assemble").configure {
     dependsOn("shadowJar")
+}
+
+configure<PublishingExtension> {
+    publications.named<MavenPublication>("maven") {
+        from(components["java"])
+    }
 }

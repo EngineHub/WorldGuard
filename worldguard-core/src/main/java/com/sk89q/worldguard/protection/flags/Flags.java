@@ -74,6 +74,7 @@ public final class Flags {
     public static final StateFlag FIREWORK_DAMAGE = register(new StateFlag("firework-damage", false));
     public static final StateFlag USE_ANVIL = register(new StateFlag("use-anvil", false));
     public static final StateFlag USE_DRIPLEAF = register(new StateFlag("use-dripleaf", false));
+    public static final StateFlag WIND_CHARGE_BURST = register(new StateFlag("wind-charge-burst", false));
 
     // These flags are similar to the ones above (used in tandem with BUILD),
     // but their defaults are set to TRUE because it is more user friendly.
@@ -93,6 +94,7 @@ public final class Flags {
     public static final StateFlag ENDERDRAGON_BLOCK_DAMAGE = register(new StateFlag("enderdragon-block-damage", true));
     public static final StateFlag GHAST_FIREBALL = register(new StateFlag("ghast-fireball", true));
     public static final StateFlag OTHER_EXPLOSION = register(new StateFlag("other-explosion", true));
+    public static final StateFlag BREEZE_WIND_CHARGE = register(new StateFlag("breeze-charge-explosion", true));
     public static final StateFlag WITHER_DAMAGE = register(new StateFlag("wither-damage", true));
     public static final StateFlag ENDER_BUILD = register(new StateFlag("enderman-grief", true));
     public static final StateFlag SNOWMAN_TRAILS = register(new StateFlag("snowman-trails", true));
@@ -128,6 +130,7 @@ public final class Flags {
     public static final StateFlag COPPER_FADE = register(new StateFlag("copper-fade", true));
     public static final StateFlag WATER_FLOW = register(new StateFlag("water-flow", true));
     public static final StateFlag LAVA_FLOW = register(new StateFlag("lava-flow", true));
+    public static final StateFlag MOISTURE_CHANGE = register(new StateFlag("moisture-change", true));
 
     public static final RegistryFlag<WeatherType> WEATHER_LOCK = register(new RegistryFlag<>("weather-lock", WeatherType.REGISTRY));
     public static final StringFlag TIME_LOCK = register(new StringFlag("time-lock"));
