@@ -24,8 +24,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
-import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.MapFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -56,7 +56,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * value of a flag is far from trivial. This class abstracts away the
  * difficult with a number of methods for performing these calculations.</p>
  */
-public class FlagValueCalculator {
+public class FlagValueCalculator implements FlagQuery {
 
     @Nullable
     private final ProtectedRegion globalRegion;
@@ -148,107 +148,28 @@ public class FlagValueCalculator {
         return result;
     }
 
-
     /**
-     * Get the effective value for a list of state flags. The rules of
-     * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
-     * and {@code ALLOW} overrides {@code NONE}.
-     *
-     * <p>A subject can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * subject is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the subject, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flags a list of flags to check
-     * @return a state
-     */
-    @Nullable
-    public State queryState(@Nullable RegionAssociable subject, StateFlag... flags) {
-        State value = null;
-
-        for (StateFlag flag : flags) {
-            value = StateFlag.combine(value, queryValue(subject, flag));
-            if (value == State.DENY) {
-                break;
-            }
-        }
-
-        return value;
-    }
-
-    /**
-     * Get the effective value for a list of state flags. The rules of
+     * Get the (effective) value for a state flag. The rules of
      * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
      * and {@code ALLOW} overrides {@code NONE}.
      *
      * <p>This method is the same as
      * {@link #queryState(RegionAssociable, StateFlag...)}.</p>
      *
-     * @param subject an optional subject, which would be used to determine the region group to apply
+     * @param subject an optional subject, which would be used to determine the region groups that apply
      * @param flag a flag to check
      * @return a state
+     * @deprecated use {@link #queryState(RegionAssociable, StateFlag...)} instead, will be removed in WorldGuard 8
      */
+    @Deprecated(forRemoval = true)
     @Nullable
     public State queryState(@Nullable RegionAssociable subject, StateFlag flag) {
         return queryValue(subject, flag);
     }
 
-    /**
-     * Get the effective value for a flag. If there are multiple values
-     * (for example, if there are multiple regions with the same priority
-     * but with different farewell messages set, there would be multiple
-     * completing values), then the selected (or "winning") value will depend
-     * on the flag type.
-     *
-     * <p>Only some flag types actually have a strategy for picking the
-     * "best value." For most types, the actual value that is chosen to be
-     * returned is undefined (it could be any value). As of writing, the only
-     * type of flag that can consistently return the same 'best' value is
-     * {@link StateFlag}.</p>
-     *
-     * <p>A subject can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * subject is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the subject, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flag the flag
-     * @return a value, which could be {@code null}
-     */
+    @Override
     @Nullable
-    public <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag) {
-        Collection<V> values = queryAllValues(subject, flag, true);
-        return flag.chooseValue(values);
-    }
-
-    /**
-     * Get the effective value for a key in a {@link MapFlag}. If there are multiple values
-     * (for example, if there are multiple regions with the same priority
-     * but with different farewell messages set, there would be multiple
-     * completing values), then the selected (or "winning") value will be undefined.
-     *
-     * <p>A subject can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * subject is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the subject, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flag the flag of type {@link MapFlag}
-     * @param key the key for the map flag
-     * @return a value, which could be {@code null}
-     */
-    @Nullable
-    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, Flag<V> fallback) {
+    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, @Nullable Flag<V> fallback) {
         checkNotNull(flag);
         checkNotNull(key);
 
@@ -297,27 +218,27 @@ public class FlagValueCalculator {
     }
 
     @Nullable
-    public <V, K> V getEffectiveMapValue(ProtectedRegion region, MapFlag<K, V> mapFlag, K key, RegionAssociable subject) {
-        return getEffectiveMapValueOf(region, mapFlag, key, subject);
+    public <V, K> V getEffectiveMapValue(ProtectedRegion region, MapFlag<K, V> flag, K key, RegionAssociable subject) {
+        return getEffectiveMapValueOf(region, flag, key, subject);
     }
 
     @Nullable
-    public static <V, K> V getEffectiveMapValueOf(ProtectedRegion region, MapFlag<K, V> mapFlag, K key, RegionAssociable subject) {
+    public static <V, K> V getEffectiveMapValueOf(ProtectedRegion region, MapFlag<K, V> flag, K key, RegionAssociable subject) {
         List<ProtectedRegion> seen = new ArrayList<>();
         ProtectedRegion current = region;
 
         while (current != null) {
             seen.add(current);
 
-            Map<K, V> mapValue = current.getFlag(mapFlag);
+            Map<K, V> mapValue = current.getFlag(flag);
 
             if (mapValue != null && mapValue.containsKey(key)) {
                 boolean use = true;
 
-                if (mapFlag.getRegionGroupFlag() != null) {
-                    RegionGroup group = current.getFlag(mapFlag.getRegionGroupFlag());
+                if (flag.getRegionGroupFlag() != null) {
+                    RegionGroup group = current.getFlag(flag.getRegionGroupFlag());
                     if (group == null) {
-                        group = mapFlag.getRegionGroupFlag().getDefault();
+                        group = flag.getRegionGroupFlag().getDefault();
                     }
 
                     if (group == null) {
@@ -339,47 +260,9 @@ public class FlagValueCalculator {
         return null;
     }
 
-    /**
-     * Get the effective values for a flag, returning a collection of all
-     * values. It is up to the caller to determine which value, if any,
-     * from the collection will be used.
-     *
-     * <p>A subject can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * subject is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the subject, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flag the flag
-     * @return a collection of values
-     */
-    public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag) {
-        return queryAllValues(subject, flag, false);
-    }
-
-    /**
-     * Get the effective values for a flag, returning a collection of all
-     * values. It is up to the caller to determine which value, if any,
-     * from the collection will be used.
-     *
-     * <p>A subject can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * subject is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the subject, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flag the flag
-     * @param acceptOne if possible, return only one value if it doesn't matter
-     * @return a collection of values
-     */
     @SuppressWarnings("unchecked")
-    private <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag, boolean acceptOne) {
+    @Override
+    public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag, boolean acceptOne) {
         checkNotNull(flag);
 
         // Can't use this optimization with flags that have a conflict resolution strategy
