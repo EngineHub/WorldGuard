@@ -19,15 +19,21 @@
 
 package com.sk89q.worldguard.bukkit.util;
 
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.entity.Allay;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.BreezeWindCharge;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Flying;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.LivingEntity;
@@ -43,11 +49,14 @@ import org.bukkit.entity.Steerable;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.WindCharge;
+import org.bukkit.entity.Wither;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.projectiles.ProjectileSource;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class Entities {
@@ -237,12 +246,32 @@ public final class Entities {
      * This is true for custom creations or the summon command.
      *
      * @param spawnReason the reason
-     * @return true if considerd plugin spawning
+     * @return true if considered plugin spawning
      */
     public static boolean isPluginSpawning(CreatureSpawnEvent.SpawnReason spawnReason) {
         return switch (spawnReason) {
             case CUSTOM, COMMAND -> true;
             default -> false;
+        };
+    }
+
+    /**
+     * Get the explosion flag relevant for an entity type.
+     * @param entity the entity
+     * @return the relevant StateFlag or OTHER_EXPLOSION if none is matching
+     */
+    public static @Nonnull StateFlag getExplosionFlag(Entity entity) {
+        return switch (entity) {
+            case BreezeWindCharge breezeWindCharge -> Flags.BREEZE_WIND_CHARGE;
+            case WindCharge windCharge -> Flags.WIND_CHARGE_BURST;
+            case Firework firework -> Flags.FIREWORK_DAMAGE;
+            case Fireball fireball -> Flags.GHAST_FIREBALL;
+            case Wither wither -> Flags.WITHER_DAMAGE;
+            case Creeper creeper -> Flags.CREEPER_EXPLOSION;
+            case TNTPrimed tnt -> Flags.TNT;
+            case ExplosiveMinecart minecart -> Flags.TNT;
+            case EnderDragon dragon -> Flags.ENDERDRAGON_BLOCK_DAMAGE;
+            case null, default -> Flags.OTHER_EXPLOSION;
         };
     }
 }

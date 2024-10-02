@@ -61,6 +61,7 @@ import org.bukkit.entity.Tameable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 
@@ -410,13 +411,15 @@ public class RegionProtectionListener extends AbstractListener {
             canUse = event.getRelevantFlags().isEmpty() || query.queryState(BukkitAdapter.adapt(target), associable, combine(event)) != State.DENY;
             what = "use that";
         /* Paintings, item frames, etc. */
-        } else if (Entities.isConsideredBuildingIfUsed(entity)) {
+        } else if (Entities.isConsideredBuildingIfUsed(entity)
+                // weird case since sneak+interact is chest access and not ride
+                || type == EntityType.CHEST_BOAT && event.getOriginalEvent() instanceof InventoryOpenEvent) {
             if ((type == EntityType.ITEM_FRAME || type == EntityType.GLOW_ITEM_FRAME)
                     && event.getCause().getFirstPlayer() != null
                     && ((ItemFrame) entity).getItem().getType() != Material.AIR) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_FRAME_ROTATE));
                 what = "change that";
-            } else if (Entities.isMinecart(type)) {
+            } else if (Entities.isMinecart(type) || type == EntityType.CHEST_BOAT) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
                 what = "open that";
             } else {
