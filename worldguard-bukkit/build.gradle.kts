@@ -34,6 +34,7 @@ dependencies {
         exclude("junit", "junit")
     }
 
+    "implementation"("com.tcoded:FoliaLib:0.3.2")
     "implementation"(libs.paperLib)
     "implementation"(libs.bstats.bukkit)
 }
@@ -52,6 +53,9 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency("org.bstats:"))
         include(dependency("io.papermc:paperlib"))
 
+        relocate ("com.tcoded.folialib", "com.sk89q.worldguard.bukkit.folialib") {
+            include(dependency("com.tcoded:FoliaLib"))
+        }
         relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats")
         relocate("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib")
     }

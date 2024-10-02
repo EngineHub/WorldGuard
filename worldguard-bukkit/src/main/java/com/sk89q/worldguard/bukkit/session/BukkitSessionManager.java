@@ -28,6 +28,8 @@ import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.session.AbstractSessionManager;
 import com.sk89q.worldguard.session.Session;
+import com.tcoded.folialib.FoliaLib;
+import com.tcoded.folialib.impl.ServerImplementation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -68,7 +70,13 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     public void run() {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-            get(localPlayer).tick(localPlayer);
+            Session session = get(localPlayer);
+
+            FoliaLib foliaLib = WorldGuardPlugin.inst().getFoliaLib();
+            ServerImplementation impl = foliaLib.getImpl();
+
+            if (foliaLib.isFolia()) impl.runAtEntity(player, (task) -> session.tick(localPlayer));
+            else session.tick(localPlayer);
         }
     }
 

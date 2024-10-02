@@ -158,6 +158,7 @@ import org.bukkit.util.Vector;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class EventAbstractionListener extends AbstractListener {
@@ -1025,8 +1026,16 @@ public class EventAbstractionListener extends AbstractListener {
             handleInventoryHolderUse(event, cause, targetHolder);
 
             if (event.isCancelled() && causeHolder instanceof Hopper && wcfg.breakDeniedHoppers) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(),
-                        () -> ((Hopper) causeHolder).getBlock().breakNaturally());
+                Hopper hopperCauseHolder = (Hopper) causeHolder;
+                Location location = hopperCauseHolder.getLocation();
+
+                getPlugin().getFoliaLib().getImpl().runAtLocationLater(location, () -> {
+                    Block block = location.getBlock();
+                    if (block.getType() == Material.HOPPER) {
+                        block.breakNaturally();
+                    }
+                }, 50, TimeUnit.MILLISECONDS);
+
             } else {
                 entry.setCancelled(event.isCancelled());
             }

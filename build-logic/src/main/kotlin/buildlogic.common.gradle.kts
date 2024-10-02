@@ -15,6 +15,10 @@ repositories {
         name = "EngineHub"
         url = uri("https://maven.enginehub.org/repo/")
     }
+    maven {
+        name = "devmart-other"
+        url = uri("https://nexuslite.gcnt.net/repos/other/")
+    }
 }
 
 configurations.all {
