@@ -32,8 +32,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Player;
@@ -326,15 +328,21 @@ public final class Cause {
                             addAll(player.getPlayer()); // player object if online, else null
                         }
                     }
-                } else if (o instanceof Creature && ((Creature) o).getTarget() != null) {
+                } else if (o instanceof Creeper c) {
                     indirect = true;
-                    addAll(((Creature) o).getTarget());
+                    addAll(c.getTarget(), c.getIgniter());
+                } else if (o instanceof Creature c) {
+                    indirect = true;
+                    addAll(c.getTarget());
                 } else if (o instanceof BlockProjectileSource) {
                     addAll(((BlockProjectileSource) o).getBlock());
                 } else if (o instanceof LightningStrike && PaperLib.isPaper() &&
                         ((LightningStrike) o).getCausingEntity() != null) {
                     indirect = true;
                     addAll(((LightningStrike) o).getCausingEntity());
+                } else if (o instanceof FallingBlock f && PaperLib.isPaper() && f.getOrigin() != null) {
+                    indirect = true;
+                    addAll(f.getOrigin().getBlock());
                 }
 
                 // Add manually tracked parent causes
