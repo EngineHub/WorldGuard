@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.cause;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.internal.WGMetadata;
@@ -32,8 +33,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Player;
@@ -74,7 +77,7 @@ public final class Cause {
     /**
      * Create a new instance.
      *
-     * @param causes a list of causes
+     * @param causes   a list of causes
      * @param indirect whether the cause is indirect
      */
     private Cause(List<Object> causes, boolean indirect) {
@@ -326,15 +329,22 @@ public final class Cause {
                             addAll(player.getPlayer()); // player object if online, else null
                         }
                     }
-                } else if (o instanceof Creature && ((Creature) o).getTarget() != null) {
+                } else if (o instanceof Creeper c) {
                     indirect = true;
-                    addAll(((Creature) o).getTarget());
+                    addAll(c.getTarget(), c.getIgniter());
+                } else if (o instanceof Creature c) {
+                    indirect = true;
+                    addAll(c.getTarget());
                 } else if (o instanceof BlockProjectileSource) {
                     addAll(((BlockProjectileSource) o).getBlock());
                 } else if (o instanceof LightningStrike && PaperLib.isPaper() &&
                         ((LightningStrike) o).getCausingEntity() != null) {
                     indirect = true;
                     addAll(((LightningStrike) o).getCausingEntity());
+                } else if (o instanceof FallingBlock f && PaperLib.isPaper() &&
+                        WorldGuardPlugin.inst().getConfigManager().get(BukkitAdapter.adapt(f.getWorld())).usePaperEntityOrigin) {
+                    indirect = true;
+                    addAll(f.getOrigin());
                 }
 
                 // Add manually tracked parent causes
