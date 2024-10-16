@@ -347,7 +347,8 @@ public class EventAbstractionListener extends AbstractListener {
         } else if (toType == Material.AIR) {
             // Track the source so later we can create a proper chain of causes
             if (entity instanceof FallingBlock) {
-                if (!getWorldConfig(event.getEntity().getWorld()).usePaperEntityOrigin) {
+                if (!PaperLib.isPaper()) {
+                    // On paper we use FallingBlock#getOrigin to get the origin location, on spigot we store it.
                     Cause.trackParentCause(entity, block);
                 }
 

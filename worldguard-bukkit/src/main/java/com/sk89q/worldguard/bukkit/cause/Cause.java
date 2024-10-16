@@ -21,7 +21,6 @@ package com.sk89q.worldguard.bukkit.cause;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.internal.WGMetadata;
@@ -341,10 +340,9 @@ public final class Cause {
                         ((LightningStrike) o).getCausingEntity() != null) {
                     indirect = true;
                     addAll(((LightningStrike) o).getCausingEntity());
-                } else if (o instanceof FallingBlock f && PaperLib.isPaper() &&
-                        WorldGuardPlugin.inst().getConfigManager().get(BukkitAdapter.adapt(f.getWorld())).usePaperEntityOrigin) {
+                } else if (o instanceof FallingBlock f && PaperLib.isPaper() && f.getOrigin() != null) {
                     indirect = true;
-                    addAll(f.getOrigin());
+                    addAll(f.getOrigin().getBlock());
                 }
 
                 // Add manually tracked parent causes
