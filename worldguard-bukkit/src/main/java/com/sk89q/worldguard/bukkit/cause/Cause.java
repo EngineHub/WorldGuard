@@ -76,7 +76,7 @@ public final class Cause {
     /**
      * Create a new instance.
      *
-     * @param causes   a list of causes
+     * @param causes a list of causes
      * @param indirect whether the cause is indirect
      */
     private Cause(List<Object> causes, boolean indirect) {
