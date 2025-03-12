@@ -47,6 +47,7 @@ import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.flags.Flags;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.event.entity.EntityPushedByEntityAttackEvent;
 import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -1324,8 +1325,8 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         @EventHandler(ignoreCancelled = true)
-        public void onEntityKnockbackByEntity(com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent event) {
-            handleKnockback(event, event.getHitBy());
+        public void onEntityKnockbackByEntity(EntityPushedByEntityAttackEvent event) {
+            handleKnockback(event, event.getPushedBy());
         }
     }
 
