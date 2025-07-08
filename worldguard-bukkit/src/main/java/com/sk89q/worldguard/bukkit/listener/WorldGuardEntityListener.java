@@ -603,7 +603,7 @@ public class WorldGuardEntityListener extends AbstractListener {
                 event.setCancelled(true);
                 return;
             }
-        } else if (event instanceof AbstractWindCharge) {
+        } else if (event.getEntity() instanceof AbstractWindCharge) {
             if (wcfg.blockWindChargeExplosions) {
                 event.setCancelled(true);
                 return;

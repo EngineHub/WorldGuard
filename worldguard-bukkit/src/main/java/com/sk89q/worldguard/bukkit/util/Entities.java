@@ -122,8 +122,11 @@ public final class Entities {
      * @return true if the type is a Boat type
      */
     public static boolean isBoat(EntityType type) {
-        return switch(type) {
-            case BOAT, CHEST_BOAT -> true;
+        return switch (type) {
+            case OAK_BOAT, DARK_OAK_BOAT, SPRUCE_BOAT, ACACIA_BOAT, CHERRY_BOAT, JUNGLE_BOAT, MANGROVE_BOAT,
+                 BIRCH_BOAT, PALE_OAK_BOAT, BAMBOO_RAFT, OAK_CHEST_BOAT, DARK_OAK_CHEST_BOAT, SPRUCE_CHEST_BOAT,
+                 ACACIA_CHEST_BOAT, CHERRY_CHEST_BOAT, JUNGLE_CHEST_BOAT, MANGROVE_CHEST_BOAT, BIRCH_CHEST_BOAT,
+                 PALE_OAK_CHEST_BOAT, BAMBOO_CHEST_RAFT -> true;
             default -> false;
         };
     }

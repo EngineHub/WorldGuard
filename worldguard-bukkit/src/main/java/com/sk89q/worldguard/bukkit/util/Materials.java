@@ -23,6 +23,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.sk89q.worldguard.protection.flags.Flags;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.Tag;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffect;
@@ -69,16 +70,25 @@ public final class Materials {
         ENTITY_ITEMS.put(EntityType.TNT, Material.TNT);
         ENTITY_ITEMS.put(EntityType.FIREWORK_ROCKET, Material.FIREWORK_ROCKET);
         ENTITY_ITEMS.put(EntityType.COMMAND_BLOCK_MINECART, Material.COMMAND_BLOCK_MINECART);
-        ENTITY_ITEMS.put(EntityType.BOAT, Material.OAK_BOAT);
         ENTITY_ITEMS.put(EntityType.MINECART, Material.MINECART);
         ENTITY_ITEMS.put(EntityType.CHEST_MINECART, Material.CHEST_MINECART);
         ENTITY_ITEMS.put(EntityType.FURNACE_MINECART, Material.FURNACE_MINECART);
         ENTITY_ITEMS.put(EntityType.TNT_MINECART, Material.TNT_MINECART);
         ENTITY_ITEMS.put(EntityType.HOPPER_MINECART, Material.HOPPER_MINECART);
-        ENTITY_ITEMS.put(EntityType.POTION, Material.POTION);
+        ENTITY_ITEMS.put(EntityType.SPLASH_POTION, Material.SPLASH_POTION);
+        ENTITY_ITEMS.put(EntityType.LINGERING_POTION, Material.LINGERING_POTION);
         ENTITY_ITEMS.put(EntityType.EGG, Material.EGG);
         ENTITY_ITEMS.put(EntityType.ARMOR_STAND, Material.ARMOR_STAND);
         ENTITY_ITEMS.put(EntityType.END_CRYSTAL, Material.END_CRYSTAL);
+
+        for (String wood : new String[]{"OAK", "SPRUCE", "BIRCH", "JUNGLE", "ACACIA", "DARK_OAK", "MANGROVE", "CHERRY", "PALE_OAK"}) {
+            String regular = wood + "_BOAT";
+            String chest = wood + "_CHEST_BOAT";
+            ENTITY_ITEMS.put(EntityType.valueOf(regular), Material.getMaterial(regular));
+            ENTITY_ITEMS.put(EntityType.valueOf(chest), Material.getMaterial(chest));
+        }
+        ENTITY_ITEMS.put(EntityType.BAMBOO_RAFT, Material.BAMBOO_RAFT);
+        ENTITY_ITEMS.put(EntityType.BAMBOO_CHEST_RAFT, Material.BAMBOO_CHEST_RAFT);
 
         // preset some tags to a default value, override some of them:
         putMaterialTag(Tag.DOORS, MODIFIED_ON_RIGHT);
@@ -829,7 +839,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.PITCHER_CROP, 0);
         MATERIAL_FLAGS.put(Material.PINK_PETALS, 0);
         MATERIAL_FLAGS.put(Material.PITCHER_POD, 0);
-        MATERIAL_FLAGS.put(Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE, 0);
 
         MATERIAL_FLAGS.put(Material.ARMADILLO_SCUTE, 0);
         MATERIAL_FLAGS.put(Material.WOLF_ARMOR, 0);
@@ -877,6 +886,7 @@ public final class Materials {
 
         putMaterialTag(Tag.SHULKER_BOXES, MODIFIED_ON_RIGHT);
         putMaterialTag(Tag.ITEMS_BOATS, 0);
+        putMaterialTag(Tag.ITEMS_CHEST_BOATS, 0);
         putMaterialTag(Tag.BANNERS, 0);
         putMaterialTag(Tag.SLABS, 0);
         putMaterialTag(Tag.PLANKS, 0);
@@ -910,8 +920,35 @@ public final class Materials {
         putMaterialTag(Tag.CAULDRONS, MODIFIED_ON_RIGHT);
 
         // 1.20
-        putMaterialTag(Tag.ITEMS_TRIM_TEMPLATES, 0);
         putMaterialTag(Tag.ITEMS_DECORATED_POT_SHERDS, 0);
+
+        // 1.21(.4)
+        putMaterialTag(Tag.ITEMS_BUNDLES, 0);
+        MATERIAL_FLAGS.put(Material.FIELD_MASONED_BANNER_PATTERN, 0);
+        MATERIAL_FLAGS.put(Material.BORDURE_INDENTED_BANNER_PATTERN, 0);
+        MATERIAL_FLAGS.put(Material.PALE_MOSS_CARPET, 0);
+        MATERIAL_FLAGS.put(Material.PALE_HANGING_MOSS, 0);
+        MATERIAL_FLAGS.put(Material.PALE_MOSS_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.CREAKING_HEART, 0);
+        MATERIAL_FLAGS.put(Material.RESIN_CLUMP, 0);
+        MATERIAL_FLAGS.put(Material.RESIN_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.RESIN_BRICKS, 0);
+        MATERIAL_FLAGS.put(Material.CHISELED_RESIN_BRICKS, 0);
+        MATERIAL_FLAGS.put(Material.MACE, 0);
+        MATERIAL_FLAGS.put(Material.RESIN_BRICK, 0);
+
+        // 1.21.5
+        MATERIAL_FLAGS.put(Material.BUSH, 0);
+        MATERIAL_FLAGS.put(Material.CACTUS_FLOWER, 0);
+        MATERIAL_FLAGS.put(Material.FIREFLY_BUSH, 0);
+        MATERIAL_FLAGS.put(Material.LEAF_LITTER, 0);
+        MATERIAL_FLAGS.put(Material.SHORT_DRY_GRASS, 0);
+        MATERIAL_FLAGS.put(Material.TALL_DRY_GRASS, 0);
+        MATERIAL_FLAGS.put(Material.WILDFLOWERS, 0);
+        MATERIAL_FLAGS.put(Material.TEST_BLOCK, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.TEST_INSTANCE_BLOCK, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.BLUE_EGG, 0);
+        MATERIAL_FLAGS.put(Material.BROWN_EGG, 0);
 
         Stream.concat(Stream.concat(
                 Tag.CORAL_BLOCKS.getValues().stream(),
@@ -925,8 +962,7 @@ public final class Materials {
         });
 
         // Check for missing items/blocks
-        for (Material material : Material.values()) {
-            if (material.isLegacy()) continue;
+        Registry.MATERIAL.stream().forEach(material -> {
             // Add spawn eggs
             if (isSpawnEgg(material)) {
                 MATERIAL_FLAGS.put(material, 0);
@@ -934,10 +970,13 @@ public final class Materials {
             if (material.name().startsWith("MUSIC_DISC_")) {
                 MATERIAL_FLAGS.put(material, 0);
             }
+            if (material.name().endsWith("_SMITHING_TEMPLATE")) {
+                MATERIAL_FLAGS.put(material, 0);
+            }
             if (!MATERIAL_FLAGS.containsKey(material)) {
                 logger.fine("Missing material definition for " + (material.isBlock() ? "block " : "item ") + material.name());
             }
-        }
+        });
 
 //        DAMAGE_EFFECTS.add(PotionEffectType.SPEED);
         DAMAGE_EFFECTS.add(PotionEffectType.SLOWNESS);
@@ -1164,6 +1203,7 @@ public final class Materials {
                 || material == Material.SMOKER
                 || material == Material.CHISELED_BOOKSHELF
                 || material == Material.CRAFTER
+                || material == Material.DECORATED_POT
                 || Tag.ITEMS_CHEST_BOATS.isTagged(material)
                 || Tag.SHULKER_BOXES.isTagged(material);
     }
@@ -1188,6 +1228,7 @@ public final class Materials {
             case CHICKEN_SPAWN_EGG -> EntityType.CHICKEN;
             case COD_SPAWN_EGG -> EntityType.COD;
             case COW_SPAWN_EGG -> EntityType.COW;
+            case CREAKING_SPAWN_EGG -> EntityType.CREAKING;
             case CREEPER_SPAWN_EGG -> EntityType.CREEPER;
             case DOLPHIN_SPAWN_EGG -> EntityType.DOLPHIN;
             case DONKEY_SPAWN_EGG -> EntityType.DONKEY;

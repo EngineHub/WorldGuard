@@ -145,6 +145,7 @@ public interface WorldGuardPlatform {
      *
      * @param localPlayer The player
      */
+    @Deprecated(forRemoval = true)
     void stackPlayerInventory(LocalPlayer localPlayer);
 
     /**

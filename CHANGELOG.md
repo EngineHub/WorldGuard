@@ -1,5 +1,25 @@
 # Changelog
 
+## 7.0.14
+
+* Update to 1.21.5
+* Fix hopper minecarts not being able to take items from containers in protected regions.
+* Fix hopper minecarts not being able to take items from other hopper minecarts in protected regions.
+* Fix non-members being able to leash boats in protected regions.
+* Use new knockback event on Paper servers to better handle mace knockback in pvp and some other knockback situations.
+
+## 7.0.13
+
+* Update to 1.21.4
+* Remove max-stack-size bypass in stack command
+* Fix a falling block metadata leak. (May still be problematic on Spigot, use Paper.)
+* Fix flame enchant being blocked as entity damage on the arrow itself.
+* More Paper-specific performance enhancements for hoppers.
+* Fix block-windcharge-explosions config option not doing anything.
+* Improvements to fishing rod protection.
+* More aggressive vehicle protection (vehicle-destroy now needs to be allowed for various non-destructive damage).
+* Move decorated pot usage from interact to chest-access.
+
 ## 7.0.12
 
 * Fix a change in the default behavior of explosion flag handling.
