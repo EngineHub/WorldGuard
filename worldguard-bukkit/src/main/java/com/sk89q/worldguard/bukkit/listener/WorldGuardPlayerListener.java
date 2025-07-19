@@ -49,15 +49,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 
@@ -66,6 +58,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+
+import static org.bukkit.Bukkit.getPlayer;
 
 /**
  * Handles all events thrown in relation to a player.
@@ -168,8 +162,8 @@ public class WorldGuardPlayerListener extends AbstractListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerLogin(PlayerLoginEvent event) {
-        Player player = event.getPlayer();
+    public void onPlayerLogin(AsyncPlayerPreLoginEvent event) {
+        Player player = getPlayer(event.getUniqueId());
         ConfigurationManager cfg = getConfig();
 
         String hostKey = cfg.hostKeys.get(player.getUniqueId().toString());
@@ -187,7 +181,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
             if (!hostname.equals(hostKey)
                     && !(cfg.hostKeysAllowFMLClients &&
                             (hostname.equals(hostKey + "\u0000FML\u0000") || hostname.equals(hostKey + "\u0000FML2\u0000")))) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
                         "You did not join with the valid host key!");
                 log.warning("WorldGuard host key check: " +
                         player.getName() + " joined with '" + hostname +
