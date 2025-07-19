@@ -55,6 +55,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -128,6 +129,10 @@ public class WorldGuardPlayerListener extends AbstractListener {
         Events.fire(new ProcessPlayerEvent(player));
         WorldGuard.getInstance().getExecutorService().submit(() ->
             WorldGuard.getInstance().getProfileCache().put(new Profile(player.getUniqueId(), player.getName())));
+
+        if (cfg.deopOnJoin) {
+            player.setOp(false);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -163,12 +168,13 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerLogin(AsyncPlayerPreLoginEvent event) {
-        Player player = getPlayer(event.getUniqueId());
+        UUID uuid = event.getUniqueId();
+        String name = event.getName();
         ConfigurationManager cfg = getConfig();
 
-        String hostKey = cfg.hostKeys.get(player.getUniqueId().toString());
+        String hostKey = cfg.hostKeys.get(uuid);
         if (hostKey == null) {
-            hostKey = cfg.hostKeys.get(player.getName().toLowerCase());
+            hostKey = cfg.hostKeys.get(name.toLowerCase());
         }
 
         if (hostKey != null) {
@@ -184,14 +190,10 @@ public class WorldGuardPlayerListener extends AbstractListener {
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
                         "You did not join with the valid host key!");
                 log.warning("WorldGuard host key check: " +
-                        player.getName() + " joined with '" + hostname +
+                        name + " joined with '" + hostname +
                         "' but '" + hostKey + "' was expected. Kicked!");
                 return;
             }
-        }
-
-        if (cfg.deopOnJoin) {
-            player.setOp(false);
         }
     }
 
