@@ -50,10 +50,15 @@ public class NotifyEntryFlag extends FlagValueChangeHandler<Boolean> {
 
     @Override
     protected boolean onSetValue(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Boolean currentValue, Boolean lastValue, MoveType moveType) {
+        if (!currentValue) {
+            // If the current value is false, we do not notify
+            return false;
+        }
+
         StringBuilder regionList = new StringBuilder();
 
         for (ProtectedRegion region : toSet) {
-            if (regionList.length() != 0) {
+            if (!regionList.isEmpty()) {
                 regionList.append(", ");
             }
 

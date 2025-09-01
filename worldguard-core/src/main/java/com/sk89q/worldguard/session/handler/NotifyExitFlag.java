@@ -56,6 +56,10 @@ public class NotifyExitFlag extends FlagValueChangeHandler<Boolean> {
 
     @Override
     protected boolean onAbsentValue(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Boolean lastValue, MoveType moveType) {
+        if (!lastValue) {
+            // If the lastValue was false, we don't notify
+            return false;
+        }
         WorldGuard.getInstance().getPlatform().broadcastNotification(new Notify(player.getName(), " left NOTIFY region").create());
         return true;
     }
