@@ -1,66 +1,58 @@
-# Contributing
+🛠️ Contributing to Community WorldGuard
+Thanks for contributing to Community WorldGuard—the faster, more responsive fork of WorldGuard, built for and by the community. We move quickly, patch boldly, and mythify every fix. To keep things smooth, please follow these guidelines. And if you hit a snag or spot an issue, brag to me, not the WorldGuard team—I’ll help you troubleshoot it.
 
-Thank you for your interest in contributing to WorldGuard! We appreciate your 
-effort, but to make sure that the inclusion of your patch is a smooth process, we
-ask that you make note of the following guidelines.
+📏 Code Style & Standards
+To keep our codebase clean, readable, and mythically maintainable:
 
-* **Follow the [Oracle coding conventions](https://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html).**
-  We can't stress this enough; if your code has notable issues, it may delay
-  the process significantly.
-* **Target Java 16 for source and compilation.**
-* **Use only spaces for indentation.** Our indents are 4-spaces long, and tabs
-  are unacceptable.
-* **Wrap code to a 89 column limit.** We do this to make side by side diffs
-  and other such tasks easier. Ignore this guideline if it makes the code
-  too unreadable.
-* **Write complete Javadocs.** Do so only for public methods, and make sure
-  that your `@param` and `@return` fields are not just blank.
-* **Don't tag classes with @author.** Some legacy classes may have this tag,
-  but we are phasing it out.
-* **Make sure the code is efficient.** One way you can achieve this is to spend
-  around ten minutes to think about what the code is doing and whether it
-  seems awfully roundabout. If you had to copy the same large piece of
-  code in several places, that's bad.
-* **Keep commit summaries under 70 characters.** For more details, place two
-  new lines after the summary line and write away!
-* **Test your code.** We're not interested in broken code, for the obvious reasons.
-* **Write unit tests.** While this is strictly optional, we recommend it for
-  complicated algorithms.
+Follow the Oracle Java coding conventions. Clean code = fast merges.
 
+Target Java 16 for both source and compilation.
 
-Checklist
----------
+Use spaces only. Indentation must be 4 spaces—no tabs allowed.
 
-Ready to submit? Perform the checklist below:
+Wrap lines at 89 characters. This helps with side-by-side diffs. If wrapping hurts readability, break the rule.
 
-1. Have all tabs been replaced into four spaces? Are indentations 4-space wide?
-2. Have I written proper Javadocs for my public methods? Are the @param and
-   @return fields actually filled out?
-3. Have I `git rebase`d my pull request to the latest commit of the target
-   branch?
-4. Have I combined my commits into a reasonably small number (if not one)
-   commit using `git rebase`?
-5. Have I made my pull request too large? Pull requests should introduce
-   small sets of changes at a time. Major changes should be discussed with
-   the team prior to starting work.
-6. Are my commit messages descriptive?
+Write full Javadocs for public methods. Fill out @param and @return fields properly—no blanks.
 
-You should be aware of [`git rebase`](http://learn.github.com/p/rebasing.html).
-It allows you to modify existing commit messages, and combine, break apart, or
-adjust past changes.
+Skip the @author tag. Legacy classes may have it, but we’re phasing it out.
 
-Example
--------
+Think through your logic. If your code feels convoluted or repeats large chunks, refactor it. Ten minutes of thought saves hours of debugging.
 
-This is **GOOD:**
+Keep commit summaries under 70 characters. For details, add two newlines after the summary and write away.
 
-    if (var.func(param1, param2)) {
-        // do things
-    }
+Test your code. Broken code doesn’t help anyone.
 
-This is **EXTREMELY BAD:**
+Write unit tests for complex logic. Optional, but highly recommended.
 
-    if(var.func( param1, param2 ))
-    {
-        // do things
-    }
+✅ Submission Checklist
+Before you hit submit, run through this:
+
+✅ Tabs replaced with 4-space indents?
+
+✅ Javadocs written for public methods, with filled-out @param and @return?
+
+✅ Pull request rebased to the latest commit of the target branch?
+
+✅ Commits squashed into a small number (ideally one) using git rebase?
+
+✅ Pull request scoped to a manageable size? Large changes should be discussed before you start.
+
+✅ Commit messages are clear and descriptive?
+
+If you’re unfamiliar with git rebase, check out this guide. It lets you rewrite commit messages, combine or split commits, and clean up your history.
+
+🧙 Code Example
+GOOD:
+
+java
+if (var.func(param1, param2)) {
+    // do things
+}
+EXTREMELY BAD:
+
+java
+if(var.func( param1, param2 ))
+{
+    // do things
+}
+Community WorldGuard is built for speed, clarity, and mythic
