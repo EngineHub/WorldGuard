@@ -6,27 +6,33 @@ plugins {
 }
 
 dependencies {
-    "api"(project(":worldguard-core"))
-    "api"(libs.worldedit.bukkit) { isTransitive = false }
-    "compileOnly"(libs.commandbook) { isTransitive = false }
+    api(project(":worldguard-core"))
+    api(libs.worldedit.bukkit) {
+        isTransitive = false
+    }
 
-    "compileOnly"(libs.jetbrains.annotations) {
+    compileOnly(libs.commandbook) {
+        isTransitive = false
+    }
+
+    compileOnly(libs.jetbrains.annotations) {
         because("Resolving Spigot annotations")
     }
-    "testCompileOnly"(libs.jetbrains.annotations) {
+    testCompileOnly(libs.jetbrains.annotations) {
         because("Resolving Spigot annotations")
     }
-    "compileOnly"(libs.paperApi) {
+
+    compileOnly(libs.paperApi) {
         exclude("org.slf4j", "slf4j-api")
         exclude("junit", "junit")
     }
 
-    "implementation"(libs.paperLib)
-    "implementation"(libs.bstats.bukkit)
+    implementation(libs.paperLib)
+    implementation(libs.bstats.bukkit)
 }
 
 tasks.named<Copy>("processResources") {
-    val internalVersion = project.ext["internalVersion"]
+    val internalVersion = project.ext["internalVersion"] ?: "1.21.10-community"
     inputs.property("internalVersion", internalVersion)
     filesMatching("plugin.yml") {
         expand("internalVersion" to internalVersion)
@@ -38,10 +44,10 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency(":worldguard-core"))
         include(dependency("org.bstats:"))
         include(dependency("io.papermc:paperlib"))
-
-        relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats")
-        relocate("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib")
     }
+
+    relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats")
+    relocate("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib")
 }
 
 tasks.named("assemble").configure {
