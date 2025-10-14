@@ -6,7 +6,7 @@
 
 Follow the Oracle Java coding conventions. Clean code = fast merges.
 
-Target Java 16 for both source and compilation.
+Target Java 21 for both source and compilation.
 
 Use spaces only. Indentation must be 4 spaces—no tabs allowed.
 
