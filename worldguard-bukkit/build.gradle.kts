@@ -42,7 +42,7 @@ tasks.named<Copy>("processResources") {
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         include(dependency(":worldguard-core"))
-        include(dependency("org.bstats:"))
+        include(dependency("org.bstats:bstats-bukkit"))
         include(dependency("io.papermc:paperlib"))
     }
 
