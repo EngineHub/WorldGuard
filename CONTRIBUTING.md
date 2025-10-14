@@ -1,8 +1,8 @@
-🛠️ Contributing to Community WorldGuard
-Thanks for contributing to Community WorldGuard—the faster, more responsive fork of WorldGuard, built for and by the community. We move quickly, patch boldly, and mythify every fix. To keep things smooth, please follow these guidelines. And if you hit a snag or spot an issue, brag to me, not the WorldGuard team—I’ll help you troubleshoot it.
+# 🛠️ Contributing to Community WorldGuard
+<p>Thanks for contributing to Community WorldGuard—the faster, more responsive fork of WorldGuard, built for and by the community. We move quickly, patch boldly, and mythify every fix. To keep things smooth, please follow these guidelines. And if you hit a snag or spot an issue, brag to me, not the WorldGuard team—I’ll help you troubleshoot it.</p>
 
-📏 Code Style & Standards
-To keep our codebase clean, readable, and mythically maintainable:
+# 📏 Code Style & Standards
+<em>To keep our codebase clean, readable, and mythically maintainable:
 
 Follow the Oracle Java coding conventions. Clean code = fast merges.
 
@@ -22,9 +22,9 @@ Keep commit summaries under 70 characters. For details, add two newlines after t
 
 Test your code. Broken code doesn’t help anyone.
 
-Write unit tests for complex logic. Optional, but highly recommended.
+Write unit tests for complex logic. Optional, but highly recommended.</em>
 
-✅ Submission Checklist
+## ✅ Submission Checklist
 Before you hit submit, run through this:
 
 ✅ Tabs replaced with 4-space indents?
@@ -42,17 +42,16 @@ Before you hit submit, run through this:
 If you’re unfamiliar with git rebase, check out this guide. It lets you rewrite commit messages, combine or split commits, and clean up your history.
 
 🧙 Code Example
-GOOD:
+# GOOD:
 
 java
 if (var.func(param1, param2)) {
     // do things
 }
-EXTREMELY BAD:
+# EXTREMELY BAD:
 
 java
 if(var.func( param1, param2 ))
 {
     // do things
 }
-Community WorldGuard is built for speed, clarity, and mythic
