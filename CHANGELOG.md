@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.0.16
+* Replace deprecated PlayerLoginEvent with AsyncPlayerPreLoginEvent
+
 ## 7.0.14
 
 * Update to 1.21.5
