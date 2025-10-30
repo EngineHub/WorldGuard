@@ -176,7 +176,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.CHISELED_STONE_BRICKS, 0);
         MATERIAL_FLAGS.put(Material.BROWN_MUSHROOM_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.RED_MUSHROOM_BLOCK, 0);
-        //MATERIAL_FLAGS.put(Material.IRON_BARS, 0); - Covered by 'BARS' tag
         MATERIAL_FLAGS.put(Material.GLASS_PANE, 0);
         MATERIAL_FLAGS.put(Material.MELON, 0);
         MATERIAL_FLAGS.put(Material.PUMPKIN_STEM, 0);
@@ -413,7 +412,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.FLETCHING_TABLE, 0);
         MATERIAL_FLAGS.put(Material.GRINDSTONE, 0);
         MATERIAL_FLAGS.put(Material.JIGSAW, MODIFIED_ON_RIGHT | MODIFIED_ON_LEFT);
-        //MATERIAL_FLAGS.put(Material.LANTERN, 0); - Covered by 'LANTERNS' tag
         MATERIAL_FLAGS.put(Material.LECTERN, 0);
         MATERIAL_FLAGS.put(Material.LOOM, 0);
         MATERIAL_FLAGS.put(Material.SCAFFOLDING, 0);
@@ -672,7 +670,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.ANCIENT_DEBRIS, 0);
         MATERIAL_FLAGS.put(Material.BASALT, 0);
         MATERIAL_FLAGS.put(Material.BLACKSTONE, 0);
-        //MATERIAL_FLAGS.put(Material.IRON_CHAIN, 0); - Covered by 'CHAINS' tag
         MATERIAL_FLAGS.put(Material.CHISELED_NETHER_BRICKS, 0);
         MATERIAL_FLAGS.put(Material.CHISELED_POLISHED_BLACKSTONE, 0);
         MATERIAL_FLAGS.put(Material.CRACKED_NETHER_BRICKS, 0);
@@ -708,7 +705,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.SHROOMLIGHT, 0);
         MATERIAL_FLAGS.put(Material.SOUL_CAMPFIRE, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.SOUL_FIRE, 0);
-        //MATERIAL_FLAGS.put(Material.SOUL_LANTERN, 0); - Covered by 'LANTERNS' tag
         MATERIAL_FLAGS.put(Material.SOUL_SOIL, 0);
         MATERIAL_FLAGS.put(Material.SOUL_TORCH, 0);
         MATERIAL_FLAGS.put(Material.SOUL_WALL_TORCH, 0);
@@ -773,7 +769,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.CHISELED_DEEPSLATE, 0);
         MATERIAL_FLAGS.put(Material.GLOW_LICHEN, 0);
         MATERIAL_FLAGS.put(Material.LIGHT, MODIFIED_ON_RIGHT);
-        //MATERIAL_FLAGS.put(Material.LIGHTNING_ROD, 0); - Covered by 'LIGHTNING_RODS' tag
         MATERIAL_FLAGS.put(Material.SCULK_SENSOR, 0);
         MATERIAL_FLAGS.put(Material.AMETHYST_SHARD, 0);
         MATERIAL_FLAGS.put(Material.RAW_IRON, 0);
