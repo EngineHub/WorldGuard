@@ -140,10 +140,15 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
     public void load() {
         stringMatcher = new BukkitStringMatcher();
         sessionManager = new BukkitSessionManager();
+        BukkitLocalizationLoader localizationLoader = new BukkitLocalizationLoader(WorldGuardPlugin.inst());
+        localization = localizationLoader.load("en");
+        WorldGuard.getInstance().setLocalization(localization);
         configuration = new BukkitConfigurationManager(WorldGuardPlugin.inst());
         configuration.load();
-        localization = new BukkitLocalizationLoader(WorldGuardPlugin.inst()).load(configuration.language);
-        WorldGuard.getInstance().setLocalization(localization);
+        if (!"en".equalsIgnoreCase(configuration.language)) {
+            localization = localizationLoader.load(configuration.language);
+            WorldGuard.getInstance().setLocalization(localization);
+        }
         regionContainer = new BukkitRegionContainer(WorldGuardPlugin.inst());
         regionContainer.initialize();
         debugHandler = new BukkitDebugHandler(WorldGuardPlugin.inst());

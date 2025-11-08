@@ -158,14 +158,14 @@ public class Blacklist {
                             builder.add(matcher, entry);
                             currentEntries.add(entry);
                         } catch (TargetMatcherParseException e) {
-                            log.log(Level.WARNING, "Could not parse a block/item heading: " + e.getMessage());
+                            log.log(Level.WARNING, message("blacklist.load.heading-parse-fail", e.getMessage()));
                         }
                     }
                 } else if (currentEntries != null) {
                     String[] parts = line.split("=");
 
                     if (parts.length == 1) {
-                        log.log(Level.WARNING, "Found option with no value " + file.getName() + " for '" + line + "'");
+                        log.log(Level.WARNING, message("blacklist.load.option-no-value", file.getName(), line));
                         continue;
                     }
 
@@ -202,11 +202,10 @@ public class Blacklist {
                     }
 
                     if (unknownOption) {
-                        log.log(Level.WARNING, "Unknown option '" + parts[0] + "' in " + file.getName() + " for '" + line + "'");
+                        log.log(Level.WARNING, message("blacklist.load.option-unknown", parts[0], file.getName(), line));
                     }
                 } else {
-                    log.log(Level.WARNING, "Found option with no heading "
-                            + file.getName() + " for '" + line + "'");
+                    log.log(Level.WARNING, message("blacklist.load.option-no-heading", file.getName(), line));
                 }
             }
 
@@ -232,7 +231,7 @@ public class Blacklist {
             }
 
             if (!found) {
-                log.log(Level.WARNING, "Unknown blacklist action: " + name);
+                log.log(Level.WARNING, message("blacklist.load.action-unknown", name));
             }
         }
 
@@ -262,6 +261,10 @@ public class Blacklist {
 
     public LoadingCache<String, TrackedEvent> getRepeatingEventCache() {
         return repeatingEventCache;
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

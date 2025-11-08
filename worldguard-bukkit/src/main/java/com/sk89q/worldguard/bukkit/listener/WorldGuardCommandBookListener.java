@@ -48,32 +48,43 @@ public class WorldGuardCommandBookListener implements Listener {
             if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld()).useRegions) {
                 ApplicableRegionSet regions =
                         WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(localPlayer.getLocation());
-                
-                // Current regions
+                String delimiter = message("listeners.command-book.regions.delimiter");
+                String ownerPrefix = message("listeners.command-book.regions.owner-prefix");
+                String memberPrefix = message("listeners.command-book.regions.member-prefix");
+
                 StringBuilder regionStr = new StringBuilder();
                 boolean first = true;
-                
+
                 for (ProtectedRegion region : regions) {
                     if (!first) {
-                        regionStr.append(", ");
+                        regionStr.append(delimiter);
                     }
-                    
+
                     if (region.isOwner(localPlayer)) {
-                        regionStr.append("+");
+                        regionStr.append(ownerPrefix);
                     } else if (region.isMemberOnly(localPlayer)) {
-                        regionStr.append("-");
+                        regionStr.append(memberPrefix);
                     }
-                    
+
                     regionStr.append(region.getId());
-                    
+
                     first = false;
                 }
-                
+
                 if (regions.size() > 0) {
-                    event.addWhoisInformation("Current Regions", regionStr);
+                    event.addWhoisInformation(message("listeners.command-book.info.current-regions"), regionStr);
                 }
-                event.addWhoisInformation("Can build", regions.testState(localPlayer, Flags.BUILD));
+                event.addWhoisInformation(message("listeners.command-book.info.can-build"), boolMessage(regions.testState(localPlayer, Flags.BUILD)));
             }
         }
     }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
+
+    private String boolMessage(boolean value) {
+        return message(value ? "listeners.command-book.boolean.yes" : "listeners.command-book.boolean.no");
+    }
 }
+

@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit.util;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.WorldGuard;
 import org.bukkit.Material;
 import org.bukkit.Registry;
 import org.bukkit.Tag;
@@ -982,7 +983,8 @@ public final class Materials {
                 MATERIAL_FLAGS.put(material, 0);
             }
             if (!MATERIAL_FLAGS.containsKey(material)) {
-                logger.fine("Missing material definition for " + (material.isBlock() ? "block " : "item ") + material.name());
+                String type = message(material.isBlock() ? "util.materials.type.block" : "util.materials.type.item");
+                logger.fine(message("util.materials.log.missing-definition", type, material.name()));
             }
         });
 
@@ -1024,6 +1026,10 @@ public final class Materials {
         DAMAGE_EFFECTS.add(PotionEffectType.WEAVING);
         DAMAGE_EFFECTS.add(PotionEffectType.OOZING);
         DAMAGE_EFFECTS.add(PotionEffectType.INFESTED);
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
     private Materials() {

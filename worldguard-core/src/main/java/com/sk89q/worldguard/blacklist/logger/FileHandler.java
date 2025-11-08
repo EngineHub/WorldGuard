@@ -23,6 +23,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 import com.sk89q.worldguard.blacklist.target.Target;
+import com.sk89q.worldguard.WorldGuard;
 
 import javax.annotation.Nullable;
 import java.io.BufferedWriter;
@@ -43,8 +44,8 @@ import java.util.regex.Pattern;
 
 public class FileHandler implements LoggerHandler {
 
-    private static Pattern pattern = Pattern.compile("%.");
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final Pattern pattern = Pattern.compile("%.");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private int cacheSize = 10;
     private String pathPattern;
@@ -150,13 +151,14 @@ public class FileHandler implements LoggerHandler {
      * @param message The message to log
      * @param comment The comment associated with the logged event
      */
-    private void log(@Nullable LocalPlayer player, String message, String comment) {
+    private void log(@Nullable LocalPlayer player, String message, @Nullable String comment) {
         String path = buildPath(player != null ? player.getName() : null);
         if (path == null) return;
         try {
             String date = dateFormat.format(new Date());
-            String line = "[" + date + "] " + (player != null ? player.getName() : "Unknown Source") + ": " + message
-                    + (comment != null ? " (" + comment + ")" : "") + "\r\n";
+            String playerName = player != null ? player.getName() : message("blacklist.logger.file.unknown-source");
+            String commentText = comment != null ? message("blacklist.logger.common.comment", comment) : "";
+            String line = message("blacklist.logger.file.entry", date, playerName, message, commentText) + "\r\n";
 
             LogFileWriter writer = writers.get(path);
 
@@ -209,8 +211,7 @@ public class FileHandler implements LoggerHandler {
             }
 
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to log blacklist event to '"
-                    + path + "': " + e.getMessage());
+            logger.log(Level.WARNING, message("blacklist.logger.file.error", path, e.getMessage()));
         }
     }
 
@@ -221,16 +222,18 @@ public class FileHandler implements LoggerHandler {
      * @return The position's coordinates in human-readable form
      */
     private String getCoordinates(BlockVector3 pos) {
-        return "@" + pos.x() + "," + pos.y() + "," + pos.z();
+        return message("blacklist.logger.file.coordinates", pos.x(), pos.y(), pos.z());
     }
 
-    private void logEvent(BlacklistEvent event, String text, Target target, BlockVector3 pos, String comment) {
-        log(event.getPlayer(), "Tried to " + text + " " + target.getFriendlyName() + " " + getCoordinates(pos), comment);
+    private void logEvent(BlacklistEvent event, BlockVector3 pos, @Nullable String comment) {
+        Target target = event.getTarget();
+        String messageText = message("blacklist.logger.file.message", event.getLoggerMessage(), target.getFriendlyName(), getCoordinates(pos));
+        log(event.getPlayer(), messageText, comment);
     }
 
     @Override
     public void logEvent(BlacklistEvent event, String comment) {
-        logEvent(event, event.getDescription(), event.getTarget(), event.getPosition(), comment);
+        logEvent(event, event.getPosition(), comment);
     }
 
     @Override
@@ -243,6 +246,10 @@ public class FileHandler implements LoggerHandler {
         }
 
         writers.clear();
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

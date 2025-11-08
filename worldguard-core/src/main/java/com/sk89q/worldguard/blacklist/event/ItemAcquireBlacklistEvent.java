@@ -40,7 +40,7 @@ public final class ItemAcquireBlacklistEvent extends ItemBlacklistEvent {
 
     @Override
     public String getDescription() {
-        return "acquire";
+        return message("blacklist.event.description.acquire");
     }
 
     @Override

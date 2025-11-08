@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.util;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.sk89q.worldguard.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.PluginClassLoader;
@@ -135,33 +136,28 @@ public class ClassSourceValidator {
         }
         StringBuilder builder = new StringBuilder("\n");
 
+        String pluginName = plugin.getName();
+        String pluginNameUpper = pluginName.toUpperCase(Locale.ROOT);
+
         builder.append(SEPARATOR_LINE).append("\n");
-        builder.append("** /!\\    SEVERE WARNING    /!\\\n");
-        builder.append("** \n");
-        builder.append("** A plugin developer has included a portion of \n");
-        builder.append("** ").append(plugin.getName()).append(" into their own plugin, so rather than using\n");
-        builder.append("** the version of ").append(plugin.getName()).append(" that you downloaded, you\n");
-        builder.append("** will be using a broken mix of old ").append(plugin.getName()).append(" (that came\n");
-        builder.append("** with the plugin) and your downloaded version. THIS MAY\n");
-        builder.append("** SEVERELY BREAK ").append(plugin.getName().toUpperCase(Locale.ROOT)).append(" AND ALL OF ITS FEATURES.\n");
-        builder.append("**\n");
-        builder.append("** This may have happened because the developer is using\n");
-        builder.append("** the ").append(plugin.getName()).append(" API and thinks that including\n");
-        builder.append("** ").append(plugin.getName()).append(" is necessary. However, it is not!\n");
-        builder.append("**\n");
-        builder.append("** Here are some files that have been overridden:\n");
-        builder.append("** \n");
+        builder.append(message("warnings.class-source.header")).append("\n");
+        builder.append(message("warnings.class-source.blank")).append("\n");
+        builder.append(message("warnings.class-source.body", pluginName, pluginNameUpper));
         for (Map.Entry<Class<?>, Plugin> entry : mismatches.entrySet()) {
             Plugin badPlugin = entry.getValue();
             String url = badPlugin == null
-                    ? "(unknown)"
+                    ? message("warnings.class-source.unknown")
                     : badPlugin.getName() + " (" + badPlugin.getClass().getProtectionDomain().getCodeSource().getLocation() + ")";
-            builder.append("** '").append(entry.getKey().getSimpleName()).append("' came from '").append(url).append("'\n");
+            builder.append(message("warnings.class-source.entry", entry.getKey().getSimpleName(), url)).append("\n");
         }
-        builder.append("**\n");
-        builder.append("** Please report this to the plugins' developers.\n");
+        builder.append(message("warnings.class-source.blank")).append("\n");
+        builder.append(message("warnings.class-source.footer")).append("\n");
         builder.append(SEPARATOR_LINE).append("\n");
 
         plugin.getLogger().severe(builder.toString());
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

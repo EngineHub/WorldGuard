@@ -21,6 +21,7 @@ package com.sk89q.worldguard.blacklist.action;
 
 import com.sk89q.worldguard.blacklist.BlacklistEntry;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
+import com.sk89q.worldguard.WorldGuard;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,11 +47,16 @@ public class TellAction extends RepeatGuardedAction {
                 message = message.replaceAll("(?!<\\\\)\\\\n", "\n").replaceAll("\\\\\\\\n", "\\n");
                 event.getPlayer().print(String.format(message, event.getTarget().getFriendlyName()));
             } else {
-                event.getPlayer().printError("You're not allowed to " + event.getDescription() + " " + event.getTarget().getFriendlyName() + ".");
+                event.getPlayer().printError(message("blacklist.action.tell.default",
+                        event.getDescription(), event.getTarget().getFriendlyName()));
             }
         }
 
         return ActionResult.INHERIT;
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

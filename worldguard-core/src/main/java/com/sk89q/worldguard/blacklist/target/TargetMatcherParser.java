@@ -23,6 +23,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
+import com.sk89q.worldguard.WorldGuard;
 
 public class TargetMatcherParser {
 
@@ -38,9 +39,13 @@ public class TargetMatcherParser {
         } else {
             ItemType itemType = ItemTypes.get(input);
             if (itemType == null) {
-                throw new TargetMatcherParseException("Unknown block or item name: " + input);
+                throw new TargetMatcherParseException(message("blacklist.target.parser.unknown", input));
             }
             return new ItemMatcher(itemType);
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

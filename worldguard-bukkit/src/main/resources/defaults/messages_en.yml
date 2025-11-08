@@ -510,6 +510,43 @@ matcher:
 listeners:
   region-protection:
     dismount-warning: "&6Don't disembark here!&7 You can't get back on."
+    action:
+      place-fire: "place fire"
+      use-frostwalker: "use frostwalker"
+      place-block: "place that block"
+      use-dynamite: "use dynamite"
+      break-block: "break that block"
+      use-that: "use that"
+      open-that: "open that"
+      take-that: "take that"
+      sleep: "sleep"
+      use-anchors: "use anchors"
+      use-explosives: "use explosives"
+      place-vehicles: "place vehicles"
+      drop-items: "drop items"
+      drop-xp: "drop XP"
+      use-lingering-potions: "use lingering potions"
+      place-things: "place things"
+      break-vehicles: "break vehicles"
+      pick-up-items: "pick up items"
+      break-things: "break things"
+      change-that: "change that"
+      ride-that: "ride that"
+      hit-that: "hit that"
+      pvp: "PvP"
+      damage-that: "damage that"
+      harm-that: "harm that"
+  command-book:
+    info:
+      current-regions: "Current Regions"
+      can-build: "Can build"
+    boolean:
+      yes: "Yes"
+      no: "No"
+    regions:
+      delimiter: ", "
+      owner-prefix: "+"
+      member-prefix: "-"
   player:
     activity-halted: "&eIntensive server activity has been HALTED."
     fire-spread-disabled: "&eFire spread is currently globally disabled for this world."
@@ -570,6 +607,9 @@ config:
     potion-unknown: "Unknown potion effect type '%s'"
     sponge-deprecated: "Sponge simulation is deprecated for removal in a future version. We recommend using CraftBook's sponge simulation instead."
     chest-protection-deprecated: "Sign-based chest protection is deprecated for removal in a future version. See https://worldguard.enginehub.org/en/latest/chest-protection/ for details."
+    sql:
+      deprecated: "SQL support for WorldGuard region storage is deprecated for removal in a future version. Please migrate to YAML storage."
+      details: "For details, see https://worldguard.enginehub.org/en/latest/regions/storage/"
     entity-unknown: "Unknown entity type '%s'"
     blacklist:
       loaded: "(%s) Blacklist loaded with %d entries."
@@ -590,6 +630,8 @@ config:
         limited: "(%s) Fire spread is limited to %d block types."
         unrestricted: "(%s) Fire spread is UNRESTRICTED."
 errors:
+  profile:
+    paper-only: "Attempt to access PaperProfileService on non-Paper server."
   actor:
     unknown-type: "Unknown actor type. Please report"
   print:
@@ -632,5 +674,80 @@ errors:
       title: "Service: %s"
       provider: "Provider"
       provider.format: "%s (%s) - %s"
+
+warnings:
+  class-source:
+    header: "** /!\\    SEVERE WARNING    /!\\"
+    blank: "** "
+    body: |-
+      ** A plugin developer has included a portion of 
+      ** %1$s into their own plugin, so rather than using
+      ** the version of %1$s that you downloaded, you
+      ** will be using a broken mix of old %1$s (that came
+      ** with the plugin) and your downloaded version. THIS MAY
+      ** SEVERELY BREAK %2$s AND ALL OF ITS FEATURES.
+      **
+      ** This may have happened because the developer is using
+      ** the %1$s API and thinks that including
+      ** %1$s is necessary. However, it is not!
+      **
+      ** Here are some files that have been overridden:
+      ** 
+    entry: "** '%s' came from '%s'"
+    unknown: "(unknown)"
+    footer: "** Please report this to the plugins' developers."
+
+util:
+  materials:
+    log:
+      missing-definition: "Missing material definition for %s %s"
+    type:
+      block: "block"
+      item: "item"
+
+blacklist:
+  action:
+    common:
+      cannot: "You can't %s %s"
+    ban:
+      reason: "Banned: %s"
+    tell:
+      default: "You're not allowed to %s %s."
+  event:
+    unknown-player: "(unknown)"
+    log:
+      action: "%s tried to %s %s"
+    description:
+      break: "break"
+      place: "place"
+      interact: "interact with"
+      dispense: "dispense"
+      acquire: "acquire"
+      use: "use"
+      equip: "equip"
+      drop: "drop"
+      destroy-with: "destroy with"
+  logger:
+    common:
+      comment: " (%s)"
+    console:
+      entry: "[%s] %s%s"
+    database:
+      error: "Failed to log blacklist event to database: %s"
+    file:
+      unknown-source: "Unknown Source"
+      entry: "[%s] %s: %s%s"
+      message: "%s %s %s"
+      coordinates: "@%d,%d,%d"
+      error: "Failed to log blacklist event to '%s': %s"
+  target:
+    parser:
+      unknown: "Unknown block or item name: %s"
+  load:
+    heading-parse-fail: "Could not parse a block/item heading: %s"
+    option-no-value: "Found option with no value %s for '%s'"
+    option-unknown: "Unknown option '%s' in %s for '%s'"
+    option-no-heading: "Found option with no heading %s for '%s'"
+    action-unknown: "Unknown blacklist action: %s"
 
 

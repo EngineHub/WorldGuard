@@ -21,6 +21,7 @@ package com.sk89q.worldguard.blacklist.action;
 
 import com.sk89q.worldguard.blacklist.BlacklistEntry;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
+import com.sk89q.worldguard.WorldGuard;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -45,11 +46,15 @@ public class KickAction implements Action {
             if (message != null) {
                 event.getPlayer().kick(String.format(message, event.getTarget().getFriendlyName()));
             } else {
-                event.getPlayer().kick("You can't " + event.getDescription() + " " + event.getTarget().getFriendlyName());
+                event.getPlayer().kick(message("blacklist.action.common.cannot", event.getDescription(), event.getTarget().getFriendlyName()));
             }
         }
 
         return ActionResult.INHERIT;
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

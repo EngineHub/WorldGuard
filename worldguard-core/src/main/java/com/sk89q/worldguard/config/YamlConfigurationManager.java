@@ -28,6 +28,7 @@ import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver
 import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
 import com.sk89q.worldedit.util.report.Unreported;
 import com.sk89q.worldguard.util.sql.DataSourceConfig;
+import com.sk89q.worldguard.WorldGuard;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,8 +99,8 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         if (!useSqlDatabase) {
             config.removeProperty("regions.sql");
         } else {
-            log.warning("SQL support for WorldGuard region storage is deprecated for removal in a future version. Please migrate to YAML storage.");
-            log.warning("For details, see https://worldguard.enginehub.org/en/latest/regions/storage/");
+            log.warning(message("config.log.sql.deprecated"));
+            log.warning(message("config.log.sql.details"));
         }
 
         DataSourceConfig dataSourceConfig = new DataSourceConfig(sqlDsn, sqlUsername, sqlPassword, sqlTablePrefix);
@@ -129,5 +130,9 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         if (!config.save()) {
             log.severe("Error saving configuration!");
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

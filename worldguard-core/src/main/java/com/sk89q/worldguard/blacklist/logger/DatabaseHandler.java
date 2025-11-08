@@ -23,6 +23,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 import com.sk89q.worldguard.blacklist.event.EventType;
+import com.sk89q.worldguard.WorldGuard;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -85,7 +86,7 @@ public class DatabaseHandler implements LoggerHandler {
      * @param item The item used
      * @param comment The comment associated with the event
      */
-    private void logEvent(EventType eventType, @Nullable LocalPlayer player, BlockVector3 pos, String item, String comment) {
+    private void logEvent(EventType eventType, @Nullable LocalPlayer player, BlockVector3 pos, String item, String description, String comment) {
         try {
             Connection conn = getConnection();
             PreparedStatement stmt = conn.prepareStatement(
@@ -100,16 +101,17 @@ public class DatabaseHandler implements LoggerHandler {
             stmt.setInt(6, pos.z());
             stmt.setString(7, item);
             stmt.setInt(8, (int)(System.currentTimeMillis() / 1000));
-            stmt.setString(9, comment);
+            stmt.setString(9, comment != null ? comment : description);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Failed to log blacklist event to database: " + e.getMessage());
+            logger.log(Level.SEVERE, message("blacklist.logger.database.error", e.getMessage()));
         }
     }
 
     @Override
     public void logEvent(BlacklistEvent event, String comment) {
-        logEvent(event.getEventType(), event.getPlayer(), event.getLoggedPosition(), event.getTarget().getTypeId(), comment);
+        logEvent(event.getEventType(), event.getPlayer(), event.getLoggedPosition(),
+                event.getTarget().getTypeId(), event.getLoggerMessage(), comment);
     }
 
     @Override
@@ -121,6 +123,10 @@ public class DatabaseHandler implements LoggerHandler {
         } catch (SQLException ignore) {
 
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

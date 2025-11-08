@@ -21,6 +21,7 @@ package com.sk89q.worldguard.blacklist.action;
 
 import com.sk89q.worldguard.blacklist.BlacklistEntry;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
+import com.sk89q.worldguard.WorldGuard;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,13 +44,19 @@ public class BanAction implements Action {
             String message = entry.getMessage();
 
             if (message != null) {
-                event.getPlayer().ban("Banned: " + String.format(message, event.getTarget().getFriendlyName()));
+                String formatted = String.format(message, event.getTarget().getFriendlyName());
+                event.getPlayer().ban(message("blacklist.action.ban.reason", formatted));
             } else {
-                event.getPlayer().ban("Banned: You can't " + event.getDescription() + " " + event.getTarget().getFriendlyName());
+                String detail = message("blacklist.action.common.cannot", event.getDescription(), event.getTarget().getFriendlyName());
+                event.getPlayer().ban(message("blacklist.action.ban.reason", detail));
             }
         }
 
         return ActionResult.INHERIT;
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

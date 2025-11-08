@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.util.profile.resolver;
 
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.util.profile.Profile;
 import io.papermc.lib.PaperLib;
 
@@ -36,7 +37,7 @@ public final class PaperProfileService extends SingleRequestService {
 
     private PaperProfileService() {
         if (!PaperLib.isPaper()) {
-            throw new IllegalStateException("Attempt to access PaperProfileService on non-Paper server.");
+            throw new IllegalStateException(message("errors.profile.paper-only"));
         }
     }
 
@@ -59,5 +60,9 @@ public final class PaperProfileService extends SingleRequestService {
 
     public static PaperProfileService getInstance() {
         return INSTANCE;
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

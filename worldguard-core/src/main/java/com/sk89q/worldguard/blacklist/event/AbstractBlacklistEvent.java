@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.target.Target;
+import com.sk89q.worldguard.WorldGuard;
 
 import javax.annotation.Nullable;
 
@@ -71,7 +72,11 @@ abstract class AbstractBlacklistEvent implements BlacklistEvent {
     }
 
     protected String getPlayerName() {
-        return player == null ? "(unknown)" : player.getName();
+        return player == null ? message("blacklist.event.unknown-player") : player.getName();
+    }
+
+    protected String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

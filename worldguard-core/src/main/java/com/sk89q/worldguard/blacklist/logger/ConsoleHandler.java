@@ -20,13 +20,14 @@
 package com.sk89q.worldguard.blacklist.logger;
 
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
+import com.sk89q.worldguard.WorldGuard;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ConsoleHandler implements LoggerHandler {
 
-    private String worldName;
+    private final String worldName;
     private final Logger logger;
 
     public ConsoleHandler(String worldName, Logger logger) {
@@ -36,12 +37,17 @@ public class ConsoleHandler implements LoggerHandler {
 
     @Override
     public void logEvent(BlacklistEvent event, String comment) {
-        logger.log(Level.INFO, "[" + worldName + "] " + event.getLoggerMessage() +
-                (comment != null ? " (" + comment + ")" : ""));
+        String commentText = comment != null ? message("blacklist.logger.common.comment", comment) : "";
+        logger.log(Level.INFO, message("blacklist.logger.console.entry",
+                worldName, event.getLoggerMessage(), commentText));
     }
 
     @Override
     public void close() {
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }
