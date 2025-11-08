@@ -81,8 +81,6 @@ import com.sk89q.worldguard.protection.util.WorldEditRegionConverter;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.util.Enums;
 import com.sk89q.worldguard.util.logging.LoggerToChatHandler;
-import com.sk89q.worldguard.util.profile.cache.ProfileCache;
-import com.sk89q.worldguard.util.profile.resolver.ProfileService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -552,7 +550,7 @@ public final class RegionCommands extends RegionCommandsBase {
         if (foundFlag == null) {
             AsyncCommandBuilder.wrap(new FlagListBuilder(flagRegistry, permModel, existing, world,
                                                          regionId, sender, flagName), sender)
-                    .registerWithSupervisor(WorldGuard.getInstance().getSupervisor(), "Flag list for invalid flag command.")
+                    .registerWithSupervisor(WorldGuard.getInstance().getSupervisor(), message("commands.region.flags.list.supervisor"))
                     .onSuccess((Component) null, sender::print)
                     .onFailure((Component) null, WorldGuard.getInstance().getExceptionConverter())
                     .buildAndExec(WorldGuard.getInstance().getExecutorService());
@@ -685,7 +683,7 @@ public final class RegionCommands extends RegionCommandsBase {
         sendFlagHelper(sender, world, region, perms, page);
     }
 
-    private static void sendFlagHelper(Actor sender, World world, ProtectedRegion region, RegionPermissionModel perms, int page) {
+    private void sendFlagHelper(Actor sender, World world, ProtectedRegion region, RegionPermissionModel perms, int page) {
         final FlagHelperBox flagHelperBox = new FlagHelperBox(world, region, perms);
         flagHelperBox.setComponentsPerPage(18);
         if (!sender.isPlayer()) {
@@ -1063,12 +1061,12 @@ public final class RegionCommands extends RegionCommandsBase {
             RegionDriver driver = container.getDriver();
             UUIDMigration migration = new UUIDMigration(driver, WorldGuard.getInstance().getProfileService(), WorldGuard.getInstance().getFlagRegistry());
             migration.setKeepUnresolvedNames(config.keepUnresolvedNames);
-            sender.print("Now performing migration... this may take a while.");
+            sender.print(message("commands.region.migrate.uuid.start"));
             container.migrate(migration);
-            sender.print("Migration complete!");
+            sender.print(message("commands.region.migrate.complete"));
         } catch (MigrationException e) {
             log.log(Level.WARNING, "Failed to migrate", e);
-            throw new CommandException("Error encountered while migrating: " + e.getMessage());
+            throw new CommandException(message("commands.region.migrate.error.generic", e.getMessage()));
         } finally {
             if (minecraftLogger != null) {
                 minecraftLogger.removeHandler(handler);
@@ -1095,8 +1093,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         if (!args.hasFlag('y')) {
-            throw new CommandException("This command is potentially dangerous.\n" +
-                    "Please ensure you have made a backup of your data, and then re-enter the command with -y tacked on at the end to proceed.");
+            throw new CommandException(message("commands.region.migrate.heights.confirm"));
         }
 
         World world = null;
@@ -1120,10 +1117,10 @@ public final class RegionCommands extends RegionCommandsBase {
             RegionDriver driver = container.getDriver();
             WorldHeightMigration migration = new WorldHeightMigration(driver, WorldGuard.getInstance().getFlagRegistry(), world);
             container.migrate(migration);
-            sender.print("Migration complete!");
+            sender.print(message("commands.region.migrate.complete"));
         } catch (MigrationException e) {
             log.log(Level.WARNING, "Failed to migrate", e);
-            throw new CommandException("Error encountered while migrating: " + e.getMessage());
+            throw new CommandException(message("commands.region.migrate.error.generic", e.getMessage()));
         } finally {
             if (minecraftLogger != null) {
                 minecraftLogger.removeHandler(handler);
@@ -1164,7 +1161,7 @@ public final class RegionCommands extends RegionCommandsBase {
             
             if (teleportLocation == null) {
                 throw new CommandException(
-                        "The region has no spawn point associated.");
+                        message("commands.region.teleport.error.no-spawn"));
             }
         } else if (args.hasFlag('c')) {
             // Check permissions
@@ -1173,21 +1170,18 @@ public final class RegionCommands extends RegionCommandsBase {
             }
             Region region = WorldEditRegionConverter.convertToRegion(existing);
             if (region == null || region.getCenter() == null) {
-                throw new CommandException("The region has no center point.");
+                throw new CommandException(message("commands.region.teleport.error.no-center"));
             }
             if (player.getGameMode() == GameModes.SPECTATOR) {
                 teleportLocation = new Location(world, region.getCenter(), 0, 0);
             } else {
-                // TODO: Add some method to create a safe teleport location.
-                // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
-                // It doesn't return the found location and it can't be checked if the location is inside the region.
-                throw new CommandException("Center teleport is only available in Spectator gamemode.");
+                throw new CommandException(message("commands.region.teleport.error.center-spectator"));
             }
         } else {
             teleportLocation = FlagValueCalculator.getEffectiveFlagOf(existing, Flags.TELE_LOC, player);
             
             if (teleportLocation == null) {
-                throw new CommandException("The region has no teleport point associated.");
+                throw new CommandException(message("commands.region.teleport.error.no-teleport"));
             }
         }
 
@@ -1201,7 +1195,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         player.teleport(teleportLocation,
                 message.replace("%id%", existing.getId()),
-                "Unable to teleport to region '" + existing.getId() + "'.");
+                message("commands.region.teleport.error.failure", existing.getId()));
     }
 
     @Command(aliases = {"toggle-bypass", "bypass"},
@@ -1217,7 +1211,7 @@ public final class RegionCommands extends RegionCommandsBase {
         if (args.argsLength() > 0) {
             String arg1 = args.getString(0);
             if (!arg1.equalsIgnoreCase("on") && !arg1.equalsIgnoreCase("off")) {
-                throw new CommandException("Allowed optional arguments are: on, off");
+                throw new CommandException(message("commands.region.bypass.error.args"));
             }
             shouldEnableBypass = arg1.equalsIgnoreCase("on");
         } else {
@@ -1225,14 +1219,14 @@ public final class RegionCommands extends RegionCommandsBase {
         }
         if (shouldEnableBypass) {
             session.setBypassDisabled(false);
-            player.print("You are now bypassing region protection (as long as you have permission).");
+            player.print(message("commands.region.bypass.enabled"));
         } else {
             session.setBypassDisabled(true);
-            player.print("You are no longer bypassing region protection.");
+            player.print(message("commands.region.bypass.disabled"));
         }
     }
 
-    private static class FlagListBuilder implements Callable<Component> {
+    private class FlagListBuilder implements Callable<Component> {
         private final FlagRegistry flagRegistry;
         private final RegionPermissionModel permModel;
         private final ProtectedRegion existing;
@@ -1268,28 +1262,29 @@ public final class RegionCommands extends RegionCommandsBase {
 
             Collections.sort(flagList);
 
-            final TextComponent.Builder builder = TextComponent.builder("Available flags: ");
+            final TextComponent.Builder builder = TextComponent.builder(message("commands.region.flags.list.available"));
 
-            final HoverEvent clickToSet = HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set"));
+            final HoverEvent clickToSet = HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(message("commands.region.flags.list.hover")));
             for (int i = 0; i < flagList.size(); i++) {
                 String flag = flagList.get(i);
 
+                String command = String.format(Locale.ROOT, message("commands.region.flags.list.command"), world.getName(), regionId, flag);
                 builder.append(TextComponent.of(flag, i % 2 == 0 ? TextColor.GRAY : TextColor.WHITE)
-                        .hoverEvent(clickToSet).clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
-                                "/rg flag -w \"" + world.getName() + "\" " + regionId + " " + flag + " ")));
+                        .hoverEvent(clickToSet)
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, command)));
                 if (i < flagList.size() + 1) {
-                    builder.append(TextComponent.of(", "));
+                    builder.append(TextComponent.of(message("commands.region.flags.list.separator")));
                 }
             }
 
-            Component ret = ErrorFormat.wrap("Unknown flag specified: " + flagName)
+            Component ret = ErrorFormat.wrap(message("commands.region.flags.list.unknown", flagName))
                     .append(TextComponent.newline())
                     .append(builder.build());
             if (sender.isPlayer()) {
-                return ret.append(TextComponent.of("Or use the command ", TextColor.LIGHT_PURPLE)
-                                .append(TextComponent.of("/rg flags " + regionId, TextColor.AQUA)
-                                    .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
-                                        "/rg flags -w \"" + world.getName() + "\" " + regionId))));
+                String helperCommand = String.format(Locale.ROOT, message("commands.region.flags.list.helper-command"), world.getName(), regionId);
+                return ret.append(TextComponent.of(message("commands.region.flags.list.helper-prefix"), TextColor.LIGHT_PURPLE)
+                                .append(TextComponent.of(String.format(Locale.ROOT, message("commands.region.flags.list.helper-label"), regionId), TextColor.AQUA)
+                                    .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, helperCommand))));
             }
             return ret;
         }

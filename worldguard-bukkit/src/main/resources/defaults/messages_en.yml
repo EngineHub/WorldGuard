@@ -157,7 +157,18 @@ commands:
         set: "Region group flag for '%s' set."
       current-prefix: "(Current flags: "
       current-suffix: ")"
-      helper-failure: "Failed to get region flags"
+      helper:
+        failure: "Failed to get region flags"
+      list:
+        available: "Available flags: "
+        hover: "Click to set"
+        command: "/rg flag -w \"%s\" %s %s "
+        separator: ", "
+        unknown: "Unknown flag specified: %s"
+        helper-prefix: "Or use the command "
+        helper-label: "/rg flags %s"
+        helper-command: "/rg flags -w \"%s\" %s"
+        supervisor: "Listing available flags"
     priority:
       set: "Priority of '%s' set to %d (higher numbers override)."
     parent:
@@ -211,12 +222,30 @@ commands:
         same: "Cannot migrate using the same driver for both source and target."
         missing-from: "Region driver '%s' is not available."
         missing-to: "Region driver '%s' is not available."
+        generic: "Error encountered while migrating: %s"
       confirm: "This operation may be destructive. Use -y to confirm."
       confirmation-required: "Confirmation required (-y flag)."
       supervisor: "Migrating region store from %s to %s"
       waiting: "(Please wait... migrating from %s to %s)"
       success: "Successfully migrated region data from %s to %s."
       failure: "Failed to migrate region data from %s to %s."
+      uuid:
+        start: "Now performing migration... this may take a while."
+      heights:
+        confirm: "This command is potentially dangerous.\nPlease ensure you have made a backup of your data, and then re-enter the command with -y tacked on at the end to proceed."
+      complete: "Migration complete!"
+    teleport:
+      error:
+        no-spawn: "The region has no spawn point associated."
+        no-center: "The region has no center point."
+        center-spectator: "Center teleport is only available in Spectator gamemode."
+        no-teleport: "The region has no teleport point associated."
+        failure: "Unable to teleport to region '%s'."
+    bypass:
+      error:
+        args: "Allowed optional arguments are: on, off"
+      enabled: "You are now bypassing region protection (as long as you have permission)."
+      disabled: "You are no longer bypassing region protection."
   stopfire:
     broadcast-disabled: "Fire spread has been globally disabled for '%s' by %s."
     already-disabled: "Fire spread was already globally disabled."
