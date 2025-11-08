@@ -81,12 +81,19 @@ commands:
       load-failed: "Region data failed to load for this world. Please ask a server administrator to read the logs to identify the reason."
       select-unsupported: "Can't select that region! The region type '%s' can't be selected."
       selection-type: "Sorry, you can only use cuboids and polygons for WorldGuard regions."
+      info-specify: "Please specify the region with /region info -w world_name region_name."
+      flags-specify: "Please specify the region with /region flags -w world_name region_name."
+      flag-empty-with-value: "You cannot use -e(mpty) with a flag value."
+      flag-no-group: "Region flag '%s' does not have a group flag!"
     standing:
       none-debug: "You're not standing in any regions. Using the global region for this world instead."
     list:
       header: "Current regions: "
       delimiter: ", "
       hover: "Click to pick this region"
+      supervisor: "Getting region list"
+      waiting: "(Please wait... fetching region list...)"
+      failure: "Failed to fetch region list"
     warning:
       save-failure: "(Warning: The background saving of region data is failing for these worlds: %s. Your changes are getting lost. See the server log for more information.)"
       height: "(Warning: The height of the region was %d block(s).)"
@@ -94,6 +101,9 @@ commands:
       auto-protect:
         prefix: "(This region is NOW PROTECTED from modification from others. Don't want that? Use "
         suffix: ")"
+      supervisor: "Fetching region info"
+      waiting: "(Please wait... fetching region information...)"
+      failure: "Failed to fetch region information"
     spawn:
       warning-title: "Warning!"
       warning-body: " This region overlaps vanilla's spawn protection. WorldGuard cannot override this, and only server operators will be able to interact with this area."
@@ -109,6 +119,7 @@ commands:
       failure: "Failed to update the region '%s'"
     common:
       waiting: "(Please wait... %s)"
+      none: "none"
     claim:
       success: "A new region has been claimed named '%s'."
       error:
@@ -123,6 +134,89 @@ commands:
     select:
       error:
         specify: "Please specify a region name."
+    flags:
+      warning:
+        title: "WARNING:"
+        passthrough-body: " This flag is unrelated to moving through regions."
+        common:
+          prefix: "It overrides build checks. If you're unsure what this means, see "
+          link: "[this documentation page]"
+          suffix: " for more info."
+        build-body: " Setting this flag is not required for protection."
+        build-detail: "Setting this flag will completely override default protection, and apply to members, non-members, pistons, sand physics, and everything else that can modify blocks."
+        protection-link: "https://worldguard.enginehub.org/en/latest/regions/flags/#protection-related"
+        overrides-link: "https://worldguard.enginehub.org/en/latest/regions/flags/#overrides"
+      error:
+        specify: "Please specify the region with /region flags -w world_name region_name."
+        empty-with-value: "You cannot use -e(mpty) with a flag value."
+        no-group: "Region flag '%s' does not have a group flag!"
+      set: "Region flag %s set on '%s' to '%s'."
+      removed: "Region flag %s removed from '%s'. (Any -g(roups) were also removed.)"
+      group:
+        reset: "Region group flag for '%s' reset to default."
+        set: "Region group flag for '%s' set."
+      current-prefix: "(Current flags: "
+      current-suffix: ")"
+      helper-failure: "Failed to get region flags"
+    priority:
+      set: "Priority of '%s' set to %d (higher numbers override)."
+    parent:
+      cycle:
+        warning: "Uh oh! Setting '%s' to be the parent of '%s' would cause circular inheritance."
+        current: "(Current inheritance on '%s':"
+        end: ")"
+      set: "Inheritance set for region '%s'."
+      parent-prefix: " Parent: "
+      inheritance-prefix: "(Current inheritance:"
+      inheritance-end: ")"
+      orphaned: " Region is now orphaned."
+    remove:
+      supervisor: "Removing region '%s' in '%s'"
+      success: "Successfully removed %s."
+      failure: "Failed to remove region"
+      error:
+        unset-and-remove: "You cannot use both -u (unset parent) and -f (remove children) together."
+    load:
+      error:
+        no-manager: "No region manager exists for world '%s'."
+      supervisor:
+        single: "Loading region data for '%s'."
+        all: "Loading regions for all worlds"
+      waiting:
+        all: "(Please wait... loading region data for all worlds...)"
+      success:
+        single: "Loaded region data for '%s'"
+        all: "Successfully loaded the region data for all worlds."
+      failure:
+        single: "Failed to load region data for '%s'"
+        all: "Failed to load regions for all worlds"
+    save:
+      error:
+        no-manager: "No region manager exists for world '%s'."
+      supervisor:
+        single: "Saving region data for '%s'."
+        all: "Saving regions for all worlds"
+      waiting:
+        all: "(Please wait... saving region data for all worlds...)"
+      success:
+        single: "Saving region data for '%s'"
+        all: "Successfully saved the region data for all worlds."
+      failure:
+        single: "Failed to save region data for '%s'"
+        all: "Failed to save regions for all worlds"
+    migrate:
+      error:
+        invalid-from: "Unknown region driver '%s'."
+        invalid-to: "Unknown region driver '%s'."
+        same: "Cannot migrate using the same driver for both source and target."
+        missing-from: "Region driver '%s' is not available."
+        missing-to: "Region driver '%s' is not available."
+      confirm: "This operation may be destructive. Use -y to confirm."
+      confirmation-required: "Confirmation required (-y flag)."
+      supervisor: "Migrating region store from %s to %s"
+      waiting: "(Please wait... migrating from %s to %s)"
+      success: "Successfully migrated region data from %s to %s."
+      failure: "Failed to migrate region data from %s to %s."
   stopfire:
     broadcast-disabled: "Fire spread has been globally disabled for '%s' by %s."
     already-disabled: "Fire spread was already globally disabled."
