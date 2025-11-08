@@ -108,8 +108,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(world);
 
         if (cfg.activityHaltToggle) {
-            player.sendMessage(ChatColor.YELLOW
-                    + "Intensive server activity has been HALTED.");
+            player.sendMessage(colorMessage("listeners.player.activity-halted"));
 
             int removed = 0;
 
@@ -127,8 +126,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
         }
 
         if (wcfg.fireSpreadDisableToggle) {
-            player.sendMessage(ChatColor.YELLOW
-                    + "Fire spread is currently globally disabled for this world.");
+            player.sendMessage(colorMessage("listeners.player.fire-spread-disabled"));
         }
 
         Events.fire(new ProcessPlayerEvent(player));
@@ -188,7 +186,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
                     && !(cfg.hostKeysAllowFMLClients &&
                             (hostname.equals(hostKey + "\u0000FML\u0000") || hostname.equals(hostKey + "\u0000FML2\u0000")))) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
-                        "You did not join with the valid host key!");
+                        colorMessage("listeners.player.host-key-invalid"));
                 log.warning("WorldGuard host key check: " +
                         player.getName() + " joined with '" + hostname +
                         "' but '" + hostKey + "' was expected. Kicked!");
@@ -221,7 +219,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
             ItemStack heldItem = player.getInventory().getItem(slot);
             if (heldItem != null && heldItem.getAmount() < 0) {
                 player.getInventory().setItem(slot, null);
-                player.sendMessage(ChatColor.RED + "Infinite stack removed.");
+                player.sendMessage(colorMessage("listeners.player.infinite-stack.removed"));
             }
         }
     }
@@ -252,7 +250,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
                 ItemStack heldItem = player.getInventory().getItem(slot);
                 if (heldItem != null && heldItem.getAmount() < 0) {
                     player.getInventory().setItem(slot, null);
-                    player.sendMessage(ChatColor.RED + "Infinite stack in slot #" + slot + " removed.");
+                    player.sendMessage(colorMessage("listeners.player.infinite-stack.slot", slot));
                 }
             }
         }
@@ -264,7 +262,9 @@ public class WorldGuardPlayerListener extends AbstractListener {
                 ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
                         .getApplicableRegions(BukkitAdapter.adapt(block.getLocation()), RegionQuery.QueryOption.SORT);
                 if (set.size() > 0) {
-                    player.sendMessage(ChatColor.YELLOW + "Can you build? " + (set.testState(localPlayer, Flags.BUILD) ? "Yes" : "No"));
+                    boolean canBuild = set.testState(localPlayer, Flags.BUILD);
+                    String answer = message(canBuild ? "listeners.player.build-query.yes" : "listeners.player.build-query.no");
+                    player.sendMessage(colorMessage("listeners.player.build-query.prompt", answer));
 
                     StringBuilder str = new StringBuilder();
                     for (Iterator<ProtectedRegion> it = set.iterator(); it.hasNext();) {
@@ -274,9 +274,9 @@ public class WorldGuardPlayerListener extends AbstractListener {
                         }
                     }
 
-                    localPlayer.print("Applicable regions: " + str);
+                    localPlayer.print(message("listeners.player.regions.list", str.toString()));
                 } else {
-                    localPlayer.print("WorldGuard: No defined regions here!");
+                    localPlayer.print(message("listeners.player.regions.none"));
                 }
 
                 event.setUseItemInHand(Event.Result.DENY);
@@ -343,7 +343,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
             ItemStack heldItem = player.getInventory().getItem(newSlot);
             if (heldItem != null && heldItem.getAmount() < 0) {
                 player.getInventory().setItem(newSlot, null);
-                player.sendMessage(ChatColor.RED + "Infinite stack removed.");
+                player.sendMessage(colorMessage("listeners.player.infinite-stack.removed"));
             }
         }
     }
@@ -438,10 +438,18 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
         if (cfg.blockInGameOp) {
             if (opPattern.matcher(event.getMessage()).matches()) {
-                player.sendMessage(ChatColor.RED + "/op and /deop can only be used in console (as set by a WG setting).");
+                player.sendMessage(colorMessage("listeners.player.blocked-op"));
                 event.setCancelled(true);
                 return;
             }
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
+
+    private String colorMessage(String key, Object... arguments) {
+        return ChatColor.translateAlternateColorCodes('&', message(key, arguments));
     }
 }

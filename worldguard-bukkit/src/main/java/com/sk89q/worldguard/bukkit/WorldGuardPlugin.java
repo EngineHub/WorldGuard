@@ -291,14 +291,15 @@ public class WorldGuardPlugin extends JavaPlugin {
         } catch (CommandPermissionsException e) {
             sender.sendMessage(colorMessage("commands.error.no-permission"));
         } catch (MissingNestedCommandException e) {
-            sender.sendMessage(ChatColor.RED + e.getUsage());
+            sender.sendMessage(colorMessage("commands.error.missing-nested", e.getUsage()));
         } catch (CommandUsageException e) {
-            sender.sendMessage(ChatColor.RED + e.getMessage());
-            sender.sendMessage(ChatColor.RED + e.getUsage());
+            sender.sendMessage(colorMessage("commands.error.usage.message", e.getMessage()));
+            sender.sendMessage(colorMessage("commands.error.usage.usage", e.getUsage()));
         } catch (WrappedCommandException e) {
-            sender.sendMessage(ChatColor.RED + e.getCause().getMessage());
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            sender.sendMessage(colorMessage("commands.error.wrapped", safeMessage(cause.getMessage())));
         } catch (CommandException e) {
-            sender.sendMessage(ChatColor.RED + e.getMessage());
+            sender.sendMessage(colorMessage("commands.error.command", safeMessage(e.getMessage())));
         }
 
         return true;
@@ -480,12 +481,16 @@ public class WorldGuardPlugin extends JavaPlugin {
         RecordMessagePrefixer.register(Logger.getLogger("com.sk89q.worldguard"), "[WorldGuard] ");
     }
 
-    private String message(String key) {
-        return WorldGuard.getInstance().getLocalization().get(key);
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
-    private String colorMessage(String key) {
-        return ChatColor.translateAlternateColorCodes('&', message(key));
+    private String colorMessage(String key, Object... arguments) {
+        return ChatColor.translateAlternateColorCodes('&', message(key, arguments));
+    }
+
+    private String safeMessage(String raw) {
+        return raw != null ? raw : "";
     }
 
     /**

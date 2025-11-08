@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -132,15 +133,15 @@ public class RegionLister implements Callable<Integer> {
                     try {
                         profile = WorldGuard.getInstance().getProfileService().findByName(name);
                     } catch (IOException e) {
-                        log.log(Level.WARNING, "Failed UUID lookup of '" + name + "'", e);
-                        throw new CommandException("Failed to lookup the UUID of '" + name + "'");
+                        log.log(Level.WARNING, message("commands.region.list.error.uuid-lookup-log", name), e);
+                        throw new CommandException(message("commands.region.list.error.uuid-lookup", name));
                     } catch (InterruptedException e) {
-                        log.log(Level.WARNING, "Failed UUID lookup of '" + name + "'", e);
-                        throw new CommandException("The lookup the UUID of '" + name + "' was interrupted");
+                        log.log(Level.WARNING, message("commands.region.list.error.uuid-lookup-log", name), e);
+                        throw new CommandException(message("commands.region.list.error.uuid-lookup-interrupted", name));
                     }
 
                     if (profile == null) {
-                        throw new CommandException("A user by the name of '" + name + "' does not seem to exist.");
+                        throw new CommandException(message("commands.region.list.error.missing-user", name));
                     }
 
                     uniqueId = profile.getUniqueId();
@@ -194,13 +195,24 @@ public class RegionLister implements Callable<Integer> {
         }
 
         RegionPermissionModel perms = sender.isPlayer() ? new RegionPermissionModel(sender) : null;
-        String title = ownerMatcher == null ? "Regions" : "Regions for " + ownerMatcher.getName();
-        String cmd = "/rg list -w \"" + world + "\""
-                + (playerName != null ? " -p " + playerName : "")
-                + (nameOnly ? " -n" : "")
-                + (filterByIntersecting != null ? " -s" : "")
-                + (idFilter != null ? " -i " + idFilter : "")
-                + " %page%";
+        String title = ownerMatcher == null
+                ? message("commands.region.list.box.title")
+                : message("commands.region.list.box.title-owner", ownerMatcher.getName());
+        StringBuilder commandBuilder = new StringBuilder(message("commands.region.list.box.command.base", world));
+        if (playerName != null) {
+            commandBuilder.append(message("commands.region.list.box.command.player", playerName));
+        }
+        if (nameOnly) {
+            commandBuilder.append(message("commands.region.list.box.command.name-only"));
+        }
+        if (filterByIntersecting != null) {
+            commandBuilder.append(message("commands.region.list.box.command.intersect"));
+        }
+        if (idFilter != null) {
+            commandBuilder.append(message("commands.region.list.box.command.id-filter", idFilter));
+        }
+        commandBuilder.append(message("commands.region.list.box.command.page"));
+        String cmd = commandBuilder.toString();
         PaginationBox box = new RegionListBox(title, cmd, perms, entries, world);
         sender.print(box.create(page));
 
@@ -271,33 +283,33 @@ public class RegionLister implements Callable<Integer> {
         @Override
         public Component getComponent(int number) {
             final RegionListEntry entry = entries.get(number);
-            final TextComponent.Builder builder = TextComponent.builder(number + 1 + ".").color(TextColor.LIGHT_PURPLE);
+            final TextComponent.Builder builder = TextComponent.builder(message("commands.region.list.box.index", number + 1)).color(TextColor.LIGHT_PURPLE);
             if (entry.isOwner()) {
-                builder.append(TextComponent.space()).append(TextComponent.of("+", TextColor.DARK_AQUA)
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Region Owner", TextColor.GOLD))));
+                builder.append(TextComponent.space()).append(TextComponent.of(message("commands.region.list.box.owner-icon"), TextColor.DARK_AQUA)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(message("commands.region.list.box.owner-hover"), TextColor.GOLD))));
             } else if (entry.isMember()) {
-                builder.append(TextComponent.space()).append(TextComponent.of("-", TextColor.AQUA)
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Region Member", TextColor.GOLD))));
+                builder.append(TextComponent.space()).append(TextComponent.of(message("commands.region.list.box.member-icon"), TextColor.AQUA)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(message("commands.region.list.box.member-hover"), TextColor.GOLD))));
             }
             builder.append(TextComponent.space()).append(TextComponent.of(entry.getRegion().getId(), TextColor.GOLD));
             if (perms != null && perms.mayLookup(entry.region)) {
-                builder.append(TextComponent.space().append(TextComponent.of("[Info]", TextColor.GRAY)
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click for info")))
+                builder.append(TextComponent.space().append(TextComponent.of(message("commands.region.list.box.info-label"), TextColor.GRAY)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(message("commands.region.list.box.info-hover"))))
                         .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
-                                "/rg info -w \"" + world + "\" " + entry.region.getId()))));
+                                String.format(Locale.ROOT, message("commands.region.list.box.info-command"), world, entry.region.getId())))));
             }
             final Location teleFlag = FlagValueCalculator.getEffectiveFlagOf(entry.region, Flags.TELE_LOC, perms != null && perms.getSender() instanceof RegionAssociable ? (RegionAssociable) perms.getSender() : null);
             if (perms != null && teleFlag != null && perms.mayTeleportTo(entry.region)) {
-                builder.append(TextComponent.space().append(TextComponent.of("[TP]", TextColor.GRAY)
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to teleport")))
+                builder.append(TextComponent.space().append(TextComponent.of(message("commands.region.list.box.tp-label"), TextColor.GRAY)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(message("commands.region.list.box.tp-hover"))))
                         .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
-                                "/rg tp -w \"" + world + "\" " + entry.region.getId()))));
+                                String.format(Locale.ROOT, message("commands.region.list.box.tp-command"), world, entry.region.getId())))));
             } else if (perms != null && perms.mayTeleportToCenter(entry.getRegion()) && entry.getRegion().isPhysicalArea()) {
-                builder.append(TextComponent.space().append(TextComponent.of("[TP-Center]", TextColor.GRAY)
+                builder.append(TextComponent.space().append(TextComponent.of(message("commands.region.list.box.tp-center-label"), TextColor.GRAY)
                         .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT,
-                                TextComponent.of("Click to teleport to the center")))
+                                TextComponent.of(message("commands.region.list.box.tp-center-hover"))))
                         .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
-                                "/rg tp -c -w \"" + world + "\" " + entry.region.getId()))));
+                                String.format(Locale.ROOT, message("commands.region.list.box.tp-center-command"), world, entry.region.getId())))));
             }
             return builder.build();
         }
@@ -306,5 +318,9 @@ public class RegionLister implements Callable<Integer> {
         public int getComponentsSize() {
             return entries.size();
         }
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

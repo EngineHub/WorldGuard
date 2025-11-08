@@ -1,6 +1,12 @@
 commands:
   error:
     no-permission: "&cYou don't have permission."
+    missing-nested: "&c%s"
+    usage:
+      message: "&c%s"
+      usage: "&c%s"
+    wrapped: "&c%s"
+    command: "&c%s"
   god:
     self-enabled: "God mode enabled! Use /ungod to disable."
     enabled-by: "God enabled by %s."
@@ -94,6 +100,35 @@ commands:
       supervisor: "Getting region list"
       waiting: "(Please wait... fetching region list...)"
       failure: "Failed to fetch region list"
+      error:
+        uuid-lookup-log: "Failed UUID lookup of '%s'"
+        uuid-lookup: "Failed to lookup the UUID of '%s'"
+        uuid-lookup-interrupted: "The lookup of the UUID of '%s' was interrupted"
+        missing-user: "A user by the name of '%s' does not seem to exist."
+      box:
+        title: "Regions"
+        title-owner: "Regions for %s"
+        command:
+          base: "/rg list -w \"%s\""
+          player: " -p %s"
+          name-only: " -n"
+          intersect: " -s"
+          id-filter: " -i %s"
+          page: " %page%"
+        index: "%d."
+        owner-icon: "+"
+        owner-hover: "Region Owner"
+        member-icon: "-"
+        member-hover: "Region Member"
+        info-label: "[Info]"
+        info-hover: "Click for info"
+        info-command: "/rg info -w \"%s\" %s"
+        tp-label: "[TP]"
+        tp-hover: "Click to teleport"
+        tp-command: "/rg tp -w \"%s\" %s"
+        tp-center-label: "[TP-Center]"
+        tp-center-hover: "Click to teleport to the center"
+        tp-center-command: "/rg tp -c -w \"%s\" %s"
     warning:
       save-failure: "(Warning: The background saving of region data is failing for these worlds: %s. Your changes are getting lost. See the server log for more information.)"
       height: "(Warning: The height of the region was %d block(s).)"
@@ -159,6 +194,32 @@ commands:
       current-suffix: ")"
       helper:
         failure: "Failed to get region flags"
+        title: "Flags for %s"
+        third-party: "Third-Party Flags"
+        member-default: "This is a special flag which defaults to allow for members, and deny for non-members"
+        build-override: "This is a special flag which overrides build checks. (Not movement related!)"
+        unset: "Click to unset"
+        set: "Click to set"
+        change: "Click to change"
+        custom: "Click to set custom value"
+        custom-label: "[custom]"
+        danger:
+          line1: "Setting this flag may have unintended consequences."
+          line2: "Please read the documentation and set this flag manually if you really intend to."
+          line3: "(Hint: You do not need to set this to protect the region!)"
+        inherited-default:
+          prefix: "Inherited & "
+          suffix: " value"
+        default: "default"
+        default-suffix: " value"
+        inherited: "Inherited value"
+        times: "x "
+        current-values: "Current values:"
+        unset-location: "unset location"
+        unset-number: "unset number"
+        unset-string: "unset string"
+        default-value: "Default value:"
+        current-value: "Current value:"
       list:
         available: "Available flags: "
         hover: "Click to set"
@@ -187,6 +248,7 @@ commands:
       failure: "Failed to remove region"
       error:
         unset-and-remove: "You cannot use both -u (unset parent) and -f (remove children) together."
+        children: "The region '%s' has child regions. Use -f to force removal of children or -u to unset the parent value of these children."
     load:
       error:
         no-manager: "No region manager exists for world '%s'."
@@ -246,6 +308,27 @@ commands:
         args: "Allowed optional arguments are: on, off"
       enabled: "You are now bypassing region protection (as long as you have permission)."
       disabled: "You are no longer bypassing region protection."
+    member:
+      add-members:
+        supervisor: "Adding members to the region '%s' on '%s'"
+        success: "Region '%s' updated with new members."
+        failure: "Failed to add new members"
+      add-owners:
+        supervisor: "Adding owners to the region '%s' on '%s'"
+        success: "Region '%s' updated with new owners."
+        failure: "Failed to add new owners"
+      remove-members:
+        supervisor: "Removing members from the region '%s' on '%s'"
+        success: "Region '%s' updated with members removed."
+        failure: "Failed to remove members"
+      remove-owners:
+        supervisor: "Removing owners from the region '%s' on '%s'"
+        success: "Region '%s' updated with owners removed."
+        failure: "Failed to remove owners"
+      waiting: "(Please wait... querying player names...)"
+      error:
+        list-required: "List some names to remove, or use -a to remove all."
+        owner-limit: "You already own the maximum allowed amount of regions."
   stopfire:
     broadcast-disabled: "Fire spread has been globally disabled for '%s' by %s."
     already-disabled: "Fire spread was already globally disabled."
@@ -276,8 +359,98 @@ worldedit:
     not-installed: "WorldEdit does not appear to be installed."
     not-enabled: "WorldEdit does not appear to be enabled."
     detection-failed: "WorldEdit detection failed (report error)."
+debug:
+  handler:
+    ignore-following: "&c(Please ignore any messages that may immediately follow.)"
+    console-only: "&7The report was printed to console."
+    console-also: "&7The report was also printed to console."
+    error:
+      console-use-target: "If this command is not to be used in-game, use -t to run the test from the viewpoint of the given player rather than yourself."
+      block-too-far: "Not currently looking at a block that is close enough."
+      entity-too-far: "Not currently looking at an entity that is close enough."
+    test:
+      block-break: "Testing BLOCK BREAK at %s"
+      block-place: "Testing BLOCK PLACE at %s"
+      block-interact: "Testing BLOCK INTERACT at %s"
+      entity-damage: "Testing ENTITY DAMAGE at %s"
+matcher:
+  world:
+    normal-missing: "No normal world found."
+    nether-missing: "No nether world found."
+    end-missing: "No end world found."
+    player-argument: "Argument expected for #player."
+    identifier-invalid: "Invalid identifier '%s'."
+    name-missing: "No world by that exact name found."
+  player:
+    none: "No players matched query."
+    group-invalid: "Invalid group '%s'."
+listeners:
+  region-protection:
+    dismount-warning: "&6Don't disembark here!&7 You can't get back on."
+  player:
+    activity-halted: "&eIntensive server activity has been HALTED."
+    fire-spread-disabled: "&eFire spread is currently globally disabled for this world."
+    host-key-invalid: "&cYou did not join with the valid host key!"
+    infinite-stack:
+      removed: "&cInfinite stack removed."
+      slot: "&cInfinite stack in slot #%d removed."
+    build-query:
+      prompt: "&eCan you build? %s"
+      yes: "&aYes"
+      no: "&cNo"
+    regions:
+      list: "Applicable regions: %s"
+      none: "WorldGuard: No defined regions here!"
+    blocked-op: "&c/op and /deop can only be used in console (as set by a WG setting)."
+  blocked-potions:
+    arrows-blocked: "&cSorry, arrows with %s are presently disabled."
+    throw-denied: "&cSorry, potions with %s can't be thrown, even if you have permission to bypass it, due to limitations (and because overly-reliable potion blocking is on)."
+    potions-blocked: "&cSorry, potions with %s are presently disabled."
+  chest-protection:
+    spot-denied: "&4This spot is for a chest that you don't have permission for."
+    chest-protected: "&4This chest is protected."
+    no-adjacent-ownership: "&4You do not own the adjacent chest."
+    lock-sign-post: "&cThe [Lock] sign must be a sign post, not a wall sign."
+    owner-line: "&cThe first owner line must be your name."
+    unsafe-block: "&cThat is not a safe block that you're putting this sign on."
+    now-protected: "&eA chest or double chest above is now protected."
+    disabled: "&cWorldGuard's sign chest protection is disabled."
 errors:
   actor:
     unknown-type: "Unknown actor type. Please report"
+  print:
+    region-label: "Region: "
+    type-prefix: " (type="
+    priority-prefix: ", priority="
+    paren-close: ")"
+    flags-label: "Flags: "
+    flag-separator: ", "
+    flag-format: "%s: "
+    flag-group-format: "%s -g %s: "
+    flag-hover: "Click to set flag"
+    flags-button: "[Flags]"
+    flags-button-hover: "Click to set a flag"
+    none: "(none)"
+    parent-arrow: "⤷"
+    parent-info-hover: "Click for info"
+    parent-info-prefix: " (parent, priority="
+    parent-unlink: "[X]"
+    parent-unlink-hover: "Click to unlink parent"
+    owners-label: "Owners: "
+    members-label: "Members: "
+    add-hover: "Click to add a player or group"
+    remove-hover: "Click to remove a player or group"
+    clear-hover: "Click to clear"
+    add-label: "[Add]"
+    remove-label: "[Rem]"
+    clear-label: "[Clr]"
+    bounds-label: "Bounds:"
+    select-hover: "Click to select"
+    teleport-label: "[Teleport]"
+    teleport-hover: "Click to teleport"
+    center-teleport-label: "[Center Teleport]"
+    center-teleport-hover: "Click to teleport to the center of the region"
+    priority-hover: "Click to change"
+    title: "Region Info"
 
 

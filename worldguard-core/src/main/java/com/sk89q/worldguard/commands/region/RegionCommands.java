@@ -425,8 +425,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Print region information
-        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), existing,
-                args.hasFlag('u') ? null : WorldGuard.getInstance().getProfileCache(), sender);
+        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), existing, sender);
 
         AsyncCommandBuilder.wrap(printout, sender)
                 .registerWithSupervisor(WorldGuard.getInstance().getSupervisor(), message("commands.region.info.supervisor"))
@@ -643,7 +642,7 @@ public final class RegionCommands extends RegionCommandsBase {
             int page = args.getFlagInteger('h');
             sendFlagHelper(sender, world, existing, permModel, page);
         } else {
-            RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), existing, null, sender);
+            RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), existing, sender);
             printout.append(SubtleFormat.wrap(message("commands.region.flags.current-prefix")));
             printout.appendFlagsList(false);
             printout.append(SubtleFormat.wrap(message("commands.region.flags.current-suffix")));
@@ -771,7 +770,7 @@ public final class RegionCommands extends RegionCommandsBase {
         try {
             child.setParent(parent);
         } catch (CircularInheritanceException e) {
-            RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), parent, null, sender);
+            RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), parent, sender);
             assert parent != null;
             printout.append(ErrorFormat.wrap(message("commands.region.parent.cycle.warning", parent.getId(), child.getId()))).newline();
             printout.append(SubtleFormat.wrap(message("commands.region.parent.cycle.current", parent.getId()))).newline();
@@ -781,7 +780,7 @@ public final class RegionCommands extends RegionCommandsBase {
             return;
         }
 
-        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), child, null, sender);
+        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), child, sender);
         printout.append(TextComponent.of(message("commands.region.parent.set", child.getId()), TextColor.LIGHT_PURPLE));
         if (parent != null) {
             printout.newline();

@@ -80,8 +80,7 @@ public class BukkitDebugHandler implements DebugHandler {
                 log.info(receiver.getName() + " is simulating an event on " + target.getName());
             }
 
-            target.sendMessage(
-                    ChatColor.RED + "(Please ignore any messages that may immediately follow.)");
+            target.sendMessage(colorMessage("debug.handler.ignore-following"));
         }
 
         Bukkit.getPluginManager().callEvent(event);
@@ -91,7 +90,7 @@ public class BukkitDebugHandler implements DebugHandler {
         String result = report.toString();
 
         if (stacktraceMode) {
-            receiver.sendMessage(ChatColor.GRAY + "The report was printed to console.");
+            receiver.sendMessage(colorMessage("debug.handler.console-only"));
             log.info("Event report for " + receiver.getName() + ":\n\n" + result);
 
             plugin.checkPermission(receiver, "worldguard.debug.pastebin");
@@ -101,7 +100,7 @@ public class BukkitDebugHandler implements DebugHandler {
             receiver.sendMessage(result.replaceAll("(?m)^", ChatColor.AQUA.toString()));
 
             if (result.length() >= 500 && !isConsole) {
-                receiver.sendMessage(ChatColor.GRAY + "The report was also printed to console.");
+                receiver.sendMessage(colorMessage("debug.handler.console-also"));
                 log.info("Event report for " + receiver.getName() + ":\n\n" + result);
             }
         }
@@ -123,8 +122,7 @@ public class BukkitDebugHandler implements DebugHandler {
             if (sender instanceof Player) {
                 return (Player) sender;
             } else {
-                throw new CommandException(
-                        "If this command is not to be used in-game, use -t to run the test from the viewpoint of the given player rather than yourself.");
+                throw new CommandException(message("debug.handler.error.console-use-target"));
             }
         }
     }
@@ -151,7 +149,7 @@ public class BukkitDebugHandler implements DebugHandler {
             i++;
         }
 
-        throw new CommandException("Not currently looking at a block that is close enough.");
+        throw new CommandException(message("debug.handler.error.block-too-far"));
     }
 
     /**
@@ -182,7 +180,7 @@ public class BukkitDebugHandler implements DebugHandler {
             i++;
         }
 
-        throw new CommandException("Not currently looking at an entity that is close enough.");
+        throw new CommandException(message("debug.handler.error.entity-too-far"));
     }
 
     @Override
@@ -191,7 +189,7 @@ public class BukkitDebugHandler implements DebugHandler {
         Player bukkitTarget = BukkitAdapter.adapt(target);
 
         Block block = traceBlock(bukkitSender, bukkitTarget, fromTarget);
-        sender.print(TextComponent.of("Testing BLOCK BREAK at ", TextColor.AQUA).append(TextComponent.of(block.toString(), TextColor.DARK_AQUA)));
+        sender.print(buildTestComponent("debug.handler.test.block-break", block.toString()));
         LoggingBlockBreakEvent event = new LoggingBlockBreakEvent(block, bukkitTarget);
         testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
     }
@@ -202,7 +200,7 @@ public class BukkitDebugHandler implements DebugHandler {
         Player bukkitTarget = BukkitAdapter.adapt(target);
 
         Block block = traceBlock(bukkitSender, bukkitTarget, fromTarget);
-        sender.print(TextComponent.of("Testing BLOCK PLACE at ", TextColor.AQUA).append(TextComponent.of(block.toString(), TextColor.DARK_AQUA)));
+        sender.print(buildTestComponent("debug.handler.test.block-place", block.toString()));
         LoggingBlockPlaceEvent event = new LoggingBlockPlaceEvent(block, block.getState(), block.getRelative(BlockFace.DOWN), bukkitTarget.getItemInHand(), bukkitTarget, true);
         testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
     }
@@ -213,7 +211,7 @@ public class BukkitDebugHandler implements DebugHandler {
         Player bukkitTarget = BukkitAdapter.adapt(target);
 
         Block block = traceBlock(bukkitSender, bukkitTarget, fromTarget);
-        sender.print(TextComponent.of("Testing BLOCK INTERACT at ", TextColor.AQUA).append(TextComponent.of(block.toString(), TextColor.DARK_AQUA)));
+        sender.print(buildTestComponent("debug.handler.test.block-interact", block.toString()));
         LoggingPlayerInteractEvent event = new LoggingPlayerInteractEvent(bukkitTarget, Action.RIGHT_CLICK_BLOCK, bukkitTarget.getItemInHand(), block, BlockFace.SOUTH);
         testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
     }
@@ -223,8 +221,36 @@ public class BukkitDebugHandler implements DebugHandler {
         CommandSender bukkitSender = plugin.unwrapActor(sender);
         Player bukkitTarget = BukkitAdapter.adapt(target);
         Entity entity = traceEntity(bukkitSender, bukkitTarget, fromTarget);
-        sender.print(TextComponent.of("Testing ENTITY DAMAGE at ", TextColor.AQUA).append(TextComponent.of(entity.toString(), TextColor.DARK_AQUA)));
+        sender.print(buildTestComponent("debug.handler.test.entity-damage", entity.toString()));
         LoggingEntityDamageByEntityEvent event = new LoggingEntityDamageByEntityEvent(bukkitTarget, entity, EntityDamageEvent.DamageCause.ENTITY_ATTACK, 1);
         testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
+
+    private String colorMessage(String key, Object... arguments) {
+        return ChatColor.translateAlternateColorCodes('&', message(key, arguments));
+    }
+
+    private TextComponent buildTestComponent(String key, String value) {
+        String template = message(key);
+        String[] segments = template.split("%s", -1);
+        TextComponent.Builder builder = TextComponent.builder("");
+        if (segments.length == 1) {
+            builder.append(TextComponent.of(template, TextColor.AQUA));
+            builder.append(TextComponent.of(value, TextColor.DARK_AQUA));
+        } else {
+            for (int i = 0; i < segments.length; i++) {
+                if (!segments[i].isEmpty()) {
+                    builder.append(TextComponent.of(segments[i], TextColor.AQUA));
+                }
+                if (i < segments.length - 1) {
+                    builder.append(TextComponent.of(value, TextColor.DARK_AQUA));
+                }
+            }
+        }
+        return builder.build();
     }
 }
