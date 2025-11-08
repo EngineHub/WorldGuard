@@ -1,0 +1,160 @@
+commands:
+  error:
+    no-permission: "&cYou don't have permission."
+  god:
+    self-enabled: "God mode enabled! Use /ungod to disable."
+    enabled-by: "God enabled by %s."
+    players-enabled: "Players now have god mode."
+    self-disabled: "God mode disabled!"
+    disabled-by: "God disabled by %s."
+    players-disabled: "Players no longer have god mode."
+  heal:
+    self: "Healed!"
+    by: "Healed by %s."
+    players: "Players healed."
+  slay:
+    self: "Slain!"
+    by: "Slain by %s."
+    players: "Players slain."
+  locate:
+    spawn: "Compass reset to spawn."
+    repointed: "Compass repointed."
+  stack:
+    compacted: "Items compacted into stacks!"
+  version:
+    info:
+      version: "WorldGuard %s"
+      website: "http://www.enginehub.org"
+    debug:
+      header: "----------- Platforms -----------"
+      platform: "* %s (%s)"
+  reload:
+    pending-tasks: "There are currently pending tasks. Use /wg running to monitor these tasks first."
+    success: "WorldGuard configuration reloaded."
+    error: "Error while reloading: %s"
+  report:
+    title: "Report"
+    success: "WorldGuard report written to %s"
+    failed: "Failed to write report: %s"
+    pastebin-template: "WorldGuard report: %s.report"
+  profile:
+    min-duration: "You must run the profile for at least 1 minute."
+    max-duration: "You can profile for, at maximum, 10 minutes."
+    interval-range: "Interval must be between 1 and 100 (in milliseconds)"
+    interval-warning: "Note: A low interval may cause additional slowdown during profiling."
+    in-progress: "A profile is currently in progress! Please use /wg stopprofile to cancel the current profile."
+    start:
+      intro: "Starting CPU profiling. Results will be available in %d minutes."
+      use-prefix: "Use "
+      use-suffix: " at any time to cancel CPU profiling."
+    monitor-label: "CPU profiling for %d minutes"
+    write-success: "CPU profiling data written to %s"
+    write-fail: "Failed to write CPU profiling data: %s"
+    pastebin-template: "Profile result: %s.profile"
+    stop:
+      not-running: "No CPU profile is currently running."
+      cancelled: "The running CPU profile has been cancelled."
+  flushstates:
+    all: "Cleared all states."
+    player: "Cleared states for player \"%s\"."
+  running:
+    none: "There are currently no running tasks."
+    title: "Running Tasks"
+    note: "Note: Some 'running' tasks may be waiting to be start."
+    entry:
+      state: "(%s) "
+      owner: "%s: "
+  region:
+    debug:
+      world-override: "Using //world override for region command: %s"
+    error:
+      specify-world: "Please specify the world with -%s world_name."
+      invalid-name: "The region name of '%s' contains characters that are not allowed."
+      global-disallowed: "Sorry, you can't use __global__ here."
+      not-found: "No region could be found with the name of '%s'."
+      not-standing: "You're not standing in a region. Specify an ID if you want to select a specific region."
+      multiple-standing: "You're standing in several regions (please pick one)."
+      selection-missing: "Please select an area first. Use WorldEdit to make a selection! (see: https://worldedit.enginehub.org/en/latest/usage/regions/selections/)."
+      exists: "A region with that name already exists. Please choose another name."
+      exists-redefine: "A region with that name already exists. To change the shape, use /region redefine %s."
+      disabled: "Region support is disabled in the target world. It can be enabled per-world in WorldGuard's configuration files. However, you may need to restart your server afterwards."
+      load-failed: "Region data failed to load for this world. Please ask a server administrator to read the logs to identify the reason."
+      select-unsupported: "Can't select that region! The region type '%s' can't be selected."
+      selection-type: "Sorry, you can only use cuboids and polygons for WorldGuard regions."
+    standing:
+      none-debug: "You're not standing in any regions. Using the global region for this world instead."
+    list:
+      header: "Current regions: "
+      delimiter: ", "
+      hover: "Click to pick this region"
+    warning:
+      save-failure: "(Warning: The background saving of region data is failing for these worlds: %s. Your changes are getting lost. See the server log for more information.)"
+      height: "(Warning: The height of the region was %d block(s).)"
+    info:
+      auto-protect:
+        prefix: "(This region is NOW PROTECTED from modification from others. Don't want that? Use "
+        suffix: ")"
+    spawn:
+      warning-title: "Warning!"
+      warning-body: " This region overlaps vanilla's spawn protection. WorldGuard cannot override this, and only server operators will be able to interact with this area."
+    selection:
+      set: "Region selected as %s"
+    define:
+      supervisor: "Adding region '%s'"
+      success: "A new region has been made named '%s'."
+      failure: "Failed to add the region '%s'"
+    redefine:
+      supervisor: "Updating region '%s'"
+      success: "Region '%s' has been updated with a new area."
+      failure: "Failed to update the region '%s'"
+    common:
+      waiting: "(Please wait... %s)"
+    claim:
+      success: "A new region has been claimed named '%s'."
+      error:
+        too-many: "You own too many regions, delete one first to claim a new one."
+        not-owner: "This region already exists and you don't own it."
+        overlap: "This region overlaps with someone else's region."
+        inside-only: "You may only claim regions inside existing regions that you or your group own."
+        volume-config: "The maximum claim volume set in the configuration is higher than is supported. Currently, it must be %d or smaller. Please contact a server administrator."
+        polygons: "Polygons are currently not supported for /rg claim."
+        too-large: "This region is too large to claim."
+        volume-stats: "Max. volume: %d, your volume: %d"
+    select:
+      error:
+        specify: "Please specify a region name."
+  stopfire:
+    broadcast-disabled: "Fire spread has been globally disabled for '%s' by %s."
+    already-disabled: "Fire spread was already globally disabled."
+  allowfire:
+    broadcast-enabled: "Fire spread has been globally re-enabled for '%s' by %s."
+    already-enabled: "Fire spread was already globally enabled."
+  stoplag:
+    info:
+      disallowed: "ALL intensive server activity is not allowed."
+      allowed: "ALL intensive server activity is allowed."
+    confirm:
+      lead: "This command will "
+      permanently: "PERMANENTLY"
+      erase: " erase ALL animals in ALL loaded chunks in ALL loaded worlds. "
+      click: "[Click]"
+      hover: "Click to confirm /%s"
+      or-type: " or type "
+      to-confirm: " to confirm."
+    halted: "ALL intensive server activity halted."
+    broadcast-halted: "ALL intensive server activity halted by %s."
+    silent-halted: "(Silent) ALL intensive server activity halted by %s."
+    auto-removed: "%d entities (>10) auto-removed from %s"
+    broadcast-allowed: "ALL intensive server activity is now allowed."
+    sender-allowed: "ALL intensive server activity is now allowed."
+    silent-allowed: "(Silent) ALL intensive server activity is now allowed."
+worldedit:
+  error:
+    not-installed: "WorldEdit does not appear to be installed."
+    not-enabled: "WorldEdit does not appear to be enabled."
+    detection-failed: "WorldEdit detection failed (report error)."
+errors:
+  actor:
+    unknown-type: "Unknown actor type. Please report"
+
+
