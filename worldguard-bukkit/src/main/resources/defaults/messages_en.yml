@@ -364,6 +364,9 @@ debug:
     ignore-following: "&c(Please ignore any messages that may immediately follow.)"
     console-only: "&7The report was printed to console."
     console-also: "&7The report was also printed to console."
+    log:
+      simulating-event: "%s is simulating an event on %s"
+      event-report: "Event report for %s:\n\n%s"
     error:
       console-use-target: "If this command is not to be used in-game, use -t to run the test from the viewpoint of the given player rather than yourself."
       block-too-far: "Not currently looking at a block that is close enough."
@@ -373,6 +376,24 @@ debug:
       block-place: "Testing BLOCK PLACE at %s"
       block-interact: "Testing BLOCK INTERACT at %s"
       entity-damage: "Testing ENTITY DAMAGE at %s"
+    report:
+      blocked: "Was the action blocked? %s"
+      first-entry: "Entry #1 had the last word."
+      by: " by "
+      plugin-unknown: " (NOT KNOWN - use the stack trace below)"
+      no-cancels: "No plugins cancelled the event. Other causes for cancellation: (1) Bukkit may be using a different event for the action (example: buckets have their own bucket events); or (2) Minecraft's spawn protection has not been disabled."
+      status:
+        blocked: "BLOCKED"
+        allowed: "ALLOWED"
+plugin:
+  log:
+    config:
+      read-fail: "Unable to read default configuration: %s"
+      write-success: "Default configuration file written: %s"
+      write-fail: "Failed to write default config file"
+platform:
+  name: "Bukkit"
+  identifier: "Bukkit-Official"
 matcher:
   world:
     normal-missing: "No normal world found."
@@ -402,6 +423,10 @@ listeners:
       list: "Applicable regions: %s"
       none: "WorldGuard: No defined regions here!"
     blocked-op: "&c/op and /deop can only be used in console (as set by a WG setting)."
+    log:
+      gamemode-blocked: "Game mode change on %s has been blocked due to the region GAMEMODE flag"
+      halt-act: "Halt-Act: %d entities (>10) auto-removed from %s"
+      host-key-warning: "WorldGuard host key check: %s joined with '%s' but '%s' was expected. Kicked!"
   blocked-potions:
     arrows-blocked: "&cSorry, arrows with %s are presently disabled."
     throw-denied: "&cSorry, potions with %s can't be thrown, even if you have permission to bypass it, due to limitations (and because overly-reliable potion blocking is on)."
@@ -415,6 +440,41 @@ listeners:
     unsafe-block: "&cThat is not a safe block that you're putting this sign on."
     now-protected: "&eA chest or double chest above is now protected."
     disabled: "&cWorldGuard's sign chest protection is disabled."
+  world:
+    log:
+      halt-act: "Halt-Act: %d entities (>50) auto-removed from %s"
+  player-modes:
+    log:
+      god: "Enabled auto-god mode for %s"
+      amphibious: "Enabled water breathing mode for %s (player is in group 'wg-amphibious')"
+config:
+  log:
+    loaded: "Loaded configuration for world '%s'"
+    target-parse-fail: "Failed to parse the block / item type specified as '%s'"
+    read-error: "Error reading configuration for world %s"
+    parse-error: "Error parsing configuration for world %s."
+    potion-unknown: "Unknown potion effect type '%s'"
+    sponge-deprecated: "Sponge simulation is deprecated for removal in a future version. We recommend using CraftBook's sponge simulation instead."
+    chest-protection-deprecated: "Sign-based chest protection is deprecated for removal in a future version. See https://worldguard.enginehub.org/en/latest/chest-protection/ for details."
+    entity-unknown: "Unknown entity type '%s'"
+    blacklist:
+      loaded: "(%s) Blacklist loaded with %d entries."
+      missing: "WorldGuard blacklist does not exist."
+      load-fail: "Could not load WorldGuard blacklist: %s"
+    summary:
+      tnt:
+        blocked: "(%s) TNT ignition is blocked."
+        allowed: "(%s) TNT ignition is PERMITTED."
+      lighter:
+        blocked: "(%s) Lighters are blocked."
+        allowed: "(%s) Lighters are PERMITTED."
+      lava:
+        blocked: "(%s) Lava fire is blocked."
+        allowed: "(%s) Lava fire is PERMITTED."
+      fire:
+        disabled: "(%s) All fire spread is disabled."
+        limited: "(%s) Fire spread is limited to %d block types."
+        unrestricted: "(%s) Fire spread is UNRESTRICTED."
 errors:
   actor:
     unknown-type: "Unknown actor type. Please report"

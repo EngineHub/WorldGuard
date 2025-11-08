@@ -28,7 +28,6 @@ import com.sk89q.worldguard.util.Entities;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
@@ -57,7 +56,7 @@ public class WorldGuardWorldListener extends AbstractListener {
             }
 
             if (removed > 50) {
-                log.info("Halt-Act: " + removed + " entities (>50) auto-removed from " + event.getChunk().toString());
+                log.info(message("listeners.world.log.halt-act", removed, event.getChunk().toString()));
             }
         }
     }
@@ -87,5 +86,9 @@ public class WorldGuardWorldListener extends AbstractListener {
         } else if (wcfg.disableThunder && !wcfg.alwaysThundering) {
             world.setStorm(false);
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

@@ -77,7 +77,7 @@ public class BukkitDebugHandler implements DebugHandler {
 
         if (!receiver.equals(target)) {
             if (!isConsole) {
-                log.info(receiver.getName() + " is simulating an event on " + target.getName());
+                log.info(message("debug.handler.log.simulating-event", receiver.getName(), target.getName()));
             }
 
             target.sendMessage(colorMessage("debug.handler.ignore-following"));
@@ -91,7 +91,7 @@ public class BukkitDebugHandler implements DebugHandler {
 
         if (stacktraceMode) {
             receiver.sendMessage(colorMessage("debug.handler.console-only"));
-            log.info("Event report for " + receiver.getName() + ":\n\n" + result);
+            log.info(message("debug.handler.log.event-report", receiver.getName(), result));
 
             plugin.checkPermission(receiver, "worldguard.debug.pastebin");
             ActorCallbackPaste.pastebin(WorldGuard.getInstance().getSupervisor(), plugin.wrapCommandSender(receiver),
@@ -101,7 +101,7 @@ public class BukkitDebugHandler implements DebugHandler {
 
             if (result.length() >= 500 && !isConsole) {
                 receiver.sendMessage(colorMessage("debug.handler.console-also"));
-                log.info("Event report for " + receiver.getName() + ":\n\n" + result);
+                log.info(message("debug.handler.log.event-report", receiver.getName(), result));
             }
         }
     }

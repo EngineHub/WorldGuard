@@ -92,7 +92,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
                     localPlayer.getWorld())) {
                 GameMode expected = handler.getSetGameMode();
                 if (handler.getOriginalGameMode() != null && expected != null && expected != BukkitAdapter.adapt(event.getNewGameMode())) {
-                    log.info("Game mode change on " + player.getName() + " has been blocked due to the region GAMEMODE flag");
+                    log.info(message("listeners.player.log.gamemode-blocked", player.getName()));
                     event.setCancelled(true);
                 }
             }
@@ -120,8 +120,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
             }
 
             if (removed > 10) {
-                log.info("Halt-Act: " + removed + " entities (>10) auto-removed from "
-                        + player.getWorld());
+                log.info(message("listeners.player.log.halt-act", removed, player.getWorld().getName()));
             }
         }
 
@@ -187,9 +186,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
                             (hostname.equals(hostKey + "\u0000FML\u0000") || hostname.equals(hostKey + "\u0000FML2\u0000")))) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
                         colorMessage("listeners.player.host-key-invalid"));
-                log.warning("WorldGuard host key check: " +
-                        player.getName() + " joined with '" + hostname +
-                        "' but '" + hostKey + "' was expected. Kicked!");
+                log.warning(message("listeners.player.log.host-key-warning", player.getName(), hostname, hostKey));
                 return;
             }
         }

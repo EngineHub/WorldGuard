@@ -69,15 +69,19 @@ public class PlayerModesListener extends AbstractListener {
 
         if (hasGodModeGroup(player) || hasGodModePermission(player)) {
             if (GodMode.set(localPlayer, session, true)) {
-                log.log(Level.INFO, "Enabled auto-god mode for " + player.getName());
+                log.log(Level.INFO, message("listeners.player-modes.log.god", player.getName()));
             }
         }
 
         if (hasAmphibiousGroup(player)) {
             if (WaterBreathing.set(localPlayer, session, true)) {
-                log.log(Level.INFO, "Enabled water breathing mode for " + player.getName() + " (player is in group 'wg-amphibious')");
+                log.log(Level.INFO, message("listeners.player-modes.log.amphibious", player.getName()));
             }
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

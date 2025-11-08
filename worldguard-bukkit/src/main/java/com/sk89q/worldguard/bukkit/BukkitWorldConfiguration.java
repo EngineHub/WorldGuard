@@ -27,6 +27,7 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldguard.blacklist.BlacklistLoggerHandler;
 import com.sk89q.worldguard.blacklist.logger.ConsoleHandler;
@@ -95,7 +96,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         loadConfiguration();
 
         if (summaryOnStart) {
-            log.info("Loaded configuration for world '" + worldName + "'");
+            log.info(message("config.log.loaded", worldName));
         }
     }
 
@@ -119,7 +120,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             try {
                 set.add(matcherParser.fromInput(input));
             } catch (TargetMatcherParseException e) {
-                log.warning("Failed to parse the block / item type specified as '" + input + "'");
+                log.warning(message("config.log.target-parse-fail", input));
             }
         }
 
@@ -134,9 +135,9 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         try {
             config.load();
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Error reading configuration for world " + worldName + ": ", e);
+            log.log(Level.SEVERE, message("config.log.read-error", worldName), e);
         } catch (YAMLException e) {
-            log.severe("Error parsing configuration for world " + worldName + ". ");
+            log.severe(message("config.log.parse-error", worldName));
             throw e;
         }
 
@@ -170,7 +171,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             PotionEffectType effect = PotionEffectType.getByName(potionName);
 
             if (effect == null) {
-                log.warning("Unknown potion effect type '" + potionName + "'");
+                log.warning(message("config.log.potion-unknown", potionName));
             } else {
                 blockPotions.add(effect);
             }
@@ -182,7 +183,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = getBoolean("simulation.sponge.redstone", false);
         if (simulateSponge) {
-            log.warning("Sponge simulation is deprecated for removal in a future version. We recommend using CraftBook's sponge simulation instead.");
+            log.warning(message("config.log.sponge-deprecated"));
         } else {
             needParentSave |= removeProperty("simulation");
         }
@@ -247,7 +248,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         signChestProtection = getBoolean("chest-protection.enable", false);
         disableSignChestProtectionCheck = getBoolean("chest-protection.disable-off-check", true);
         if (signChestProtection) {
-            log.warning("Sign-based chest protection is deprecated for removal in a future version. See https://worldguard.enginehub.org/en/latest/chest-protection/ for details.");
+            log.warning(message("config.log.chest-protection-deprecated"));
         } else {
             needParentSave |= removeProperty("chest-protection");
         }
@@ -325,7 +326,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             EntityType creature = EntityTypes.get(creatureName.toLowerCase());
 
             if (creature == null) {
-                log.warning("Unknown entity type '" + creatureName + "'");
+                log.warning(message("config.log.entity-unknown", creatureName));
             } else {
                 blockCreatureSpawn.add(creature);
             }
@@ -366,8 +367,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             } else {
                 this.blacklist = blist;
                 if (summaryOnStart) {
-                    log.log(Level.INFO, "({0}) Blacklist loaded with {1} entries.",
-                            new Object[]{worldName, blacklist.getItemCount()});
+                    log.log(Level.INFO, message("config.log.blacklist.loaded", worldName, blacklist.getItemCount()));
                 }
 
                 BlacklistLoggerHandler blacklistLogger = blist.getLogger();
@@ -387,34 +387,30 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
                 }
             }
         } catch (FileNotFoundException e) {
-            log.log(Level.WARNING, "WorldGuard blacklist does not exist.");
+            log.log(Level.WARNING, message("config.log.blacklist.missing"));
         } catch (IOException e) {
-            log.log(Level.WARNING, "Could not load WorldGuard blacklist: "
-                    + e.getMessage());
+            log.log(Level.WARNING, message("config.log.blacklist.load-fail", e.getMessage()), e);
         }
 
         // Print an overview of settings
         if (summaryOnStart) {
-            log.log(Level.INFO, blockTNTExplosions
-                    ? "(" + worldName + ") TNT ignition is blocked."
-                    : "(" + worldName + ") TNT ignition is PERMITTED.");
-            log.log(Level.INFO, blockLighter
-                    ? "(" + worldName + ") Lighters are blocked."
-                    : "(" + worldName + ") Lighters are PERMITTED.");
-            log.log(Level.INFO, preventLavaFire
-                    ? "(" + worldName + ") Lava fire is blocked."
-                    : "(" + worldName + ") Lava fire is PERMITTED.");
+            log.log(Level.INFO, message(blockTNTExplosions
+                    ? "config.log.summary.tnt.blocked"
+                    : "config.log.summary.tnt.allowed", worldName));
+            log.log(Level.INFO, message(blockLighter
+                    ? "config.log.summary.lighter.blocked"
+                    : "config.log.summary.lighter.allowed", worldName));
+            log.log(Level.INFO, message(preventLavaFire
+                    ? "config.log.summary.lava.blocked"
+                    : "config.log.summary.lava.allowed", worldName));
 
             if (disableFireSpread) {
-                log.log(Level.INFO, "(" + worldName + ") All fire spread is disabled.");
+                log.log(Level.INFO, message("config.log.summary.fire.disabled", worldName));
             } else {
                 if (!disableFireSpreadBlocks.isEmpty()) {
-                    log.log(Level.INFO, "(" + worldName
-                            + ") Fire spread is limited to "
-                            + disableFireSpreadBlocks.size() + " block types.");
+                    log.log(Level.INFO, message("config.log.summary.fire.limited", worldName, disableFireSpreadBlocks.size()));
                 } else {
-                    log.log(Level.INFO, "(" + worldName
-                            + ") Fire spread is UNRESTRICTED.");
+                    log.log(Level.INFO, message("config.log.summary.fire.unrestricted", worldName));
                 }
             }
         }
@@ -478,6 +474,10 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
     public ChestProtection getChestProtection() {
         return chestProtection;
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

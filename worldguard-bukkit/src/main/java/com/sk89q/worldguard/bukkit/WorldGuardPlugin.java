@@ -515,7 +515,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             if (stream == null) throw new FileNotFoundException();
             copyDefaultConfig(stream, actual, defaultName);
         } catch (IOException e) {
-            getLogger().severe("Unable to read default configuration: " + defaultName);
+            getLogger().severe(message("plugin.log.config.read-fail", defaultName));
         }
 
     }
@@ -527,9 +527,9 @@ public class WorldGuardPlugin extends JavaPlugin {
             while ((length = input.read(buf)) > 0) {
                 output.write(buf, 0, length);
             }
-            getLogger().info("Default configuration file written: " + name);
+            getLogger().info(message("plugin.log.config.write-success", name));
         } catch (IOException e) {
-            getLogger().log(Level.WARNING, "Failed to write default config file", e);
+            getLogger().log(Level.WARNING, message("plugin.log.config.write-fail"), e);
         }
     }
 

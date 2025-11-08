@@ -82,7 +82,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
 
     @Override
     public String getPlatformName() {
-        return "Bukkit-Official";
+        return WorldGuard.getInstance().getLocalization().get("platform.name");
     }
 
     @Override
@@ -282,5 +282,9 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
             }
         }
         return null;
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }
