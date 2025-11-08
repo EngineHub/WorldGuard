@@ -29,9 +29,7 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.util.profile.resolver.PaperPlayerService;
+import com.sk89q.worldguard.bukkit.localization.BukkitLocalizationLoader;
 import com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent;
 import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.bukkit.util.report.DatapackReport;
@@ -45,13 +43,17 @@ import com.sk89q.worldguard.internal.platform.DebugHandler;
 import com.sk89q.worldguard.internal.platform.StringMatcher;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.flags.FlagContext;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.session.SessionManager;
+import com.sk89q.worldguard.util.localization.Localization;
 import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 import com.sk89q.worldguard.util.profile.resolver.BukkitPlayerService;
 import com.sk89q.worldguard.util.profile.resolver.CacheForwardingService;
 import com.sk89q.worldguard.util.profile.resolver.CombinedProfileService;
 import com.sk89q.worldguard.util.profile.resolver.HttpRepositoryService;
+import com.sk89q.worldguard.util.profile.resolver.PaperPlayerService;
 import com.sk89q.worldguard.util.profile.resolver.ProfileService;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
@@ -73,6 +75,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
     private BukkitRegionContainer regionContainer;
     private BukkitDebugHandler debugHandler;
     private StringMatcher stringMatcher;
+    private Localization localization = Localization.empty();
 
     public BukkitWorldGuardPlatform() {
     }
@@ -139,6 +142,8 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
         sessionManager = new BukkitSessionManager();
         configuration = new BukkitConfigurationManager(WorldGuardPlugin.inst());
         configuration.load();
+        localization = new BukkitLocalizationLoader(WorldGuardPlugin.inst()).load(configuration.language);
+        WorldGuard.getInstance().setLocalization(localization);
         regionContainer = new BukkitRegionContainer(WorldGuardPlugin.inst());
         regionContainer.initialize();
         debugHandler = new BukkitDebugHandler(WorldGuardPlugin.inst());
@@ -164,6 +169,10 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
     @Override
     public GameMode getDefaultGameMode() {
         return GameModes.get(Bukkit.getServer().getDefaultGameMode().name().toLowerCase());
+    }
+
+    public Localization getLocalization() {
+        return localization;
     }
 
     @Override

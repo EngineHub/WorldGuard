@@ -66,10 +66,9 @@ public class ToggleCommands {
 
         if (!wcfg.fireSpreadDisableToggle) {
             worldGuard.getPlatform().broadcastNotification(
-                    LabelFormat.wrap("Fire spread has been globally disabled for '" + world.getName() + "' by "
-                    + sender.getDisplayName() + "."));
+                    LabelFormat.wrap(message("commands.stopfire.broadcast-disabled", world.getName(), sender.getDisplayName())));
         } else {
-            sender.print("Fire spread was already globally disabled.");
+            sender.print(message("commands.stopfire.already-disabled"));
         }
 
         wcfg.fireSpreadDisableToggle = true;
@@ -91,10 +90,9 @@ public class ToggleCommands {
         WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
         if (wcfg.fireSpreadDisableToggle) {
-            worldGuard.getPlatform().broadcastNotification(LabelFormat.wrap("Fire spread has been globally for '" + world.getName() + "' re-enabled by "
-                    + sender.getDisplayName() + "."));
+            worldGuard.getPlatform().broadcastNotification(LabelFormat.wrap(message("commands.allowfire.broadcast-enabled", world.getName(), sender.getDisplayName())));
         } else {
-            sender.print("Fire spread was already globally enabled.");
+            sender.print(message("commands.allowfire.already-enabled"));
         }
 
         wcfg.fireSpreadDisableToggle = false;
@@ -108,10 +106,10 @@ public class ToggleCommands {
         ConfigurationManager configManager = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
 
         if (args.hasFlag('i')) {
-            if (configManager.activityHaltToggle) {
-                 sender.print("ALL intensive server activity is not allowed.");
+                if (configManager.activityHaltToggle) {
+                 sender.print(message("commands.stoplag.info.disallowed"));
             } else {
-                 sender.print("ALL intensive server activity is allowed.");
+                 sender.print(message("commands.stoplag.info.allowed"));
             }
         } else {
             boolean activityHaltToggle = !args.hasFlag('c');
@@ -120,18 +118,18 @@ public class ToggleCommands {
                 String confirmCommand = "/" + args.getCommand() + " confirm";
 
                 TextComponent message = TextComponent.builder("")
-                        .append(ErrorFormat.wrap("This command will "))
-                        .append(ErrorFormat.wrap("PERMANENTLY")
+                        .append(ErrorFormat.wrap(message("commands.stoplag.confirm.lead")))
+                        .append(ErrorFormat.wrap(message("commands.stoplag.confirm.permanently"))
                                 .decoration(TextDecoration.BOLD, TextDecoration.State.TRUE))
-                        .append(ErrorFormat.wrap(" erase ALL animals in ALL loaded chunks in ALL loaded worlds. "))
+                        .append(ErrorFormat.wrap(message("commands.stoplag.confirm.erase")))
                         .append(TextComponent.newline())
-                        .append(TextComponent.of("[Click]", TextColor.GREEN)
+                        .append(TextComponent.of(message("commands.stoplag.confirm.click"), TextColor.GREEN)
                                 .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, confirmCommand))
-                                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to confirm /" + args.getCommand()))))
-                        .append(ErrorFormat.wrap(" or type "))
+                                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(message("commands.stoplag.confirm.hover", args.getCommand())))))
+                        .append(ErrorFormat.wrap(message("commands.stoplag.confirm.or-type")))
                         .append(CodeFormat.wrap(confirmCommand)
                                 .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, confirmCommand)))
-                        .append(ErrorFormat.wrap(" to confirm."))
+                        .append(ErrorFormat.wrap(message("commands.stoplag.confirm.to-confirm")))
                         .build();
 
                 sender.print(message);
@@ -142,13 +140,13 @@ public class ToggleCommands {
 
             if (activityHaltToggle) {
                 if (!(sender instanceof LocalPlayer)) {
-                    sender.print("ALL intensive server activity halted.");
+                    sender.print(message("commands.stoplag.halted"));
                 }
 
                 if (!args.hasFlag('s')) {
-                    worldGuard.getPlatform().broadcastNotification(LabelFormat.wrap("ALL intensive server activity halted by " + sender.getDisplayName() + "."));
+                    worldGuard.getPlatform().broadcastNotification(LabelFormat.wrap(message("commands.stoplag.broadcast-halted", sender.getDisplayName())));
                 } else {
-                    sender.print("(Silent) ALL intensive server activity halted by " + sender.getDisplayName() + ".");
+                    sender.print(message("commands.stoplag.silent-halted", sender.getDisplayName()));
                 }
 
                 for (World world : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
@@ -162,21 +160,24 @@ public class ToggleCommands {
                     }
 
                     if (removed > 10) {
-                        sender.printRaw("" + removed + " entities (>10) auto-removed from "
-                                + world.getName());
+                        sender.printRaw(message("commands.stoplag.auto-removed", removed, world.getName()));
                     }
                 }
             } else {
                 if (!args.hasFlag('s')) {
-                    worldGuard.getPlatform().broadcastNotification(LabelFormat.wrap("ALL intensive server activity is now allowed."));
+                    worldGuard.getPlatform().broadcastNotification(LabelFormat.wrap(message("commands.stoplag.broadcast-allowed")));
                     
                     if (!(sender instanceof LocalPlayer)) {
-                        sender.print("ALL intensive server activity is now allowed.");
+                        sender.print(message("commands.stoplag.sender-allowed"));
                     }
                 } else {
-                    sender.print("(Silent) ALL intensive server activity is now allowed.");
+                    sender.print(message("commands.stoplag.silent-allowed"));
                 }
             }
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return worldGuard.getLocalization().format(key, arguments);
     }
 }

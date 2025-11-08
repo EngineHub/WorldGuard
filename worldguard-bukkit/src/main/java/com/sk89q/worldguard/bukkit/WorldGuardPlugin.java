@@ -289,7 +289,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 throw t;
             }
         } catch (CommandPermissionsException e) {
-            sender.sendMessage(ChatColor.RED + "You don't have permission.");
+            sender.sendMessage(colorMessage("commands.error.no-permission"));
         } catch (MissingNestedCommandException e) {
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (CommandUsageException e) {
@@ -386,15 +386,15 @@ public class WorldGuardPlugin extends JavaPlugin {
     public WorldEditPlugin getWorldEdit() throws CommandException {
         Plugin worldEdit = getServer().getPluginManager().getPlugin("WorldEdit");
         if (worldEdit == null) {
-            throw new CommandException("WorldEdit does not appear to be installed.");
+            throw new CommandException(message("worldedit.error.not-installed"));
         } else if (!worldEdit.isEnabled()) {
-            throw new CommandException("WorldEdit does not appear to be enabled.");
+            throw new CommandException(message("worldedit.error.not-enabled"));
         }
 
         if (worldEdit instanceof WorldEditPlugin) {
             return (WorldEditPlugin) worldEdit;
         } else {
-            throw new CommandException("WorldEdit detection failed (report error).");
+            throw new CommandException(message("worldedit.error.detection-failed"));
         }
     }
 
@@ -439,7 +439,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         } else if (sender instanceof BukkitCommandSender) {
             return Bukkit.getConsoleSender(); // TODO Fix
         } else {
-            throw new IllegalArgumentException("Unknown actor type. Please report");
+            throw new IllegalArgumentException(message("errors.actor.unknown-type"));
         }
     }
 
@@ -478,6 +478,14 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     private void configureLogger() {
         RecordMessagePrefixer.register(Logger.getLogger("com.sk89q.worldguard"), "[WorldGuard] ");
+    }
+
+    private String message(String key) {
+        return WorldGuard.getInstance().getLocalization().get(key);
+    }
+
+    private String colorMessage(String key) {
+        return ChatColor.translateAlternateColorCodes('&', message(key));
     }
 
     /**

@@ -38,6 +38,7 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 import com.sk89q.worldguard.util.WorldGuardExceptionConverter;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
+import com.sk89q.worldguard.util.localization.Localization;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +61,7 @@ public final class WorldGuard {
     private ProfileService profileService;
     private ListeningExecutorService executorService;
     private WorldGuardExceptionConverter exceptionConverter = new WorldGuardExceptionConverter();
+    private Localization localization = Localization.empty();
 
     static {
         Flags.registerAll();
@@ -160,6 +162,14 @@ public final class WorldGuard {
      */
     public WorldGuardExceptionConverter getExceptionConverter() {
         return exceptionConverter;
+    }
+
+    public Localization getLocalization() {
+        return localization;
+    }
+
+    public void setLocalization(Localization localization) {
+        this.localization = checkNotNull(localization, "localization");
     }
 
     /**
