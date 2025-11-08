@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.util.report;
 
 import com.sk89q.worldedit.util.report.DataReport;
+import com.sk89q.worldguard.WorldGuard;
 import io.papermc.paper.datapack.Datapack;
 import org.bukkit.Bukkit;
 
@@ -28,21 +29,26 @@ import java.util.Collection;
 /**
  * A report for current datapacks with some information. Only available on Paper
  */
+
 public class DatapackReport extends DataReport {
     public DatapackReport() {
-        super("DataPacks");
+        super(message("reports.datapack.title"));
 
         Collection<Datapack> packs = Bukkit.getDatapackManager().getPacks();
 
-        append("Datapack Count", packs.size());
-        append("Datapack Enabled Count", Bukkit.getDatapackManager().getEnabledPacks().size());
+        append(message("reports.datapack.count"), packs.size());
+        append(message("reports.datapack.enabled-count"), Bukkit.getDatapackManager().getEnabledPacks().size());
 
         for (Datapack pack : packs) {
-            DataReport report = new DataReport("DataPack: " + pack.getName());
-            report.append("Enabled?", pack.isEnabled());
-            report.append("Name", pack.getName());
-            report.append("Compatibility", pack.getCompatibility().name());
+            DataReport report = new DataReport(message("reports.datapack.entry.title", pack.getName()));
+            report.append(message("reports.datapack.entry.enabled"), pack.isEnabled());
+            report.append(message("reports.datapack.entry.name"), pack.getName());
+            report.append(message("reports.datapack.entry.compatibility"), pack.getCompatibility().name());
             append(report.getTitle(), report);
         }
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

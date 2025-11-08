@@ -16,65 +16,43 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.sk89q.worldguard.bukkit.util.report;
 
 import com.sk89q.worldedit.util.report.DataReport;
+import com.sk89q.worldguard.WorldGuard;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.World;
-import org.bukkit.generator.ChunkGenerator;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class WorldReport extends DataReport {
 
     public WorldReport() {
-        super("Worlds");
+        super(message("reports.world.title"));
 
-        List<World> worlds = Bukkit.getServer().getWorlds();
+        for (World world : Bukkit.getServer().getWorlds()) {
+            DataReport report = new DataReport(message("reports.world.entry.title", world.getName()));
+            report.append(message("reports.world.entry.seed"), world.getSeed());
+            report.append(message("reports.world.entry.type"), world.getWorldType().getName());
+            report.append(message("reports.world.entry.entities"), world.getEntities().size());
 
-        append("World Count", worlds.size());
+            int tileEntityCount = 0;
+            for (Chunk chunk : world.getLoadedChunks()) {
+                tileEntityCount += chunk.getTileEntities().length;
+            }
+            report.append(message("reports.world.entry.tiles"), tileEntityCount);
 
-        for (World world : worlds) {
-            DataReport report = new DataReport("World: " + world.getName());
-            report.append("UUID", world.getUID());
-            report.append("World Type", world.getWorldType());
-            report.append("Environment", world.getEnvironment());
-            ChunkGenerator generator = world.getGenerator();
-            report.append("Chunk Generator", generator != null ? generator.getClass().getName() : "<Default>");
-
-            DataReport spawning = new DataReport("Spawning");
-            spawning.append("Animals?", world.getAllowAnimals());
-            spawning.append("Monsters?", world.getAllowMonsters());
-            spawning.append("Ambient Spawn Limit", world.getAmbientSpawnLimit());
-            spawning.append("Animal Spawn Limit", world.getAnimalSpawnLimit());
-            spawning.append("Monster Spawn Limit", world.getMonsterSpawnLimit());
-            spawning.append("Water Creature Spawn Limit", world.getWaterAnimalSpawnLimit());
-            report.append(spawning.getTitle(), spawning);
-
-            DataReport config = new DataReport("Configuration");
-            config.append("Difficulty", world.getDifficulty());
-            config.append("Max Height", world.getMaxHeight());
-            config.append("Sea Level", world.getSeaLevel());
-            report.append(config.getTitle(), config);
-
-            DataReport state = new DataReport("State");
-            state.append("Spawn Location", world.getSpawnLocation());
-            state.append("Full Time", world.getFullTime());
-            state.append("Weather Duration", world.getWeatherDuration());
-            state.append("Thunder Duration", world.getThunderDuration());
-            report.append(state.getTitle(), state);
-
-            DataReport protection = new DataReport("Protection");
-            protection.append("PVP?", world.getPVP());
-            protection.append("Game Rules", Arrays.stream(world.getGameRules())
-                    .map(name -> name + "=" + world.getGameRuleValue(name))
-                    .collect(Collectors.joining(", ")));
-            report.append(protection.getTitle(), protection);
-
+            report.append(message("reports.world.entry.environment"), world.getEnvironment().name());
+            report.append(message("reports.world.entry.difficulty"), world.getDifficulty().name());
+            report.append(message("reports.world.entry.time"), world.getTime());
+            report.append(message("reports.world.entry.full-time"), world.getFullTime());
+            report.append(message("reports.world.entry.thunder"), world.isThundering());
+            report.append(message("reports.world.entry.storm"), world.hasStorm());
+            report.append(message("reports.world.entry.autosave"), world.isAutoSave());
             append(report.getTitle(), report);
         }
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

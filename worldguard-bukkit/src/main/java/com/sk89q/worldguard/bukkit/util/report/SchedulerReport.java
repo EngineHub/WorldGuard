@@ -24,6 +24,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.util.report.DataReport;
+import com.sk89q.worldguard.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -50,19 +51,20 @@ public class SchedulerReport extends DataReport {
             });
 
     public SchedulerReport() {
-        super("Scheduler");
+        super(message("reports.scheduler.title"));
 
         List<BukkitTask> tasks = Bukkit.getServer().getScheduler().getPendingTasks();
 
-        append("Pending Task Count", tasks.size());
+        append(message("reports.scheduler.pending-count"), tasks.size());
 
         for (BukkitTask task : tasks) {
             Class<?> taskClass = getTaskClass(task);
 
-            DataReport report = new DataReport("Task: #" + task.getTaskId());
-            report.append("Owner", task.getOwner().getName());
-            report.append("Runnable", taskClass != null ? taskClass.getName() : "<Unknown>");
-            report.append("Synchronous?", task.isSync());
+            DataReport report = new DataReport(message("reports.scheduler.entry.title", task.getTaskId()));
+            report.append(message("reports.scheduler.entry.owner"), task.getOwner().getName());
+            report.append(message("reports.scheduler.entry.runnable"),
+                    taskClass != null ? taskClass.getName() : message("reports.scheduler.entry.runnable-unknown"));
+            report.append(message("reports.scheduler.entry.sync"), task.isSync());
             append(report.getTitle(), report);
         }
     }
@@ -85,5 +87,9 @@ public class SchedulerReport extends DataReport {
         }
 
         return null;
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

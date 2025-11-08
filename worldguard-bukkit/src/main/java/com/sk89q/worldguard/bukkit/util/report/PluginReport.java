@@ -16,39 +16,44 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.sk89q.worldguard.bukkit.util.report;
 
 import com.sk89q.worldedit.util.report.DataReport;
+import com.sk89q.worldguard.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 public class PluginReport extends DataReport {
 
     public PluginReport() {
-        super("Plugins");
+        super(message("reports.plugin.title"));
 
         Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
 
-        append("Plugin Count", plugins.length);
+        append(message("reports.plugin.count"), plugins.length);
 
         for (Plugin plugin : plugins) {
-            DataReport report = new DataReport("Plugin: " + plugin.getName());
-            report.append("Enabled?", plugin.isEnabled());
-            report.append("Full Name", plugin.getDescription().getFullName());
-            report.append("Version", plugin.getDescription().getVersion());
-            report.append("Website", plugin.getDescription().getWebsite());
-            report.append("Description", plugin.getDescription().getDescription());
-            report.append("Authors", plugin.getDescription().getAuthors());
-            report.append("Load Before", plugin.getDescription().getLoadBefore());
-            report.append("Dependencies", plugin.getDescription().getDepend());
-            report.append("Soft Dependencies", plugin.getDescription().getSoftDepend());
-            report.append("Folder", plugin.getDataFolder().getAbsoluteFile());
-            report.append("Entry Point", plugin.getDescription().getMain());
-            report.append("Class", plugin.getClass().getName());
-            report.append("Class Source", plugin.getClass().getProtectionDomain().getCodeSource().getLocation());
+            DataReport report = new DataReport(message("reports.plugin.entry.title", plugin.getName()));
+            report.append(message("reports.plugin.entry.enabled"), plugin.isEnabled());
+            report.append(message("reports.plugin.entry.full-name"), plugin.getDescription().getFullName());
+            report.append(message("reports.plugin.entry.version"), plugin.getDescription().getVersion());
+            report.append(message("reports.plugin.entry.website"), plugin.getDescription().getWebsite());
+            report.append(message("reports.plugin.entry.description"), plugin.getDescription().getDescription());
+            report.append(message("reports.plugin.entry.authors"), plugin.getDescription().getAuthors());
+            report.append(message("reports.plugin.entry.load-before"), plugin.getDescription().getLoadBefore());
+            report.append(message("reports.plugin.entry.dependencies"), plugin.getDescription().getDepend());
+            report.append(message("reports.plugin.entry.soft-dependencies"), plugin.getDescription().getSoftDepend());
+            report.append(message("reports.plugin.entry.folder"), plugin.getDataFolder().getAbsoluteFile());
+            report.append(message("reports.plugin.entry.entry-point"), plugin.getDescription().getMain());
+            report.append(message("reports.plugin.entry.class"), plugin.getClass().getName());
+            report.append(message("reports.plugin.entry.class-source"),
+                    plugin.getClass().getProtectionDomain().getCodeSource().getLocation());
             append(report.getTitle(), report);
         }
     }
 
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
 }
+

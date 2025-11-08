@@ -64,8 +64,9 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
     /**
      * Create a new instance with a region to report on.
      *
+     * @param world the world name
      * @param region the region
-     * @param cache a profile cache, or {@code null}
+     * @param actor an optional actor to evaluate permissions for
      */
     public RegionPrintoutBuilder(String world, ProtectedRegion region, @Nullable Actor actor) {
         this.world = world;

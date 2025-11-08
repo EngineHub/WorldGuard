@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.util.report;
 
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.util.report.DataReport;
+import com.sk89q.worldguard.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -33,19 +34,19 @@ import java.util.Map;
 public class PerformanceReport extends DataReport {
 
     public PerformanceReport() {
-        super("Performance");
+        super(message("reports.performance.title"));
 
         List<World> worlds = Bukkit.getServer().getWorlds();
 
-        append("World Count", worlds.size());
+        append(message("reports.performance.world-count"), worlds.size());
 
         for (World world : worlds) {
             int loadedChunkCount = world.getLoadedChunks().length;
 
-            DataReport report = new DataReport("World: " + world.getName());
-            report.append("Keep in Memory?", world.getKeepSpawnInMemory());
-            report.append("Entity Count", world.getEntities().size());
-            report.append("Chunk Count", loadedChunkCount);
+            DataReport report = new DataReport(message("reports.performance.world.title", world.getName()));
+            report.append(message("reports.performance.world.keep-spawn"), world.getKeepSpawnInMemory());
+            report.append(message("reports.performance.world.entity-count"), world.getEntities().size());
+            report.append(message("reports.performance.world.chunk-count"), loadedChunkCount);
 
             Map<Class<? extends Entity>, Integer> entityCounts = Maps.newHashMap();
             Map<Class<? extends BlockState>, Integer> tileEntityCounts = Maps.newHashMap();
@@ -64,7 +65,7 @@ public class PerformanceReport extends DataReport {
                     }
                 }
             }
-            report.append("Tile Entity Count", teCount);
+            report.append(message("reports.performance.world.tile-entity-count"), teCount);
 
             // Collect entities
             for (Entity entity : world.getEntities()) {
@@ -78,18 +79,18 @@ public class PerformanceReport extends DataReport {
             }
 
             // Print entities
-            DataReport entities = new DataReport("Entity Distribution");
+            DataReport entities = new DataReport(message("reports.performance.entities.title"));
             for (Map.Entry<Class<? extends Entity>, Integer> entry : entityCounts.entrySet()) {
-                entities.append(entry.getKey().getSimpleName(), "%d [%f/chunk]",
+                entities.append(entry.getKey().getSimpleName(), message("reports.performance.entities.format"),
                         entry.getValue(),
                         (float) (entry.getValue() / (double) loadedChunkCount));
             }
             report.append(entities.getTitle(), entities);
 
             // Print tile entities
-            DataReport tileEntities = new DataReport("Tile Entity Distribution");
+            DataReport tileEntities = new DataReport(message("reports.performance.tile-entities.title"));
             for (Map.Entry<Class<? extends BlockState>, Integer> entry : tileEntityCounts.entrySet()) {
-                tileEntities.append(entry.getKey().getSimpleName(), "%d [%f/chunk]",
+                tileEntities.append(entry.getKey().getSimpleName(), message("reports.performance.entities.format"),
                         entry.getValue(),
                         (float) (entry.getValue() / (double) loadedChunkCount));
             }
@@ -98,6 +99,10 @@ public class PerformanceReport extends DataReport {
             append(report.getTitle(), report);
         }
 
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

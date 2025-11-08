@@ -391,9 +391,111 @@ plugin:
       read-fail: "Unable to read default configuration: %s"
       write-success: "Default configuration file written: %s"
       write-fail: "Failed to write default config file"
+  title: "Plugins"
+  count: "Plugin Count"
+  entry:
+    title: "Plugin: %s"
+    enabled: "Enabled?"
+    full-name: "Full Name"
+    version: "Version"
+    website: "Website"
+    description: "Description"
+    authors: "Authors"
+    load-before: "Load Before"
+    dependencies: "Dependencies"
+    soft-dependencies: "Soft Dependencies"
+    folder: "Folder"
+    entry-point: "Entry Point"
+    class: "Class"
+    class-source: "Class Source"
 platform:
   name: "Bukkit"
   identifier: "Bukkit-Official"
+reports:
+  datapack:
+    title: "Datapacks"
+    count: "Datapack Count"
+    enabled-count: "Datapack Enabled Count"
+    entry:
+      title: "Datapack: %s"
+      enabled: "Enabled?"
+      name: "Name"
+      compatibility: "Compatibility"
+  performance:
+    title: "Performance"
+    world-count: "World Count"
+    world:
+      title: "World: %s"
+      keep-spawn: "Keep in Memory?"
+      entity-count: "Entity Count"
+      chunk-count: "Chunk Count"
+      tile-entity-count: "Tile Entity Count"
+    entities:
+      title: "Entity Distribution"
+      format: "%d [%f/chunk]"
+    tile-entities:
+      title: "Tile Entity Distribution"
+  scheduler:
+    title: "Scheduler"
+    pending-count: "Pending Task Count"
+    entry:
+      title: "Task: #%d"
+      owner: "Owner"
+      runnable: "Runnable"
+      runnable-unknown: "<Unknown>"
+      sync: "Synchronous?"
+  plugin:
+    title: "Plugins"
+    count: "Plugin Count"
+    entry:
+      title: "Plugin: %s"
+      enabled: "Enabled?"
+      full-name: "Full Name"
+      version: "Version"
+      website: "Website"
+      description: "Description"
+      authors: "Authors"
+      load-before: "Load Before"
+      dependencies: "Dependencies"
+      soft-dependencies: "Soft Dependencies"
+      folder: "Folder"
+      entry-point: "Entry Point"
+      class: "Class"
+      class-source: "Class Source"
+  server:
+    title: "Server Information"
+    bukkit-version: "Bukkit Version"
+    implementation: "Implementation"
+    player-count: "Player Count"
+    player-count.format: "%d/%d"
+    class-source: "Server Class Source"
+    online-mode:
+      title: "Online Mode"
+      enabled: "Enabled?"
+      bungeecord: "BungeeCord support?"
+      velocity: "Velocity support?"
+    spawning:
+      title: "Spawning"
+      ambient-limit: "Ambient Spawn Limit"
+      animal-limit: "Animal Spawn Limit"
+      monster-limit: "Monster Spawn Limit"
+      ticks-animal: "Ticks per Animal Spawn"
+      ticks-monster: "Ticks per Monster Spawn"
+    configuration:
+      title: "Configuration"
+      nether: "Nether Enabled?"
+      end: "The End Enabled?"
+      structures: "Generate Structures?"
+      flight: "Flight Allowed?"
+      connection-throttle: "Connection Throttle"
+      idle-timeout: "Idle Timeout"
+      shutdown-message: "Shutdown Message"
+      gamemode: "Default Game Mode"
+      world-type: "Main World Type"
+      view-distance: "View Distance"
+    protection:
+      title: "Protection"
+      spawn-radius: "Spawn Radius"
 matcher:
   world:
     normal-missing: "No normal world found."
@@ -441,8 +543,20 @@ listeners:
     now-protected: "&eA chest or double chest above is now protected."
     disabled: "&cWorldGuard's sign chest protection is disabled."
   world:
-    log:
-      halt-act: "Halt-Act: %d entities (>50) auto-removed from %s"
+    title: "Worlds"
+    entry:
+      title: "World: %s"
+      seed: "Seed"
+      type: "World Type"
+      entities: "Entity Count"
+      tiles: "Tile Entity Count"
+      environment: "Environment"
+      difficulty: "Difficulty"
+      time: "Time"
+      full-time: "Full Time"
+      thunder: "Thundering?"
+      storm: "Storming?"
+      autosave: "Auto-Save Enabled?"
   player-modes:
     log:
       god: "Enabled auto-god mode for %s"
@@ -512,5 +626,11 @@ errors:
     center-teleport-hover: "Click to teleport to the center of the region"
     priority-hover: "Click to change"
     title: "Region Info"
+  services:
+    title: "Services"
+    entry:
+      title: "Service: %s"
+      provider: "Provider"
+      provider.format: "%s (%s) - %s"
 
 

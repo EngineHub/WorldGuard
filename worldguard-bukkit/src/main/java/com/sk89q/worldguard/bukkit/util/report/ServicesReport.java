@@ -16,29 +16,36 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.sk89q.worldguard.bukkit.util.report;
 
 import com.sk89q.worldedit.util.report.DataReport;
+import com.sk89q.worldguard.WorldGuard;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.ServicesManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.ServicePriority;
 
 import java.util.Collection;
 
 public class ServicesReport extends DataReport {
 
     public ServicesReport() {
-        super("Services");
+        super(message("reports.services.title"));
 
-        ServicesManager manager = Bukkit.getServer().getServicesManager();
-        Collection<Class<?>> services = manager.getKnownServices();
-
+        Collection<Class<?>> services = Bukkit.getServicesManager().getKnownServices();
         for (Class<?> service : services) {
-            Object provider = manager.load(service);
-            if (provider != null) {
-                append(service.getName(), provider);
+            DataReport report = new DataReport(message("reports.services.entry.title", service.getName()));
+            for (RegisteredServiceProvider<?> provider : Bukkit.getServicesManager().getRegistrations(service)) {
+                ServicePriority priority = provider.getPriority();
+                String pluginName = provider.getPlugin().getName();
+                String providerName = provider.getProvider().getClass().getName();
+                report.append(message("reports.services.entry.provider"),
+                        message("reports.services.entry.provider.format", pluginName, priority.name(), providerName));
             }
+            append(report.getTitle(), report);
         }
     }
 
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
 }
