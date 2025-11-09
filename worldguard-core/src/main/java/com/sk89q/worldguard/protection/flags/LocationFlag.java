@@ -73,10 +73,10 @@ public class LocationFlag extends Flag<Location> {
                 if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(player.getWorld()).boundedLocationFlags) {
                     if (!rg.contains(loc.toVector().toBlockPoint())) {
                         if (new RegionPermissionModel(player).mayOverrideLocationFlagBounds(rg)) {
-                            player.printDebug("WARNING: Flag location is outside of region.");
+                            player.printDebug(Flag.message("flags.context.location.outside-warning"));
                         } else {
                             // no permission
-                            throw new InvalidFlagFormat("You can't set that flag outside of the region boundaries.");
+                            throw new InvalidFlagFormat(Flag.message("flags.context.location.outside-bounds"));
                         }
                     }
                     // clamp height to world limits
@@ -86,7 +86,7 @@ public class LocationFlag extends Flag<Location> {
             }
             return loc;
         }
-        throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
+        throw new InvalidFlagFormat(Flag.message("flags.context.location.format"));
     }
 
     @Override

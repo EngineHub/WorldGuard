@@ -749,5 +749,49 @@ blacklist:
     option-unknown: "Unknown option '%s' in %s for '%s'"
     option-no-heading: "Found option with no heading %s for '%s'"
     action-unknown: "Unknown blacklist action: %s"
+flags:
+  registry:
+    conflict: "A flag already exists by the name %s"
+    parse-fail: "Failed to parse flag '%s' with value '%s'"
+    unmarshal-fail: "Failed to unmarshal flag value for %s"
+    register-all-conflict: "%s"
+  error:
+    invalid-name: "Invalid flag name used"
+  context:
+    not-player: "Not a player"
+    number: "Not a number: %s"
+    yesno: "Not a yes/no value: %s"
+    enum-unknown: "Unknown value '%s' in %s"
+    entity-unknown: "Unknown entity type: %s"
+    gamemode-unknown: "Unknown game mode: %s"
+    location:
+      outside-warning: "WARNING: Flag location is outside of region."
+      outside-bounds: "You can't set that flag outside of the region boundaries."
+      format: "Expected 'here' or x,y,z."
+    map:
+      format: "Input must be in a 'key:value,key1=value1' format. Either ':' or '=' can be used."
+    registry-unknown: "Unknown %s: %s"
+    state: "Expected none/allow/deny but got '%s'"
+    timestamp:
+      unrecognized: "Unrecognized input."
+      format: "Expected 'now' or ISO 8601 formatted input."
+    uuid: "Not a valid uuid: %s"
+    vector:
+      format: "Expected 'here' or x,y,z."
+    weather-unknown: "Unknown weather type: %s"
+  unknown:
+    missing-plugin: "The plugin that registered this flag is not currently installed"
+  messages:
+    deny:
+      hey: "Hey!"
+      body: " Sorry, but you can't %what% here."
+    entry:
+      hey: "Hey!"
+      body: " You are not permitted to enter this area."
+    exit:
+      hey: "Hey!"
+      body: " You are not permitted to leave this area."
+  util:
+    marshal-fail: "Failed to marshal flag value for %s; value is %s"
 
 

@@ -47,7 +47,7 @@ public class RegistryFlag<T extends Keyed> extends Flag<T> {
     public T parseInput(FlagContext context) throws InvalidFlagFormat {
         final String key = context.getUserInput().trim().toLowerCase(Locale.ROOT);
         return Optional.ofNullable(registry.get(key))
-                .orElseThrow(() -> new InvalidFlagFormat("Unknown " + registry.getName() + ": " + key));
+                .orElseThrow(() -> new InvalidFlagFormat(Flag.message("flags.context.registry-unknown", registry.getName(), key)));
     }
 
     public Registry<T> getRegistry() {

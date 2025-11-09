@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import com.sk89q.worldguard.WorldGuard;
 
 public final class FlagUtil {
 
@@ -49,7 +50,7 @@ public final class FlagUtil {
             try {
                 rawValues.put(entry.getKey().getName(), marshal(entry.getKey(), entry.getValue()));
             } catch (Throwable e) {
-                log.log(Level.WARNING, "Failed to marshal flag value for " + entry.getKey() + "; value is " + entry.getValue(), e);
+                log.log(Level.WARNING, message("flags.util.marshal-fail", entry.getKey().getName(), entry.getValue()), e);
             }
         }
 
@@ -61,4 +62,7 @@ public final class FlagUtil {
         return flag.marshal((T) value);
     }
 
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
 }

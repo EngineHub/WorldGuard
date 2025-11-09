@@ -67,7 +67,7 @@ public final class FlagContext {
         if (sender.isPlayer() && sender instanceof LocalPlayer) {
             return (LocalPlayer) sender;
         } else {
-            throw new InvalidFlagFormat("Not a player");
+            throw new InvalidFlagFormat(message("flags.context.not-player"));
         }
     }
 
@@ -75,7 +75,7 @@ public final class FlagContext {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
+            throw new InvalidFlagFormat(message("flags.context.number", input));
         }
     }
 
@@ -83,7 +83,7 @@ public final class FlagContext {
         try {
             return Double.parseDouble(input);
         } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
+            throw new InvalidFlagFormat(message("flags.context.number", input));
         }
     }
 
@@ -167,6 +167,10 @@ public final class FlagContext {
 
             return new FlagContext(sender, input, map);
         }
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

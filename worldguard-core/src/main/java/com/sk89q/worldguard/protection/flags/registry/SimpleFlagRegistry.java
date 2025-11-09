@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.WorldGuard;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -71,7 +72,7 @@ public class SimpleFlagRegistry implements FlagRegistry {
                 try {
                     register(flag);
                 } catch (FlagConflictException e) {
-                    log.log(Level.WARNING, e.getMessage());
+                    log.log(Level.WARNING, message("flags.registry.register-all-conflict", e.getMessage()));
                 }
             }
         }
@@ -84,7 +85,7 @@ public class SimpleFlagRegistry implements FlagRegistry {
         synchronized (lock) {
             String name = flag.getName().toLowerCase();
             if (flags.containsKey(name)) {
-                throw new FlagConflictException("A flag already exists by the name " + name);
+                throw new FlagConflictException(message("flags.registry.conflict", name));
             }
 
             flags.put(name, flag);
@@ -142,10 +143,10 @@ public class SimpleFlagRegistry implements FlagRegistry {
                     if (unmarshalled != null) {
                         values.put(flag, unmarshalled);
                     } else {
-                        log.warning("Failed to parse flag '" + flag.getName() + "' with value '" + entry.getValue() + "'");
+                        log.warning(message("flags.registry.parse-fail", flag.getName(), entry.getValue()));
                     }
                 } catch (Throwable e) {
-                    log.log(Level.WARNING, "Failed to unmarshal flag value for " + flag, e);
+                    log.log(Level.WARNING, message("flags.registry.unmarshal-fail", flag.getName()), e);
                 }
             }
         }
@@ -177,5 +178,9 @@ public class SimpleFlagRegistry implements FlagRegistry {
     @Override
     public Iterator<Flag<?>> iterator() {
         return Iterators.unmodifiableIterator(flags.values().iterator());
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

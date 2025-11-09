@@ -61,10 +61,10 @@ public class TimestampFlag extends Flag<Instant> {
                 } else if (parsed instanceof ZonedDateTime) {
                     return ((ZonedDateTime) parsed).toInstant();
                 } else {
-                    throw new InvalidFlagFormat("Unrecognized input.");
+                    throw new InvalidFlagFormat(Flag.message("flags.context.timestamp.unrecognized"));
                 }
             } catch (DateTimeParseException ignored) {
-                throw new InvalidFlagFormat("Expected 'now' or ISO 8601 formatted input.");
+                throw new InvalidFlagFormat(Flag.message("flags.context.timestamp.format"));
             }
         }
     }

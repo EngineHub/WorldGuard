@@ -45,7 +45,7 @@ public class GameModeTypeFlag extends Flag<GameMode> {
         input = input.trim();
         GameMode gamemode = unmarshal(input);
         if (gamemode == null) {
-            throw new InvalidFlagFormat("Unknown game mode: " + input);
+            throw new InvalidFlagFormat(Flag.message("flags.context.gamemode-unknown", input));
         }
         return gamemode;
     }
@@ -57,6 +57,6 @@ public class GameModeTypeFlag extends Flag<GameMode> {
 
     @Override
     public Object marshal(GameMode o) {
-        return o.id();
+        return o.getName();
     }
 }

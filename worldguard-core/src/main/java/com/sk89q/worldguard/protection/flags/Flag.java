@@ -19,11 +19,12 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.Iterators;
 import com.sk89q.worldguard.protection.FlagValueCalculator;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.WorldGuard;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
 import java.util.regex.Pattern;
@@ -56,7 +57,7 @@ public abstract class Flag<T> {
      */
     protected Flag(String name, @Nullable RegionGroup defaultGroup) {
         if (name != null && !isValidName(name)) {
-            throw new IllegalArgumentException("Invalid flag name used");
+            throw new IllegalArgumentException(message("flags.error.invalid-name"));
         }
         this.name = name;
         this.regionGroup = defaultGroup != null ? new RegionGroupFlag(name + "-group", defaultGroup) : null;
@@ -219,6 +220,10 @@ public abstract class Flag<T> {
     public static boolean isValidName(String name) {
         checkNotNull(name, "name");
         return VALID_NAME.matcher(name).matches();
+    }
+
+    protected static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }
