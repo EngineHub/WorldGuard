@@ -21,4 +21,5 @@
 
 # -- This should be automatically replaced by the plugin in-game --
 
+# Set the localization language code (available defaults: en, ru)
 language: en

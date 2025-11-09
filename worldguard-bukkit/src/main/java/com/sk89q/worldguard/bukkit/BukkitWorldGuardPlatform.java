@@ -27,6 +27,8 @@ import com.sk89q.worldedit.util.report.ReportList;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
+import com.sk89q.util.yaml.YAMLFormat;
+import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.localization.BukkitLocalizationLoader;
@@ -66,6 +68,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
@@ -141,17 +144,32 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
         stringMatcher = new BukkitStringMatcher();
         sessionManager = new BukkitSessionManager();
         BukkitLocalizationLoader localizationLoader = new BukkitLocalizationLoader(WorldGuardPlugin.inst());
-        localization = localizationLoader.load("en");
-        WorldGuard.getInstance().setLocalization(localization);
         configuration = new BukkitConfigurationManager(WorldGuardPlugin.inst());
+        String requestedLanguage = determineLanguage();
+        localization = localizationLoader.load(requestedLanguage);
+        WorldGuard.getInstance().setLocalization(localization);
         configuration.load();
-        if (!"en".equalsIgnoreCase(configuration.language)) {
+        if (!requestedLanguage.equalsIgnoreCase(configuration.language)) {
             localization = localizationLoader.load(configuration.language);
             WorldGuard.getInstance().setLocalization(localization);
         }
         regionContainer = new BukkitRegionContainer(WorldGuardPlugin.inst());
         regionContainer.initialize();
         debugHandler = new BukkitDebugHandler(WorldGuardPlugin.inst());
+    }
+
+    private String determineLanguage() {
+        WorldGuardPlugin plugin = WorldGuardPlugin.inst();
+        String language = "en";
+        try {
+            plugin.createDefaultConfiguration(new java.io.File(plugin.getDataFolder(), "config.yml"), "config.yml");
+            YAMLProcessor processor = new YAMLProcessor(new java.io.File(plugin.getDataFolder(), "config.yml"), true, YAMLFormat.EXTENDED);
+            processor.load();
+            language = processor.getString("language", "en");
+        } catch (java.io.IOException e) {
+            plugin.getLogger().log(Level.WARNING, "Unable to read configuration while determining language. Falling back to 'en'.", e);
+        }
+        return language;
     }
 
     @Override

@@ -32,19 +32,34 @@ import java.util.Map;
 public final class BukkitLocalizationLoader {
 
     private final WorldGuardPlugin plugin;
+    private boolean defaultsInstalled;
+    private static final String[] DEFAULT_LANG_CODES = {"en", "ru"};
 
     public BukkitLocalizationLoader(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
 
     public Localization load(String language) {
+        ensureDefaultMessages();
         String fileName = "messages_" + language + ".yml";
-        File file = new File(plugin.getDataFolder(), fileName);
-        plugin.createDefaultConfiguration(file, fileName);
+        File file = new File(new File(plugin.getDataFolder(), "lang"), fileName);
+        plugin.createDefaultConfiguration(file, "lang/" + fileName);
         FileConfiguration configuration = YamlConfiguration.loadConfiguration(file);
         Map<String, String> messages = new HashMap<>();
         collect("", configuration, messages);
         return new Localization(messages);
+    }
+
+    private void ensureDefaultMessages() {
+        if (defaultsInstalled) {
+            return;
+        }
+        for (String code : DEFAULT_LANG_CODES) {
+            String fileName = "messages_" + code + ".yml";
+            File file = new File(new File(plugin.getDataFolder(), "lang"), fileName);
+            plugin.createDefaultConfiguration(file, "lang/" + fileName);
+        }
+        defaultsInstalled = true;
     }
 
     private void collect(String root, ConfigurationSection section, Map<String, String> messages) {
