@@ -109,8 +109,7 @@ public abstract class AbstractSessionManager implements SessionManager {
     @Override
     public boolean registerHandler(Handler.Factory<? extends Handler> factory, @Nullable Handler.Factory<? extends Handler> after) {
         if (factory == null) return false;
-        WorldGuard.logger.log(Level.INFO, "Registering session handler "
-                + factory.getClass().getEnclosingClass().getName());
+        WorldGuard.logger.log(Level.INFO, message("session.manager.register", factory.getClass().getEnclosingClass().getName()));
         hasCustom = true;
         if (after == null) {
             handlers.add(factory);
@@ -126,11 +125,9 @@ public abstract class AbstractSessionManager implements SessionManager {
     @Override
     public boolean unregisterHandler(Handler.Factory<? extends Handler> factory) {
         if (defaultHandlers.contains(factory)) {
-            WorldGuard.logger.log(Level.WARNING, "Someone is unregistering a default WorldGuard handler: "
-                    + factory.getClass().getEnclosingClass().getName() + ". This may cause parts of WorldGuard to stop functioning");
+            WorldGuard.logger.log(Level.WARNING, message("session.manager.unregister-default", factory.getClass().getEnclosingClass().getName()));
         } else {
-            WorldGuard.logger.log(Level.INFO, "Unregistering session handler "
-                    + factory.getClass().getEnclosingClass().getName());
+            WorldGuard.logger.log(Level.INFO, message("session.manager.unregister", factory.getClass().getEnclosingClass().getName()));
         }
         return handlers.remove(factory);
     }
@@ -214,5 +211,9 @@ public abstract class AbstractSessionManager implements SessionManager {
         public int hashCode() {
             return uuid.hashCode();
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

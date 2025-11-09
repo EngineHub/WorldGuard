@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.sk89q.worldguard.internal.util.sql.StatementUtils;
 import com.sk89q.worldguard.util.io.Closer;
 import com.sk89q.worldguard.util.sql.DataSourceConfig;
+import com.sk89q.worldguard.WorldGuard;
 
 import javax.annotation.Nullable;
 import java.sql.Connection;
@@ -177,7 +178,7 @@ abstract class TableCache<V> {
                         if (generatedKeys.next()) {
                             cache.put(toKey(entry), generatedKeys.getInt(1));
                         } else {
-                            log.warning("Could not get the database ID for entry " + entry);
+                            log.warning(message("storage.sql.table-cache.id-missing", entry));
                         }
                     }
                 } finally {
@@ -185,6 +186,10 @@ abstract class TableCache<V> {
                 }
             }
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
     /**

@@ -117,7 +117,7 @@ public class RegionContainerImpl {
                     failingLoads.remove(normal);
                     return manager;
                 } catch (StorageException e) {
-                    log.log(Level.WARNING, "Failed to load the region data for '" + name + "' (periodic attempts will be made to load the data until success)", e);
+                    log.log(Level.WARNING, message("storage.region-container.load-fail", name), e);
                     failingLoads.add(normal);
                     return null;
                 }
@@ -158,7 +158,7 @@ public class RegionContainerImpl {
                 try {
                     manager.save();
                 } catch (StorageException e) {
-                    log.log(Level.WARNING, "Failed to save the region data for '" + name + "'", e);
+                    log.log(Level.WARNING, message("storage.region-container.save-fail", name), e);
                 }
 
                 mapping.remove(normal);
@@ -181,7 +181,7 @@ public class RegionContainerImpl {
                 try {
                     manager.saveChanges();
                 } catch (StorageException e) {
-                    log.log(Level.WARNING, "Failed to save the region data for '" + name + "' while unloading the data for all worlds", e);
+                    log.log(Level.WARNING, message("storage.region-container.save-fail-unload-all", name), e);
                 }
             }
 
@@ -243,15 +243,15 @@ public class RegionContainerImpl {
                     RegionManager manager = entry.getValue();
                     try {
                         if (manager.saveChanges()) {
-                            log.info("Region data changes made in '" + name + "' have been background saved");
+                            log.info(message("storage.region-container.background-save", name));
                         }
                         failingSaves.remove(manager);
                     } catch (StorageException e) {
                         failingSaves.add(manager);
-                        log.log(Level.WARNING, "Failed to save the region data for '" + name + "' during a periodical save", e);
+                        log.log(Level.WARNING, message("storage.region-container.save-fail-periodic", name), e);
                     } catch (Exception e) {
                         failingSaves.add(manager);
-                        log.log(Level.WARNING, "An expected error occurred during a periodical save", e);
+                        log.log(Level.WARNING, message("storage.region-container.save-fail-periodic-unknown"), e);
                     }
                 }
             }
@@ -269,7 +269,7 @@ public class RegionContainerImpl {
         public void run() {
             synchronized (lock) {
                 if (!failingLoads.isEmpty()) {
-                    log.info("Attempting to load region data that has previously failed to load...");
+                    log.info(message("storage.region-container.retry-load-start"));
 
                     Iterator<Normal> it = failingLoads.iterator();
                     while (it.hasNext()) {
@@ -278,14 +278,14 @@ public class RegionContainerImpl {
                             RegionManager manager = createAndLoad(normal.toString());
                             mapping.put(normal, manager);
                             it.remove();
-                            log.info("Successfully loaded region data for '" + normal.toString() + "'");
+                            log.info(message("storage.region-container.retry-load-success", normal.toString()));
                         } catch (StorageException e) {
                             if (e.getCause() != null && e.getCause().getMessage().equals(lastMsg)) {
                                 // if it's the same error, don't print a whole stacktrace
-                                log.log(Level.WARNING, "Region data is still failing to load, at least for the world named '" + normal.toString() + "'");
+                                log.log(Level.WARNING, message("storage.region-container.retry-load-still-failing", normal.toString()));
                                 break;
                             }
-                            log.log(Level.WARNING, "Region data is still failing to load, at least for the world named '" + normal.toString() + "'", e);
+                            log.log(Level.WARNING, message("storage.region-container.retry-load-still-failing", normal.toString()), e);
                             lastMsg = e.getCause() == null ? e.getMessage() : e.getCause().getMessage();
                             break;
                         }
@@ -293,6 +293,10 @@ public class RegionContainerImpl {
                 }
             }
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return com.sk89q.worldguard.WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

@@ -21,6 +21,7 @@ package com.sk89q.worldguard.util.io;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
+import com.sk89q.worldguard.WorldGuard;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -91,7 +92,7 @@ public final class Closer implements Closeable {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    throw new IOException("Failed to close", e);
+                    throw new IOException(message("util.closer.failed-close"), e);
                 }
             }
         });
@@ -111,7 +112,7 @@ public final class Closer implements Closeable {
                 try {
                     statement.close();
                 } catch (SQLException e) {
-                    throw new IOException("Failed to close", e);
+                    throw new IOException(message("util.closer.failed-close"), e);
                 }
             }
         });
@@ -131,7 +132,7 @@ public final class Closer implements Closeable {
                 try {
                     resultSet.close();
                 } catch (SQLException e) {
-                    throw new IOException("Failed to close", e);
+                    throw new IOException(message("util.closer.failed-close"), e);
                 }
             }
         });
@@ -265,7 +266,7 @@ public final class Closer implements Closeable {
         @Override
         public void suppress(Closeable closeable, Throwable thrown, Throwable suppressed) {
             // log to the same place as Closeables
-            logger.log(Level.WARNING, "Suppressing exception thrown when closing " + closeable, suppressed);
+            logger.log(Level.WARNING, message("util.closer.close-fail", closeable), suppressed);
         }
     }
 
@@ -304,5 +305,9 @@ public final class Closer implements Closeable {
                 LoggingSuppressor.INSTANCE.suppress(closeable, thrown, suppressed);
             }
         }
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

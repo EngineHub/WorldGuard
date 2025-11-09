@@ -90,7 +90,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      */
     @Deprecated
     public void setMinimumPoint(BlockVector3 position) {
-        WorldGuard.logger.warning("ProtectedCuboidRegion#setMinimumPoint call ignored. Mutating regions leads to undefined behavior.");
+        WorldGuard.logger.warning(message("regions.cuboid.mutate-min"));
     }
 
     /**
@@ -102,7 +102,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      */
     @Deprecated
     public void setMaximumPoint(BlockVector3 position) {
-        WorldGuard.logger.warning("ProtectedCuboidRegion#setMaximumPoint call ignored. Mutating regions leads to undefined behavior.");
+        WorldGuard.logger.warning(message("regions.cuboid.mutate-max"));
     }
 
     @Override
@@ -176,6 +176,10 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         } catch (ArithmeticException e) {
             return Integer.MAX_VALUE;
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

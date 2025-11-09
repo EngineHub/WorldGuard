@@ -389,7 +389,7 @@ public class FlagValueCalculator {
 
         // Check to see whether we have a subject if this is BUILD
         if (flag.requiresSubject() && subject == null) {
-            throw new NullPointerException("The " + flag.getName() + " flag is handled in a special fashion and requires a non-null subject parameter");
+            throw new NullPointerException(message("protection.flag-value.requires-subject", flag.getName()));
         }
 
         int minimumPriority = Integer.MIN_VALUE;
@@ -579,4 +579,7 @@ public class FlagValueCalculator {
         SUCCESS
     }
 
+    private static String message(String key, Object... arguments) {
+        return com.sk89q.worldguard.WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
 }

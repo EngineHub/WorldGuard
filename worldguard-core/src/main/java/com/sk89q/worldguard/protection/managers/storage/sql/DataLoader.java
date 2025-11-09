@@ -36,6 +36,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.io.Closer;
 import com.sk89q.worldguard.util.sql.DataSourceConfig;
+import com.sk89q.worldguard.WorldGuard;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
@@ -198,7 +199,7 @@ class DataLoader {
                 List<BlockVector2> points = pointsCache.get(id);
 
                 if (points.size() < 3) {
-                    log.log(Level.WARNING, "Invalid polygonal region '" + id + "': region has " + points.size() + " point(s) (less than the required 3). Skipping this region.");
+                    log.log(Level.WARNING, message("storage.sql.loader.invalid-polygon", id, points.size()));
                     continue;
                 }
 
@@ -285,7 +286,7 @@ class DataLoader {
                         try {
                             domain.addPlayer(UUID.fromString(uuid));
                         } catch (IllegalArgumentException e) {
-                            log.warning("Invalid UUID '" + uuid + "' for region '" + region.getId() + "'");
+                            log.warning(message("storage.sql.loader.invalid-uuid", uuid, region.getId()));
                         }
                     }
                 }
@@ -333,6 +334,10 @@ class DataLoader {
         } catch (YAMLException e) {
             return String.valueOf(rawValue);
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

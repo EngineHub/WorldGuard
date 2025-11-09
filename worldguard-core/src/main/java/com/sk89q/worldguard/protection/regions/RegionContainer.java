@@ -155,11 +155,11 @@ public abstract class RegionContainer {
 
         synchronized (lock) {
             try {
-                WorldGuard.logger.info("Unloading and saving region data that is currently loaded...");
+                WorldGuard.logger.info(message("storage.region-container.migrate.unloading"));
                 unload();
                 migration.migrate();
             } finally {
-                WorldGuard.logger.info("Loading region data for loaded worlds...");
+                WorldGuard.logger.info(message("storage.region-container.migrate.loading"));
                 loadWorlds();
             }
         }
@@ -169,7 +169,7 @@ public abstract class RegionContainer {
      * Try loading the region managers for all currently loaded worlds.
      */
     protected void loadWorlds() {
-        WorldGuard.logger.info("Loading region data...");
+        WorldGuard.logger.info(message("storage.region-container.load.start"));
         synchronized (lock) {
             for (World world : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
                 load(world);
@@ -203,12 +203,11 @@ public abstract class RegionContainer {
             try {
                 migrate(migrator);
 
-                WorldGuard.logger.info("Regions saved after UUID migration! This won't happen again unless " +
-                        "you change the relevant configuration option in WorldGuard's config.");
+                WorldGuard.logger.info(message("storage.region-container.auto-migrate.saved"));
 
                 config.disableUuidMigration();
             } catch (MigrationException e) {
-                WorldGuard.logger.log(Level.WARNING, "Failed to execute the migration", e);
+                WorldGuard.logger.log(Level.WARNING, message("storage.region-container.auto-migrate.fail"), e);
             }
         }
     }
@@ -220,4 +219,8 @@ public abstract class RegionContainer {
      * @return a region manager, either returned from the cache or newly loaded
      */
     @Nullable protected abstract RegionManager load(World world);
+
+    private String message(String key, Object... arguments) {
+        return com.sk89q.worldguard.WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
 }

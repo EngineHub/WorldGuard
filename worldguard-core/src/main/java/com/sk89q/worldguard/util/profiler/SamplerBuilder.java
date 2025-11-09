@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import com.sk89q.worldguard.WorldGuard;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
@@ -39,7 +40,7 @@ import java.util.function.Predicate;
 
 public class SamplerBuilder {
 
-    private static final Timer timer = new Timer("WorldGuard Sampler", true);
+    private static final Timer timer = new Timer(message("profiler.sampler.timer-name"), true);
     private int interval = 100;
     private long runTime = TimeUnit.MINUTES.toMillis(5);
     private Predicate<ThreadInfo> threadFilter = thread -> true;
@@ -49,7 +50,7 @@ public class SamplerBuilder {
     }
 
     public void setInterval(int interval) {
-        checkArgument(interval >= 1, "interval >= 1");
+        checkArgument(interval >= 1, message("profiler.sampler.interval-invalid"));
         this.interval = interval;
     }
 
@@ -58,7 +59,7 @@ public class SamplerBuilder {
     }
 
     public void setThreadFilter(Predicate<ThreadInfo> threadFilter) {
-        checkNotNull(threadFilter, "threadFilter");
+        checkNotNull(threadFilter, message("profiler.sampler.thread-filter-null"));
         this.threadFilter = threadFilter;
     }
 
@@ -67,7 +68,7 @@ public class SamplerBuilder {
     }
 
     public void setRunTime(long time, TimeUnit timeUnit) {
-        checkArgument(time > 0, "time > 0");
+        checkArgument(time > 0, message("profiler.sampler.time-invalid"));
         this.runTime = timeUnit.toMillis(time);
     }
 
@@ -144,14 +145,16 @@ public class SamplerBuilder {
         public String toString() {
             StringBuilder builder = new StringBuilder();
             for (Map.Entry<String, StackNode> entry : getData().entrySet()) {
-                builder.append(entry.getKey());
-                builder.append(" ");
-                builder.append(entry.getValue().getTotalTime()).append("ms");
+                builder.append(message("profiler.sampler.entry.header", entry.getKey(), entry.getValue().getTotalTime()));
                 builder.append("\n");
                 entry.getValue().writeString(builder, 1);
             }
             return builder.toString();
         }
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

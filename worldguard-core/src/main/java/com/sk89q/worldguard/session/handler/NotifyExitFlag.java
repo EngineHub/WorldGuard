@@ -60,11 +60,15 @@ public class NotifyExitFlag extends FlagValueChangeHandler<Boolean> {
             // If the lastValue was false, we don't notify
             return true;
         }
-        WorldGuard.getInstance().getPlatform().broadcastNotification(new Notify(player.getName(), " left NOTIFY region").create());
+        WorldGuard.getInstance().getPlatform().broadcastNotification(new Notify(player.getName(), message("session.notify.exit")).create());
         return true;
     }
 
     @Override
     protected void onClearValue(LocalPlayer player, ApplicableRegionSet set) {
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

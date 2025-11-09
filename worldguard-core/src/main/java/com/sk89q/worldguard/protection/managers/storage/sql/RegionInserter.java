@@ -28,6 +28,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.io.Closer;
 import com.sk89q.worldguard.util.sql.DataSourceConfig;
+import com.sk89q.worldguard.WorldGuard;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -69,7 +70,7 @@ class RegionInserter {
             // Nothing special to do about them
 
         } else {
-            throw new IllegalArgumentException("Unknown type of region: " + region.getClass().getName());
+            throw new IllegalArgumentException(message("storage.sql.inserter.unknown-type", region.getClass().getName()));
         }
     }
 
@@ -184,6 +185,10 @@ class RegionInserter {
         insertCuboids();
         insertPolygons();
         insertPolygonVertices();
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

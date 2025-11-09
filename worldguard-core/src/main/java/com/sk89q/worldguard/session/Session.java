@@ -111,9 +111,8 @@ public class Session {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
         disableBypass = cfg.disableDefaultBypass;
         if (cfg.announceBypassStatus && player.hasPermission("worldguard.region.toggle-bypass")) {
-            player.printInfo(TextComponent.of(
-                    "You are " + (disableBypass ? "not " : "") + "bypassing region protection. " +
-                    "You can toggle this with /rg bypass", TextColor.DARK_PURPLE));
+            String key = disableBypass ? "session.bypass.disabled" : "session.bypass.enabled";
+            player.printInfo(TextComponent.of(message(key), TextColor.DARK_PURPLE));
         }
 
 
@@ -267,5 +266,9 @@ public class Session {
      */
     public void setBypassDisabled(boolean disabled) {
         disableBypass = disabled;
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

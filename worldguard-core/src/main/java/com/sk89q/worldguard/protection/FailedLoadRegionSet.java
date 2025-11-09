@@ -43,11 +43,12 @@ public class FailedLoadRegionSet extends AbstractRegionSet {
 
     private static final FailedLoadRegionSet INSTANCE = new FailedLoadRegionSet();
 
-    private final String denyMessage = "Region data for WorldGuard failed to load for this world, so " +
-            "everything has been protected as a precaution. Please inform a server administrator.";
-    private final Collection<String> denyMessageCollection = ImmutableList.of(denyMessage);
+    private final String denyMessage;
+    private final Collection<String> denyMessageCollection;
 
     private FailedLoadRegionSet() {
+        denyMessage = message("protection.failed-load.deny");
+        denyMessageCollection = ImmutableList.of(denyMessage);
     }
 
     @Override
@@ -125,5 +126,9 @@ public class FailedLoadRegionSet extends AbstractRegionSet {
     public static FailedLoadRegionSet getInstance() {
         return INSTANCE;
     }
-    
+
+    private String message(String key, Object... arguments) {
+        return com.sk89q.worldguard.WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
+
 }

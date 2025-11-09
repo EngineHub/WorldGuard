@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection.managers.storage.sql;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.io.Closer;
 import com.sk89q.worldguard.util.sql.DataSourceConfig;
+import com.sk89q.worldguard.WorldGuard;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -57,7 +58,7 @@ class RegionRemover {
         } else if (currentType.equals("global")) {
             // Nothing to do
         } else {
-            throw new RuntimeException("Unknown type of region in the database: " + currentType);
+            throw new RuntimeException(message("storage.sql.remover.unknown-type", currentType));
         }
 
     }
@@ -84,5 +85,9 @@ class RegionRemover {
         removeRows(regionQueue, "region", "id");
         removeRows(cuboidGeometryQueue, "region_cuboid", "region_id");
         removeRows(polygonGeometryQueue, "region_poly2d", "region_id");
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

@@ -35,47 +35,51 @@ import java.util.List;
 public class ConfigReport extends DataReport {
 
     public ConfigReport() {
-        super("WorldGuard Configuration");
+        super(message("reports.config.title"));
 
         List<? extends World> worlds = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds();
 
-        append("Configuration", new HierarchyObjectReport("Configuration", WorldGuard.getInstance().getPlatform().getGlobalStateManager()));
+        append(message("reports.config.configuration"), new HierarchyObjectReport(message("reports.config.configuration"), WorldGuard.getInstance().getPlatform().getGlobalStateManager()));
 
         for (World world : worlds) {
             WorldConfiguration config = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
-            DataReport report = new DataReport("World: " + world.getName());
-            report.append("Configuration", new HierarchyObjectReport("Configuration", config));
+            DataReport report = new DataReport(message("reports.config.world.title", world.getName()));
+            report.append(message("reports.config.configuration"), new HierarchyObjectReport(message("reports.config.configuration"), config));
 
             Blacklist blacklist = config.getBlacklist();
             if (blacklist != null) {
-                DataReport section = new DataReport("Blacklist");
-                section.append("Rule Count", blacklist.getItemCount());
-                section.append("Whitelist Mode?", blacklist.isWhitelist());
+                DataReport section = new DataReport(message("reports.config.blacklist.title"));
+                section.append(message("reports.config.blacklist.rule-count"), blacklist.getItemCount());
+                section.append(message("reports.config.blacklist.whitelist"), blacklist.isWhitelist());
                 report.append(section.getTitle(), section);
             } else {
-                report.append("Blacklist", "<Disabled>");
+                report.append(message("reports.config.blacklist.title"), message("reports.common.disabled"));
             }
 
             RegionManager regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
             if (regions != null) {
-                DataReport section = new DataReport("Regions");
-                section.append("Region Count", regions.size());
+                DataReport section = new DataReport(message("reports.config.regions.title"));
+                section.append(message("reports.config.regions.count"), regions.size());
 
                 ProtectedRegion global = regions.getRegion("__global__");
                 if (global != null) {
-                    section.append("__global__", new RegionReport(global));
+                    section.append(message("reports.config.regions.global"), new RegionReport(global));
                 } else {
-                    section.append("__global__", "<Undefined>");
+                    section.append(message("reports.config.regions.global"), message("reports.common.undefined"));
                 }
 
                 report.append(section.getTitle(), section);
             } else {
-                report.append("Regions", "<Disabled>");
+                report.append(message("reports.config.regions.title"), message("reports.common.disabled"));
             }
 
             append(report.getTitle(), report);
         }
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

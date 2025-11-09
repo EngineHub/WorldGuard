@@ -21,6 +21,7 @@ package com.sk89q.worldguard.util.report;
 
 import com.sk89q.worldedit.util.report.DataReport;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.WorldGuard;
 
 /**
  * Reports on a region.
@@ -28,15 +29,19 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 public class RegionReport extends DataReport {
 
     public RegionReport(ProtectedRegion region) {
-        super("Region: " + region.getId());
+        super(message("reports.region.title", region.getId()));
 
-        append("Type", region.getType());
-        append("Priority", region.getPriority());
-        append("Parent", region.getParent() == null ? "<none>" : region.getParent().getId());
-        append("Owners", region.getOwners());
-        append("Members", region.getMembers());
-        append("Flags", region.getFlags());
-        append("Bounds", region.getMinimumPoint() + " -> " + region.getMaximumPoint());
+        append(message("reports.region.type"), region.getType());
+        append(message("reports.region.priority"), region.getPriority());
+        append(message("reports.region.parent"), region.getParent() == null ? message("reports.region.parent.none") : region.getParent().getId());
+        append(message("reports.region.owners"), region.getOwners());
+        append(message("reports.region.members"), region.getMembers());
+        append(message("reports.region.flags"), region.getFlags());
+        append(message("reports.region.bounds"), message("reports.region.bounds.value", region.getMinimumPoint(), region.getMaximumPoint()));
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

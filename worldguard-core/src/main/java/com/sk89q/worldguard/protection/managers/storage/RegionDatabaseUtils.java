@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection.managers.storage;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.WorldGuard;
 
 import java.util.Map;
 import java.util.logging.Logger;
@@ -58,12 +59,16 @@ public final class RegionDatabaseUtils {
                 try {
                     target.setParent(parent);
                 } catch (CircularInheritanceException e) {
-                    log.warning("Circular inheritance detected! Can't set the parent of '" + target + "' to parent '" + parent.getId() + "'");
+                    log.warning(message("storage.region-utils.circular", target.toString(), parent.getId()));
                 }
             } else {
-                log.warning("Unknown region parent: " + entry.getValue());
+                log.warning(message("storage.region-utils.parent-unknown", entry.getValue()));
             }
         }
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

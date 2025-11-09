@@ -56,16 +56,17 @@ public class NotifyEntryFlag extends FlagValueChangeHandler<Boolean> {
         }
 
         StringBuilder regionList = new StringBuilder();
+        String delimiter = message("session.notify.regions.delimiter");
 
         for (ProtectedRegion region : toSet) {
             if (!regionList.isEmpty()) {
-                regionList.append(", ");
+                regionList.append(delimiter);
             }
 
             regionList.append(region.getId());
         }
 
-        WorldGuard.getInstance().getPlatform().broadcastNotification(new Notify(player.getName(), " entered NOTIFY region: " + regionList).create());
+        WorldGuard.getInstance().getPlatform().broadcastNotification(new Notify(player.getName(), message("session.notify.entry", regionList.toString())).create());
 
         return true;
     }
@@ -75,4 +76,7 @@ public class NotifyEntryFlag extends FlagValueChangeHandler<Boolean> {
         return true;
     }
 
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
 }

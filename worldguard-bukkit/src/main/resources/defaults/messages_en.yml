@@ -412,6 +412,44 @@ platform:
   name: "Bukkit"
   identifier: "Bukkit-Official"
 reports:
+  common:
+    disabled: "<Disabled>"
+    undefined: "<Undefined>"
+    none: "None"
+  applicable:
+    title: "Applicable Regions"
+    location: "Location"
+    location-value: "%s @ %s"
+    regions:
+      title: "Regions"
+      disabled: "Disabled for current world"
+      section-title: "Regions"
+    region-entry: "%s%s"
+    region-inherited-marker: "*"
+  config:
+    title: "WorldGuard Configuration"
+    configuration: "Configuration"
+    world:
+      title: "World: %s"
+    blacklist:
+      title: "Blacklist"
+      rule-count: "Rule Count"
+      whitelist: "Whitelist Mode?"
+    regions:
+      title: "Regions"
+      count: "Region Count"
+      global: "__global__"
+  region:
+    title: "Region: %s"
+    type: "Type"
+    priority: "Priority"
+    parent: "Parent"
+    parent.none: "<none>"
+    owners: "Owners"
+    members: "Members"
+    flags: "Flags"
+    bounds: "Bounds"
+    bounds.value: "%s -> %s"
   datapack:
     title: "Datapacks"
     count: "Datapack Count"
@@ -821,5 +859,116 @@ storage:
     parse-null-note: "Note: This region will disappear as a result!"
     dump: "Here is what the region data looks like:\n\n%s"
     save-difference: "An error occured while saving the region difference!"
+  sql:
+    loader:
+      invalid-polygon: "Invalid polygonal region '%s': region has %d point(s) (less than the required 3). Skipping this region."
+      invalid-uuid: "Invalid UUID '%s' for region '%s'"
+    inserter:
+      unknown-type: "Unknown type of region: %s"
+    remover:
+      unknown-type: "Unknown type of region in the database: %s"
+    driver:
+      worlds-fetch-fail: "Failed to fetch list of worlds"
+      migrate-fail-init: "Failed to migrate database tables"
+      migrate-auto-too-old: "Sorry, your tables are too old for the region SQL auto-migration system. Please run region_manual_update_20110325.sql on your database, which comes with WorldGuard or can be found in http://github.com/sk89q/worldguard"
+      migrations-table-create: "The SQL region tables exist but the migrations table seems to not exist yet. Creating the migrations table..."
+      tables-create: "SQL region tables do not exist: creating..."
+      migrate-fail: "Failed to migrate tables"
+      connection-interrupted: "Failed to get a SQL connection because the operation was interrupted"
+      connection-error: "Failed to get a SQL connection due to an error"
+      connection-timeout: "Failed to get a SQL connection within the time limit"
+    region-db:
+      world-id-fail: "Failed to choose the ID for this world"
+      expected-result: "Expected result, got none"
+      unexpected-type: "Unexpected region type: %s"
+      connection-fail: "Failed to get a connection to the database"
+      save-fail: "Failed to save the region data to the database"
+    table-cache:
+      id-missing: "Could not get the database ID for entry %s"
+protection:
+  domain:
+    lookup:
+      fail: "The UUID lookup service failed so the names entered could not be turned into UUIDs"
+      interrupted: "UUID lookup was interrupted"
+      unresolved: "Unable to resolve the names %s"
+  failed-load:
+    deny: "Region data for WorldGuard failed to load for this world, so everything has been protected as a precaution. Please inform a server administrator."
+  flag-value:
+    requires-subject: "The %s flag is handled in a special fashion and requires a non-null subject parameter"
+region-utils:
+  circular: "Circular inheritance detected! Can't set the parent of '%s' to parent '%s'"
+  parent-unknown: "Unknown region parent: %s"
+region-container:
+  load-fail: "Failed to load the region data for '%s' (periodic attempts will be made to load the data until success)"
+  save-fail: "Failed to save the region data for '%s'"
+  save-fail-unload-all: "Failed to save the region data for '%s' while unloading the data for all worlds"
+  background-save: "Region data changes made in '%s' have been background saved"
+  save-fail-periodic: "Failed to save the region data for '%s' during a periodical save"
+  save-fail-periodic-unknown: "An expected error occurred during a periodical save"
+  retry-load-start: "Attempting to load region data that has previously failed to load..."
+  retry-load-success: "Successfully loaded region data for '%s'"
+  retry-load-still-failing: "Region data is still failing to load, at least for the world named '%s'"
+  migrate:
+    unloading: "Unloading and saving region data that is currently loaded..."
+    loading: "Loading region data for loaded worlds..."
+  load:
+    start: "Loading region data..."
+  auto-migrate:
+    saved: "Regions saved after UUID migration! This won't happen again unless you change the relevant configuration option in WorldGuard's config."
+    fail: "Failed to execute the migration"
+regions:
+  cuboid:
+    mutate-min: "ProtectedCuboidRegion#setMinimumPoint call ignored. Mutating regions leads to undefined behavior."
+    mutate-max: "ProtectedCuboidRegion#setMaximumPoint call ignored. Mutating regions leads to undefined behavior."
+session:
+  notify:
+    regions:
+      delimiter: ", "
+    entry: " entered NOTIFY region: %s"
+    exit: " left NOTIFY region"
+  manager:
+    register: "Registering session handler %s"
+    unregister-default: "Someone is unregistering a default WorldGuard handler: %s. This may cause parts of WorldGuard to stop functioning"
+    unregister: "Unregistering session handler %s"
+  bypass:
+    enabled: "You are bypassing region protection. You can toggle this with /rg bypass"
+    disabled: "You are not bypassing region protection. You can toggle this with /rg bypass"
+util:
+  closer:
+    close-fail: "Suppressing exception thrown when closing %s"
+    failed-close: "Failed to close"
+profiler:
+  sampler:
+    timer-name: "WorldGuard Sampler"
+    interval-invalid: "interval >= 1"
+    thread-filter-null: "threadFilter"
+    time-invalid: "time > 0"
+    entry:
+      header: "%s %dms"
 
+exceptions:
+  number:
+    expected-with-input: "Number expected; string \"%s\" given."
+    expected: "Number expected; string given."
+  storage:
+    log: "Error loading/saving regions"
+    command: "Region data could not be loaded/saved: %s"
+  tasks:
+    too-many: "There are currently too many tasks queued to add yours. Use /wg running to list queued and running tasks."
+    cancelled: "Task was cancelled."
+    interrupted: "Task was interrupted."
+  auth:
+    no-permission: "You don't have permission to do that."
 
+worldguard:
+  executor:
+    name: "WorldGuard Task Executor - %s"
+  cache:
+    init-fail: "Failed to initialize SQLite profile cache. Cache is memory-only."
+  platform:
+    unavailable: "WorldGuard is not enabled, unable to access the platform."
+  check-player:
+    expected: "A player is expected."
+  shutdown:
+    start: "Shutting down executor and cancelling any pending tasks..."
+    known-tasks: "Known tasks:"

@@ -126,14 +126,14 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
                     domain.addPlayer(profile.getUniqueId());
                 }
             } catch (IOException e) {
-                throw new UnresolvedNamesException("The UUID lookup service failed so the names entered could not be turned into UUIDs");
+                throw new UnresolvedNamesException(message("protection.domain.lookup.fail"));
             } catch (InterruptedException e) {
-                throw new UnresolvedNamesException("UUID lookup was interrupted");
+                throw new UnresolvedNamesException(message("protection.domain.lookup.interrupted"));
             }
         }
 
         if (!namesToQuery.isEmpty()) {
-            throw new UnresolvedNamesException("Unable to resolve the names " + Joiner.on(", ").join(namesToQuery));
+            throw new UnresolvedNamesException(message("protection.domain.lookup.unresolved", Joiner.on(", ").join(namesToQuery)));
         }
 
         return domain;
@@ -176,5 +176,9 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+    private String message(String key, Object... arguments) {
+        return com.sk89q.worldguard.WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 }

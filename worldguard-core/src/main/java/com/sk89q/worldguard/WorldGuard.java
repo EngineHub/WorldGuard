@@ -76,7 +76,7 @@ public final class WorldGuard {
 
     public void setup() {
         executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20,
-                "WorldGuard Task Executor - %s"));
+                message("worldguard.executor.name")));
 
         File cacheDir = new File(getPlatform().getConfigDir().toFile(), "cache");
         cacheDir.mkdirs();
@@ -84,7 +84,7 @@ public final class WorldGuard {
         try {
             profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
         } catch (IOException | UnsatisfiedLinkError ignored) {
-            logger.log(Level.WARNING, "Failed to initialize SQLite profile cache. Cache is memory-only.");
+            logger.log(Level.WARNING, message("worldguard.cache.init-fail"));
             profileCache = new HashMapCache();
         }
 
@@ -100,7 +100,7 @@ public final class WorldGuard {
      * @return The platform
      */
     public WorldGuardPlatform getPlatform() {
-        checkNotNull(platform, "WorldGuard is not enabled, unable to access the platform.");
+        checkNotNull(platform, message("worldguard.platform.unavailable"));
         return platform;
     }
 
@@ -183,7 +183,7 @@ public final class WorldGuard {
         if (sender instanceof LocalPlayer) {
             return (LocalPlayer) sender;
         } else {
-            throw new CommandException("A player is expected.");
+            throw new CommandException(message("worldguard.check-player.expected"));
         }
     }
 
@@ -194,11 +194,11 @@ public final class WorldGuard {
         executorService.shutdown();
 
         try {
-            logger.log(Level.INFO, "Shutting down executor and cancelling any pending tasks...");
+            logger.log(Level.INFO, message("worldguard.shutdown.start"));
 
             List<Task<?>> tasks = supervisor.getTasks();
             if (!tasks.isEmpty()) {
-                StringBuilder builder = new StringBuilder("Known tasks:");
+                StringBuilder builder = new StringBuilder(message("worldguard.shutdown.known-tasks"));
                 for (Task<?> task : tasks) {
                     builder.append("\n");
                     builder.append(task.getName());
@@ -243,6 +243,10 @@ public final class WorldGuard {
         }
 
         return version;
+    }
+
+    private static String message(String key, Object... arguments) {
+        return getInstance().getLocalization().format(key, arguments);
     }
 
 }

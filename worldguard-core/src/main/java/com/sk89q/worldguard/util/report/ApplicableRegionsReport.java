@@ -30,25 +30,30 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 public class ApplicableRegionsReport extends DataReport {
 
     public ApplicableRegionsReport(LocalPlayer player) {
-        super("Applicable regions");
+        super(message("reports.applicable.title"));
         BlockVector3 position = player.getBlockIn().toVector().toBlockPoint();
-        append("Location", player.getWorld().getName() + " @ " + position);
+        append(message("reports.applicable.location"), message("reports.applicable.location-value", player.getWorld().getName(), position));
         RegionManager mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(player.getWorld());
         if (mgr == null) {
-            append("Regions", "Disabled for current world");
+            append(message("reports.applicable.regions.title"), message("reports.applicable.regions.disabled"));
         } else {
             ApplicableRegionSet rgs = mgr.getApplicableRegions(position);
             if (rgs.getRegions().isEmpty()) {
-                append("Regions", "None");
+                append(message("reports.applicable.regions.title"), message("reports.common.none"));
             } else {
-                DataReport regions = new DataReport("Regions");
+                DataReport regions = new DataReport(message("reports.applicable.regions.section-title"));
                 for (ProtectedRegion region : rgs.getRegions()) {
                     boolean inherited = !region.contains(position);
-                    regions.append(region.getId() + (inherited ? "*" : ""), new RegionReport(region));
+                    String marker = inherited ? message("reports.applicable.region-inherited-marker") : "";
+                    regions.append(message("reports.applicable.region-entry", region.getId(), marker), new RegionReport(region));
                 }
                 append(regions.getTitle(), regions);
             }
         }
+    }
+
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }
