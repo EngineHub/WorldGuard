@@ -303,7 +303,7 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
 
         private EnumerateRegions(List<BlockVector2> positions) {
             checkNotNull(positions);
-            checkArgument(!positions.isEmpty(), "List of positions can't be empty");
+            checkArgument(!positions.isEmpty(), message("chunk.hash-table.positions-empty"));
             this.positions = positions;
         }
 
@@ -378,4 +378,11 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
         }
     }
 
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
+
+    private String chunkMessage(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format("chunk." + key, arguments);
+    }
 }

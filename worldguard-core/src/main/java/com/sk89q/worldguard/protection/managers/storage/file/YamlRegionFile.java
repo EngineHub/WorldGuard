@@ -35,6 +35,7 @@ import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabaseUtils;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
@@ -122,7 +123,7 @@ public class YamlRegionFile implements RegionDatabase {
         } catch (FileNotFoundException | NoSuchFileException e) {
             return new HashSet<>(loaded.values());
         } catch (IOException | ParserException e) {
-            throw new StorageException("Failed to load region data from '" + file + "'", e);
+            throw new StorageException(message("storage.yaml.load-fail", file), e);
         }
 
         Map<String, YAMLNode> regionData = config.getNodes("regions");
@@ -142,8 +143,8 @@ public class YamlRegionFile implements RegionDatabase {
 
             try {
                 if (type == null) {
-                    log.warning("Undefined region type for region '" + id + "'!\n" +
-                            "Here is what the region data looks like:\n\n" + toYamlOutput(entry.getValue().getMap()) + "\n");
+                    log.warning(message("storage.yaml.type-undefined", id) + "\n" +
+                            message("storage.yaml.dump", toYamlOutput(entry.getValue().getMap())) + "\n");
                     continue;
                 } else if (type.equals("cuboid")) {
                     Vector3 pt1 = checkNotNull(node.getVector("min"));
@@ -159,8 +160,8 @@ public class YamlRegionFile implements RegionDatabase {
                 } else if (type.equals("global")) {
                     region = new GlobalProtectedRegion(id);
                 } else {
-                    log.warning("Unknown region type for region '" + id + "'!\n" +
-                            "Here is what the region data looks like:\n\n" + toYamlOutput(entry.getValue().getMap()) + "\n");
+                    log.warning(message("storage.yaml.type-unknown", id) + "\n" +
+                            message("storage.yaml.dump", toYamlOutput(entry.getValue().getMap())) + "\n");
                     continue;
                 }
 
@@ -178,9 +179,9 @@ public class YamlRegionFile implements RegionDatabase {
                 }
             } catch (NullPointerException e) {
                 log.log(Level.WARNING,
-                        "Unexpected NullPointerException encountered during parsing for the region '" + id + "'!\n" +
-                                "Here is what the region data looks like:\n\n" + toYamlOutput(entry.getValue().getMap()) +
-                                "\n\nNote: This region will disappear as a result!", e);
+                        message("storage.yaml.parse-null", id) + "\n" +
+                                message("storage.yaml.dump", toYamlOutput(entry.getValue().getMap())) +
+                                "\n\n" + message("storage.yaml.parse-null-note"), e);
             }
         }
 
@@ -256,7 +257,7 @@ public class YamlRegionFile implements RegionDatabase {
 
     @Override
     public void saveChanges(RegionDifference difference) throws DifferenceSaveException {
-        throw new DifferenceSaveException("Not supported");
+        throw new DifferenceSaveException(message("storage.yaml.save-difference"));
     }
 
     private DefaultDomain parseDomain(YAMLNode node) {
@@ -348,4 +349,7 @@ public class YamlRegionFile implements RegionDatabase {
         }
     }
 
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
 }

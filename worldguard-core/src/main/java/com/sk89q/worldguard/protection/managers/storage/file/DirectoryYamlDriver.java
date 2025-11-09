@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection.managers.storage.file;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
+import com.sk89q.worldguard.WorldGuard;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +67,7 @@ public class DirectoryYamlDriver implements RegionDriver {
             f.getCanonicalPath();
             return f;
         } catch (IOException e) {
-            throw new IllegalArgumentException("Invalid file path for the world's regions file");
+            throw new IllegalArgumentException(message("storage.directory.invalid-path"));
         }
     }
 
@@ -93,6 +94,10 @@ public class DirectoryYamlDriver implements RegionDriver {
         }
 
         return stores;
+    }
+
+    private String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
 }

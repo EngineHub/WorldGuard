@@ -63,14 +63,14 @@ public class WorldHeightMigration extends AbstractMigration {
     protected void migrate(RegionDatabase store) throws MigrationException {
         if (world != null && !store.getName().equals(world.getName())) return;
 
-        log.log(Level.INFO, "Migrating regions in '" + store.getName() + "' to new height limits...");
+        log.log(Level.INFO, message("migration.height.start", store.getName()));
 
         Set<ProtectedRegion> regions;
 
         try {
             regions = store.loadAll(flagRegistry);
         } catch (StorageException e) {
-            throw new MigrationException("Failed to load region data for the world '" + store.getName() + "'", e);
+            throw new MigrationException(message("migration.height.load-fail", store.getName()), e);
         }
 
         int min = -64;
@@ -93,7 +93,7 @@ public class WorldHeightMigration extends AbstractMigration {
         try {
             store.saveAll(regions);
         } catch (StorageException e) {
-            throw new MigrationException("Failed to save region data after migration of the world '" + store.getName() + "'", e);
+            throw new MigrationException(message("migration.height.save-fail", store.getName()), e);
         }
     }
 
@@ -103,12 +103,12 @@ public class WorldHeightMigration extends AbstractMigration {
             maxField.set(region, region.getMaximumPoint().withY(max));
             region.setDirty(true);
         } catch (IllegalAccessException e) {
-            throw new MigrationException("Migrator broke.", e);
+            throw new MigrationException(WorldGuard.getInstance().getLocalization().format("migration.height.error"), e);
         }
     }
 
     @Override
     protected void postMigration() {
-        log.log(Level.INFO, "A total of " + changed + " top-to-bottom regions were vertically expanded.");
+        log.log(Level.INFO, message("migration.height.summary", changed));
     }
 }

@@ -779,19 +779,47 @@ flags:
     vector:
       format: "Expected 'here' or x,y,z."
     weather-unknown: "Unknown weather type: %s"
-  unknown:
-    missing-plugin: "The plugin that registered this flag is not currently installed"
-  messages:
-    deny:
-      hey: "Hey!"
-      body: " Sorry, but you can't %what% here."
-    entry:
-      hey: "Hey!"
-      body: " You are not permitted to enter this area."
-    exit:
-      hey: "Hey!"
-      body: " You are not permitted to leave this area."
-  util:
-    marshal-fail: "Failed to marshal flag value for %s; value is %s"
+chunk:
+  hash-table:
+    positions-empty: "List of positions can't be empty"
+    uncache: "Uncaching regions for chunk %s for %s"
+index:
+  hashmap:
+    circular: "Failed to replace parent '%s' of child '%s' with replacement '%s'"
+migration:
+  world-failed: "Migration of one world (%s) failed with an error"
+  worlds-list-failed: "Migration failed because the process of getting a list of all the worlds to migrate failed"
+  driver:
+    load: "Loading the regions for '%s' with the old driver..."
+    load-fail: "Failed to load region data for the world '%s'"
+    save: "Saving the data for '%s' with the new driver..."
+    save-fail: "Failed to save region data for '%s' to the new driver"
+  uuid:
+    start: "Migrating regions in '%s' to convert names -> UUIDs..."
+    load-fail: "Failed to load region data for the world '%s'"
+    save-fail: "Failed to save region data after migration of the world '%s'"
+    resolving: "Resolving %d name(s) into UUIDs... this may take a while."
+    converted: "UUIDs resolved... now migrating all regions to UUIDs where possible..."
+    service-fail: "The name -> UUID service failed"
+    interrupted: "The migration was interrupted"
+    unresolved-keep: "Some member and owner names do not seem to exist or own Minecraft so they could not be converted into UUIDs. They have been left as names, but the conversion can be re-run with 'keep-names-that-lack-uuids' set to false in the configuration in order to remove these names. Leaving the names means that someone can register with one of these names in the future and become that player."
+    unresolved-removed: "Some member and owner names do not seem to exist or own Minecraft so they could not be converted into UUIDs. These names have been removed."
+  height:
+    start: "Migrating regions in '%s' to new height limits..."
+    load-fail: "Failed to load region data for the world '%s'"
+    save-fail: "Failed to save region data after migration of the world '%s'"
+    summary: "A total of %d top-to-bottom regions were vertically expanded."
+    error: "Migrator broke."
+storage:
+  directory:
+    invalid-path: "Invalid file path for the world's regions file"
+  yaml:
+    load-fail: "Failed to load region data from '%s'"
+    type-undefined: "Undefined region type for region '%s'!"
+    type-unknown: "Unknown region type for region '%s'!"
+    parse-null: "Unexpected NullPointerException encountered during parsing for the region '%s'!"
+    parse-null-note: "Note: This region will disappear as a result!"
+    dump: "Here is what the region data looks like:\n\n%s"
+    save-difference: "An error occured while saving the region difference!"
 
 

@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection.managers.migration;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
+import com.sk89q.worldguard.WorldGuard;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,13 +57,13 @@ abstract class AbstractMigration implements Migration {
                 try {
                     migrate(store);
                 } catch (MigrationException e) {
-                    log.log(Level.WARNING, "Migration of one world (" + store.getName() + ") failed with an error", e);
+                    log.log(Level.WARNING, message("migration.world-failed", store.getName()), e);
                 }
             }
 
             postMigration();
         } catch (StorageException e) {
-            throw new MigrationException("Migration failed because the process of getting a list of all the worlds to migrate failed", e);
+            throw new MigrationException(message("migration.worlds-list-failed"), e);
         }
     }
 
@@ -79,4 +80,7 @@ abstract class AbstractMigration implements Migration {
      */
     protected abstract void postMigration();
 
+    protected String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
 }

@@ -55,6 +55,10 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
     private Set<ProtectedRegion> removed = new HashSet<>();
     private final Object lock = new Object();
 
+    private static String message(String key, Object... arguments) {
+        return WorldGuard.getInstance().getLocalization().format(key, arguments);
+    }
+
     /**
      * Called to rebuild the index after changes.
      */
@@ -175,7 +179,7 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
                                     try {
                                         current.setParent(replacement);
                                     } catch (CircularInheritanceException e) {
-                                        WorldGuard.logger.log(Level.WARNING, "Failed to replace parent '" + parent.getId() + "' of child '" + current.getId() + "' with replacement '" + replacement.getId() + "'", e);
+                                        WorldGuard.logger.log(Level.WARNING, message("index.hashmap.circular", parent.getId(), current.getId(), replacement.getId()), e);
                                         current.clearParent();
                                     }
                             }
