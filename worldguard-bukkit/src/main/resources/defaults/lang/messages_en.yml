@@ -885,19 +885,6 @@ storage:
       save-fail: "Failed to save the region data to the database"
     table-cache:
       id-missing: "Could not get the database ID for entry %s"
-protection:
-  domain:
-    lookup:
-      fail: "The UUID lookup service failed so the names entered could not be turned into UUIDs"
-      interrupted: "UUID lookup was interrupted"
-      unresolved: "Unable to resolve the names %s"
-  failed-load:
-    deny: "Region data for WorldGuard failed to load for this world, so everything has been protected as a precaution. Please inform a server administrator."
-  flag-value:
-    requires-subject: "The %s flag is handled in a special fashion and requires a non-null subject parameter"
-region-utils:
-  circular: "Circular inheritance detected! Can't set the parent of '%s' to parent '%s'"
-  parent-unknown: "Unknown region parent: %s"
   region-container:
     load-fail: "Failed to load the region data for '%s' (periodic attempts will be made to load the data until success)"
     save-fail: "Failed to save the region data for '%s'"
@@ -916,6 +903,19 @@ region-utils:
     auto-migrate:
       saved: "Regions saved after UUID migration! This won't happen again unless you change the relevant configuration option in WorldGuard's config."
       fail: "Failed to execute the migration"
+protection:
+  domain:
+    lookup:
+      fail: "The UUID lookup service failed so the names entered could not be turned into UUIDs"
+      interrupted: "UUID lookup was interrupted"
+      unresolved: "Unable to resolve the names %s"
+  failed-load:
+    deny: "Region data for WorldGuard failed to load for this world, so everything has been protected as a precaution. Please inform a server administrator."
+  flag-value:
+    requires-subject: "The %s flag is handled in a special fashion and requires a non-null subject parameter"
+region-utils:
+  circular: "Circular inheritance detected! Can't set the parent of '%s' to parent '%s'"
+  parent-unknown: "Unknown region parent: %s"
 regions:
   cuboid:
     mutate-min: "ProtectedCuboidRegion#setMinimumPoint call ignored. Mutating regions leads to undefined behavior."

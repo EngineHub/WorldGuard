@@ -94,6 +94,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -485,6 +486,16 @@ public class WorldGuardPlugin extends JavaPlugin {
         return WorldGuard.getInstance().getLocalization().format(key, arguments);
     }
 
+    private String messageOrDefault(String key, String defaultTemplate, Object... arguments) {
+        String localized = message(key, arguments);
+        if (localized.equals(key)) {
+            return defaultTemplate == null
+                    ? key
+                    : String.format(Locale.ROOT, defaultTemplate, arguments);
+        }
+        return localized;
+    }
+
     private String colorMessage(String key, Object... arguments) {
         return ChatColor.translateAlternateColorCodes('&', message(key, arguments));
     }
@@ -515,7 +526,8 @@ public class WorldGuardPlugin extends JavaPlugin {
             if (stream == null) throw new FileNotFoundException();
             copyDefaultConfig(stream, actual, defaultName);
         } catch (IOException e) {
-            getLogger().severe(message("plugin.log.config.read-fail", defaultName));
+            getLogger().severe(messageOrDefault("plugin.log.config.read-fail",
+                    "Unable to read default configuration: %s", defaultName));
         }
 
     }
@@ -527,9 +539,11 @@ public class WorldGuardPlugin extends JavaPlugin {
             while ((length = input.read(buf)) > 0) {
                 output.write(buf, 0, length);
             }
-            getLogger().info(message("plugin.log.config.write-success", name));
+            getLogger().info(messageOrDefault("plugin.log.config.write-success",
+                    "Default configuration file written: %s", name));
         } catch (IOException e) {
-            getLogger().log(Level.WARNING, message("plugin.log.config.write-fail"), e);
+            getLogger().log(Level.WARNING, messageOrDefault("plugin.log.config.write-fail",
+                    "Failed to write default config file"), e);
         }
     }
 
