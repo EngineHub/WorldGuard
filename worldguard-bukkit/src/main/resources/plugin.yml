@@ -2,4 +2,4 @@ name: WorldGuard
 main: com.sk89q.worldguard.bukkit.WorldGuardPlugin
 version: "${internalVersion}"
 depend: [WorldEdit]
-api-version: "1.21.5"
+api-version: "1.21.10"

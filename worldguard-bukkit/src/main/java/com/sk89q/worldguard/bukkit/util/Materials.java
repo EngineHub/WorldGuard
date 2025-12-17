@@ -176,7 +176,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.CHISELED_STONE_BRICKS, 0);
         MATERIAL_FLAGS.put(Material.BROWN_MUSHROOM_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.RED_MUSHROOM_BLOCK, 0);
-        MATERIAL_FLAGS.put(Material.IRON_BARS, 0);
         MATERIAL_FLAGS.put(Material.GLASS_PANE, 0);
         MATERIAL_FLAGS.put(Material.MELON, 0);
         MATERIAL_FLAGS.put(Material.PUMPKIN_STEM, 0);
@@ -413,7 +412,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.FLETCHING_TABLE, 0);
         MATERIAL_FLAGS.put(Material.GRINDSTONE, 0);
         MATERIAL_FLAGS.put(Material.JIGSAW, MODIFIED_ON_RIGHT | MODIFIED_ON_LEFT);
-        MATERIAL_FLAGS.put(Material.LANTERN, 0);
         MATERIAL_FLAGS.put(Material.LECTERN, 0);
         MATERIAL_FLAGS.put(Material.LOOM, 0);
         MATERIAL_FLAGS.put(Material.SCAFFOLDING, 0);
@@ -672,7 +670,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.ANCIENT_DEBRIS, 0);
         MATERIAL_FLAGS.put(Material.BASALT, 0);
         MATERIAL_FLAGS.put(Material.BLACKSTONE, 0);
-        MATERIAL_FLAGS.put(Material.CHAIN, 0);
         MATERIAL_FLAGS.put(Material.CHISELED_NETHER_BRICKS, 0);
         MATERIAL_FLAGS.put(Material.CHISELED_POLISHED_BLACKSTONE, 0);
         MATERIAL_FLAGS.put(Material.CRACKED_NETHER_BRICKS, 0);
@@ -708,7 +705,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.SHROOMLIGHT, 0);
         MATERIAL_FLAGS.put(Material.SOUL_CAMPFIRE, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.SOUL_FIRE, 0);
-        MATERIAL_FLAGS.put(Material.SOUL_LANTERN, 0);
         MATERIAL_FLAGS.put(Material.SOUL_SOIL, 0);
         MATERIAL_FLAGS.put(Material.SOUL_TORCH, 0);
         MATERIAL_FLAGS.put(Material.SOUL_WALL_TORCH, 0);
@@ -773,7 +769,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.CHISELED_DEEPSLATE, 0);
         MATERIAL_FLAGS.put(Material.GLOW_LICHEN, 0);
         MATERIAL_FLAGS.put(Material.LIGHT, MODIFIED_ON_RIGHT);
-        MATERIAL_FLAGS.put(Material.LIGHTNING_ROD, 0);
         MATERIAL_FLAGS.put(Material.SCULK_SENSOR, 0);
         MATERIAL_FLAGS.put(Material.AMETHYST_SHARD, 0);
         MATERIAL_FLAGS.put(Material.RAW_IRON, 0);
@@ -949,6 +944,19 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.TEST_INSTANCE_BLOCK, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.BLUE_EGG, 0);
         MATERIAL_FLAGS.put(Material.BROWN_EGG, 0);
+
+        // 1.21.6
+        MATERIAL_FLAGS.put(Material.DRIED_GHAST, 0);
+
+        // 1.21.9
+        MATERIAL_FLAGS.put(Material.COPPER_TORCH, 0);
+        putMaterialTag(Tag.BARS, 0);
+        putMaterialTag(Tag.CHAINS, 0);
+        putMaterialTag(Tag.COPPER_CHESTS, MODIFIED_ON_RIGHT);
+        putMaterialTag(Tag.COPPER_GOLEM_STATUES, MODIFIED_ON_RIGHT);
+        putMaterialTag(Tag.LANTERNS, 0);
+        putMaterialTag(Tag.LIGHTNING_RODS, 0);
+        putMaterialTag(Tag.WOODEN_SHELVES, MODIFIED_ON_RIGHT);
 
         Stream.concat(Stream.concat(
                 Tag.CORAL_BLOCKS.getValues().stream(),
@@ -1204,6 +1212,8 @@ public final class Materials {
                 || material == Material.CHISELED_BOOKSHELF
                 || material == Material.CRAFTER
                 || material == Material.DECORATED_POT
+                || Tag.WOODEN_SHELVES.isTagged(material)
+                || Tag.COPPER_CHESTS.isTagged(material)
                 || Tag.ITEMS_CHEST_BOATS.isTagged(material)
                 || Tag.SHULKER_BOXES.isTagged(material);
     }
@@ -1227,6 +1237,7 @@ public final class Materials {
             case CAVE_SPIDER_SPAWN_EGG -> EntityType.CAVE_SPIDER;
             case CHICKEN_SPAWN_EGG -> EntityType.CHICKEN;
             case COD_SPAWN_EGG -> EntityType.COD;
+            case COPPER_GOLEM_SPAWN_EGG -> EntityType.COPPER_GOLEM;
             case COW_SPAWN_EGG -> EntityType.COW;
             case CREAKING_SPAWN_EGG -> EntityType.CREAKING;
             case CREEPER_SPAWN_EGG -> EntityType.CREEPER;
@@ -1244,6 +1255,7 @@ public final class Materials {
             case GLOW_SQUID_SPAWN_EGG -> EntityType.GLOW_SQUID;
             case GOAT_SPAWN_EGG -> EntityType.GOAT;
             case GUARDIAN_SPAWN_EGG -> EntityType.GUARDIAN;
+            case HAPPY_GHAST_SPAWN_EGG -> EntityType.HAPPY_GHAST;
             case HOGLIN_SPAWN_EGG -> EntityType.HOGLIN;
             case HORSE_SPAWN_EGG -> EntityType.HORSE;
             case HUSK_SPAWN_EGG -> EntityType.HUSK;
@@ -1472,6 +1484,7 @@ public final class Materials {
         switch (toolMaterial) {
             case WOODEN_HOE:
             case STONE_HOE:
+            case COPPER_HOE:
             case IRON_HOE:
             case GOLDEN_HOE:
             case DIAMOND_HOE:
@@ -1483,6 +1496,7 @@ public final class Materials {
                 };
             case WOODEN_AXE:
             case STONE_AXE:
+            case COPPER_AXE:
             case IRON_AXE:
             case GOLDEN_AXE:
             case DIAMOND_AXE:
@@ -1497,6 +1511,7 @@ public final class Materials {
                 };
             case WOODEN_SHOVEL:
             case STONE_SHOVEL:
+            case COPPER_SHOVEL:
             case IRON_SHOVEL:
             case GOLDEN_SHOVEL:
             case DIAMOND_SHOVEL:
@@ -1556,7 +1571,8 @@ public final class Materials {
     public static boolean isUnwaxedCopper(Material type) {
         // copied from the MaterialTags class in Paper
         return switch (type) {
-            case COPPER_BLOCK, CHISELED_COPPER, COPPER_DOOR, COPPER_TRAPDOOR, COPPER_GRATE, COPPER_BULB -> true;
+            case COPPER_BLOCK, CHISELED_COPPER, COPPER_DOOR, COPPER_TRAPDOOR, COPPER_GRATE, COPPER_BULB, COPPER_BARS,
+                 COPPER_TORCH, COPPER_CHEST, COPPER_CHAIN, COPPER_WALL_TORCH, COPPER_LANTERN, COPPER_GOLEM_STATUE -> true;
             default -> type.name().startsWith("EXPOSED_") || type.name().startsWith("WEATHERED_") ||
                     type.name().startsWith("OXIDIZED_") || type.name().startsWith("CUT_COPPER");
         };

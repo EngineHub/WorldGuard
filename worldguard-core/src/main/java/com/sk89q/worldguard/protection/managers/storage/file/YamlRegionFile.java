@@ -50,6 +50,7 @@ import org.yaml.snakeyaml.representer.Representer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -118,7 +119,7 @@ public class YamlRegionFile implements RegionDatabase {
         YAMLProcessor config = createYamlProcessor(file);
         try {
             config.load();
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | NoSuchFileException e) {
             return new HashSet<>(loaded.values());
         } catch (IOException | ParserException e) {
             throw new StorageException("Failed to load region data from '" + file + "'", e);
