@@ -947,9 +947,22 @@ public final class Materials {
 
         // 1.21.6
         MATERIAL_FLAGS.put(Material.DRIED_GHAST, 0);
+        putMaterialTag(Tag.ITEMS_HARNESSES, 0);
 
         // 1.21.9
         MATERIAL_FLAGS.put(Material.COPPER_TORCH, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_WALL_TORCH, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_HELMET, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_CHESTPLATE, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_LEGGINGS, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_BOOTS, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_HORSE_ARMOR, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_SWORD, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_PICKAXE, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_AXE, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_SHOVEL, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_HOE, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_NUGGET, 0);
         putMaterialTag(Tag.BARS, 0);
         putMaterialTag(Tag.CHAINS, 0);
         putMaterialTag(Tag.COPPER_CHESTS, MODIFIED_ON_RIGHT);
@@ -957,6 +970,15 @@ public final class Materials {
         putMaterialTag(Tag.LANTERNS, 0);
         putMaterialTag(Tag.LIGHTNING_RODS, 0);
         putMaterialTag(Tag.WOODEN_SHELVES, MODIFIED_ON_RIGHT);
+
+        // 1.21.11
+        MATERIAL_FLAGS.put(Material.COPPER_NAUTILUS_ARMOR, 0);
+        MATERIAL_FLAGS.put(Material.IRON_NAUTILUS_ARMOR, 0);
+        MATERIAL_FLAGS.put(Material.GOLDEN_NAUTILUS_ARMOR, 0);
+        MATERIAL_FLAGS.put(Material.DIAMOND_NAUTILUS_ARMOR, 0);
+        MATERIAL_FLAGS.put(Material.NETHERITE_NAUTILUS_ARMOR, 0);
+        MATERIAL_FLAGS.put(Material.NETHERITE_HORSE_ARMOR, 0);
+        putMaterialTag(Tag.ITEMS_SPEARS, 0);
 
         Stream.concat(Stream.concat(
                 Tag.CORAL_BLOCKS.getValues().stream(),
@@ -1232,8 +1254,9 @@ public final class Materials {
             case BLAZE_SPAWN_EGG -> EntityType.BLAZE;
             case BOGGED_SPAWN_EGG -> EntityType.BOGGED;
             case BREEZE_SPAWN_EGG -> EntityType.BREEZE;
-            case CAT_SPAWN_EGG -> EntityType.CAT;
+            case CAMEL_HUSK_SPAWN_EGG -> EntityType.CAMEL_HUSK;
             case CAMEL_SPAWN_EGG -> EntityType.CAMEL;
+            case CAT_SPAWN_EGG -> EntityType.CAT;
             case CAVE_SPIDER_SPAWN_EGG -> EntityType.CAVE_SPIDER;
             case CHICKEN_SPAWN_EGG -> EntityType.CHICKEN;
             case COD_SPAWN_EGG -> EntityType.COD;
@@ -1245,9 +1268,9 @@ public final class Materials {
             case DONKEY_SPAWN_EGG -> EntityType.DONKEY;
             case DROWNED_SPAWN_EGG -> EntityType.DROWNED;
             case ELDER_GUARDIAN_SPAWN_EGG -> EntityType.ELDER_GUARDIAN;
-            case ENDER_DRAGON_SPAWN_EGG -> EntityType.ENDER_DRAGON;
             case ENDERMAN_SPAWN_EGG -> EntityType.ENDERMAN;
             case ENDERMITE_SPAWN_EGG -> EntityType.ENDERMITE;
+            case ENDER_DRAGON_SPAWN_EGG -> EntityType.ENDER_DRAGON;
             case EVOKER_SPAWN_EGG -> EntityType.EVOKER;
             case FOX_SPAWN_EGG -> EntityType.FOX;
             case FROG_SPAWN_EGG -> EntityType.FROG;
@@ -1264,12 +1287,15 @@ public final class Materials {
             case MAGMA_CUBE_SPAWN_EGG -> EntityType.MAGMA_CUBE;
             case MOOSHROOM_SPAWN_EGG -> EntityType.MOOSHROOM;
             case MULE_SPAWN_EGG -> EntityType.MULE;
+            case NAUTILUS_SPAWN_EGG -> EntityType.NAUTILUS;
             case OCELOT_SPAWN_EGG -> EntityType.OCELOT;
             case PANDA_SPAWN_EGG -> EntityType.PANDA;
+            case PARCHED_SPAWN_EGG -> EntityType.PARCHED;
             case PARROT_SPAWN_EGG -> EntityType.PARROT;
             case PHANTOM_SPAWN_EGG -> EntityType.PHANTOM;
             case PIGLIN_BRUTE_SPAWN_EGG -> EntityType.PIGLIN_BRUTE;
             case PIGLIN_SPAWN_EGG -> EntityType.PIGLIN;
+            case PIG_SPAWN_EGG -> EntityType.PIG;
             case PILLAGER_SPAWN_EGG -> EntityType.PILLAGER;
             case POLAR_BEAR_SPAWN_EGG -> EntityType.POLAR_BEAR;
             case PUFFERFISH_SPAWN_EGG -> EntityType.PUFFERFISH;
@@ -1298,15 +1324,15 @@ public final class Materials {
             case WANDERING_TRADER_SPAWN_EGG -> EntityType.WANDERING_TRADER;
             case WARDEN_SPAWN_EGG -> EntityType.WARDEN;
             case WITCH_SPAWN_EGG -> EntityType.WITCH;
-            case WITHER_SPAWN_EGG -> EntityType.WITHER;
             case WITHER_SKELETON_SPAWN_EGG -> EntityType.WITHER_SKELETON;
+            case WITHER_SPAWN_EGG -> EntityType.WITHER;
             case WOLF_SPAWN_EGG -> EntityType.WOLF;
             case ZOGLIN_SPAWN_EGG -> EntityType.ZOGLIN;
             case ZOMBIE_HORSE_SPAWN_EGG -> EntityType.ZOMBIE_HORSE;
-            case ZOMBIFIED_PIGLIN_SPAWN_EGG -> EntityType.ZOMBIFIED_PIGLIN;
+            case ZOMBIE_NAUTILUS_SPAWN_EGG -> EntityType.ZOMBIE_NAUTILUS;
             case ZOMBIE_SPAWN_EGG -> EntityType.ZOMBIE;
             case ZOMBIE_VILLAGER_SPAWN_EGG -> EntityType.ZOMBIE_VILLAGER;
-            case PIG_SPAWN_EGG -> EntityType.PIG;
+            case ZOMBIFIED_PIGLIN_SPAWN_EGG -> EntityType.ZOMBIFIED_PIGLIN;
             default -> null;
         };
     }

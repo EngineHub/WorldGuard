@@ -1,5 +1,5 @@
 [versions]
-worldedit = "7.3.9"
+worldedit = "7.3.18"
 
 # Minimum versions we apply to make dependencies support newer Java
 minimumAsm = "9.7"
@@ -27,7 +27,7 @@ junit-jupiter-api.module = "org.junit.jupiter:junit-jupiter-api"
 junit-jupiter-params.module = "org.junit.jupiter:junit-jupiter-params"
 junit-jupiter-engine.module = "org.junit.jupiter:junit-jupiter-engine"
 
-paperApi = "io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT"
+paperApi = "io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT"
 paperLib = "io.papermc:paperlib:1.0.8"
 
 dummypermscompat = "com.sk89q:dummypermscompat:1.10"
@@ -42,10 +42,10 @@ commandbook = "com.sk89q:commandbook:2.3"
 hamcrest-library = "org.hamcrest:hamcrest-library:2.2"
 
 # Mojang-provided libraries, CHECK AGAINST MINECRAFT for versions
-guava = "com.google.guava:guava:33.3.1-jre!!"
+guava = "com.google.guava:guava:33.5.0-jre!!"
 log4j-bom = "org.apache.logging.log4j:log4j-bom:2.24.1!!"
-gson = "com.google.code.gson:gson:2.11.0!!"
-fastutil = "it.unimi.dsi:fastutil:8.5.15!!"
+gson = "com.google.code.gson:gson:2.13.2!!"
+fastutil = "it.unimi.dsi:fastutil:8.5.18!!"
 
 # Bukkit-provided libraries, CHECK AGAINST SPIGOT for versions
 # Note that we need to balance support for older MC versus working at all on newer ones, so the exact versions here
