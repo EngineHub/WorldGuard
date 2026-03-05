@@ -1045,8 +1045,14 @@ public class EventAbstractionListener extends AbstractListener {
             }
 
             if (event.isCancelled() && causeHolder instanceof Hopper && wcfg.breakDeniedHoppers) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(),
-                        () -> ((Hopper) causeHolder).getBlock().breakNaturally());
+                Hopper hopper = (Hopper) causeHolder;
+                if (WorldGuardPlugin.inst().isFolia()) {
+                    Bukkit.getRegionScheduler().run(getPlugin(), hopper.getLocation(),
+                            (scheduledTask) -> hopper.getBlock().breakNaturally());
+                } else {
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(),
+                            () -> hopper.getBlock().breakNaturally());
+                }
             } else {
                 entry.setCancelled(event.isCancelled());
             }

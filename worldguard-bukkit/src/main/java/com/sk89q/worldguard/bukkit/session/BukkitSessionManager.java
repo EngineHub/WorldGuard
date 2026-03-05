@@ -49,10 +49,20 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     public void resetAllStates() {
         Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
         for (Player player : players) {
-            BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
-            Session session = getIfPresent(bukkitPlayer);
-            if (session != null) {
-                session.resetState(bukkitPlayer);
+            if (WorldGuardPlugin.inst().isFolia()) {
+                player.getScheduler().run(WorldGuardPlugin.inst(), scheduledTask -> {
+                    BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
+                    Session session = getIfPresent(bukkitPlayer);
+                    if (session != null) {
+                        session.resetState(bukkitPlayer);
+                    }
+                }, null);
+            } else {
+                BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
+                Session session = getIfPresent(bukkitPlayer);
+                if (session != null) {
+                    session.resetState(bukkitPlayer);
+                }
             }
         }
     }
@@ -67,8 +77,15 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     @Override
     public void run() {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-            get(localPlayer).tick(localPlayer);
+            if (WorldGuardPlugin.inst().isFolia()) {
+                player.getScheduler().run(WorldGuardPlugin.inst(), (scheduledTask) -> {
+                    LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                    get(localPlayer).tick(localPlayer);
+                }, null);
+            } else {
+                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                get(localPlayer).tick(localPlayer);
+            }
         }
     }
 
