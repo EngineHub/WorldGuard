@@ -128,7 +128,7 @@ public class PlayerMoveListener extends AbstractListener {
                        if (getPlugin().isFolia()) {
                            PaperLib.teleportAsync(vehicle, override.clone().add(0, 1, 0));
                        } else {
-                           vehicle.teleport(override.clone());
+                           vehicle.teleport(override.clone().add(0, 1, 0));
                        }
                     }
                     current = current.getVehicle();
