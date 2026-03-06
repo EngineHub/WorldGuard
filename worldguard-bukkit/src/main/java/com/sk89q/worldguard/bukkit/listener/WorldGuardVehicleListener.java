@@ -67,10 +67,18 @@ public class WorldGuardVehicleListener extends AbstractListener {
                     if ((lastValid = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer)
                             .testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.RIDE)) != null) {
                         vehicle.setVelocity(new Vector(0, 0, 0));
-                        PaperLib.teleportAsync(vehicle, event.getFrom());
+                        if (getPlugin().isFolia()) {
+                            PaperLib.teleportAsync(vehicle, event.getFrom());
+                        } else {
+                            vehicle.teleport(event.getFrom());
+                        }
                         if (Locations.isDifferentBlock(lastValid, BukkitAdapter.adapt(event.getFrom()))) {
                             Vector dir = player.getLocation().getDirection();
-                            PaperLib.teleportAsync(player, BukkitAdapter.adapt(lastValid).setDirection(dir));
+                            if (getPlugin().isFolia()) {
+                                PaperLib.teleportAsync(player, BukkitAdapter.adapt(lastValid).setDirection(dir));
+                            } else {
+                                player.teleport(BukkitAdapter.adapt(lastValid).setDirection(dir));
+                            }
                         }
                         return;
                     }

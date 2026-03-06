@@ -119,14 +119,27 @@ public class PlayerMoveListener extends AbstractListener {
                     current.eject();
                     vehicle.setVelocity(new Vector());
                     if (vehicle instanceof LivingEntity) {
-                        PaperLib.teleportAsync(vehicle, override.clone());
+                        if (getPlugin().isFolia()) {
+                            PaperLib.teleportAsync(vehicle, override.clone());
+                        } else {
+                            vehicle.teleport(override.clone());
+                        }
                     } else {
-                        PaperLib.teleportAsync(vehicle, override.clone().add(0, 1, 0));
+                       if (getPlugin().isFolia()) {
+                           PaperLib.teleportAsync(vehicle, override.clone().add(0, 1, 0));
+                       } else {
+                           vehicle.teleport(override.clone());
+                       }
                     }
                     current = current.getVehicle();
                 }
 
-                PaperLib.teleportAsync(player, override.clone().add(0, 1, 0));
+                if (getPlugin().isFolia()) {
+                    PaperLib.teleportAsync(player, override.clone().add(0, 1, 0));
+                } else {
+                    player.teleport(override.clone().add(0, 1, 0));
+                }
+
 
                 if (getPlugin().isFolia()) {
                     player.getScheduler().runDelayed(getPlugin(), scheduledTask -> PaperLib.teleportAsync(player, override.clone().add(0, 1, 0)), null, 1);
@@ -146,7 +159,11 @@ public class PlayerMoveListener extends AbstractListener {
         com.sk89q.worldedit.util.Location loc = session.testMoveTo(localPlayer,
             BukkitAdapter.adapt(event.getPlayer().getLocation()), MoveType.OTHER_CANCELLABLE); // white lie
         if (loc != null) {
-            PaperLib.teleportAsync(player, BukkitAdapter.adapt(loc));
+            if (getPlugin().isFolia()) {
+                PaperLib.teleportAsync(player, BukkitAdapter.adapt(loc));
+            } else {
+                player.teleport(BukkitAdapter.adapt(loc));
+            }
         }
 
         session.uninitialize(localPlayer);
