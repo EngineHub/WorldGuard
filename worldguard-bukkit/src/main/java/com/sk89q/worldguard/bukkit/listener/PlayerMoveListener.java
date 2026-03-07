@@ -119,32 +119,36 @@ public class PlayerMoveListener extends AbstractListener {
                     current.eject();
                     vehicle.setVelocity(new Vector());
                     if (vehicle instanceof LivingEntity) {
+                        Location vehicleTeleportLocation = override.clone();
                         if (getPlugin().isFolia()) {
-                            PaperLib.teleportAsync(vehicle, override.clone());
+                            PaperLib.teleportAsync(vehicle, vehicleTeleportLocation);
                         } else {
-                            vehicle.teleport(override.clone());
+                            vehicle.teleport(vehicleTeleportLocation);
                         }
                     } else {
-                       if (getPlugin().isFolia()) {
-                           PaperLib.teleportAsync(vehicle, override.clone().add(0, 1, 0));
-                       } else {
-                           vehicle.teleport(override.clone().add(0, 1, 0));
-                       }
+                        Location dismountLocation = override.clone().add(0, 1, 0);
+                        if (getPlugin().isFolia()) {
+                           PaperLib.teleportAsync(vehicle, dismountLocation);
+                        } else {
+                           vehicle.teleport(dismountLocation);
+                        }
                     }
                     current = current.getVehicle();
                 }
 
+                Location playerDismountLocation = override.clone().add(0, 1, 0);
                 if (getPlugin().isFolia()) {
-                    PaperLib.teleportAsync(player, override.clone().add(0, 1, 0));
+                    PaperLib.teleportAsync(player, playerDismountLocation);
                 } else {
-                    player.teleport(override.clone().add(0, 1, 0));
+                    player.teleport(playerDismountLocation);
                 }
 
 
+                Location delayedDismountLocation = override.clone().add(0, 1, 0);
                 if (getPlugin().isFolia()) {
-                    player.getScheduler().runDelayed(getPlugin(), scheduledTask -> PaperLib.teleportAsync(player, override.clone().add(0, 1, 0)), null, 1);
+                    player.getScheduler().runDelayed(getPlugin(), scheduledTask -> PaperLib.teleportAsync(player, delayedDismountLocation), null, 1);
                 } else {
-                    Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleport(override.clone().add(0, 1, 0)), 1);
+                    Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleport(delayedDismountLocation), 1);
                 }
             }
         }

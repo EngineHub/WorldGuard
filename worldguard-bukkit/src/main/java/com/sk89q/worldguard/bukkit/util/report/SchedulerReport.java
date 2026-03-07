@@ -52,7 +52,9 @@ public class SchedulerReport extends DataReport {
 
     public SchedulerReport() {
         super("Scheduler");
-        if (WorldGuardPlugin.inst().isFolia()) return; // Todo Add support Schedulers
+        if (WorldGuardPlugin.inst().isFolia()) {
+            return; // Todo Add support Schedulers
+        }
 
         List<BukkitTask> tasks = Bukkit.getServer().getScheduler().getPendingTasks();
 
