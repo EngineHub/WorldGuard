@@ -3,3 +3,5 @@ main: com.sk89q.worldguard.bukkit.WorldGuardPlugin
 version: "${internalVersion}"
 depend: [WorldEdit]
 api-version: "1.21.11"
+folia-supported: true
+description: "Protect your worlds and regions with a powerful set of tools. Supports both Paper/Bukkit and Folia servers."

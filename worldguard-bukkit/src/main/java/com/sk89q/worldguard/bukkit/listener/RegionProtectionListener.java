@@ -99,32 +99,13 @@ public class RegionProtectionListener extends AbstractListener {
      * @param what what was done
      */
     private void tellErrorMessage(DelegateEvent event, Cause cause, Location location, String what) {
-        if (event.isSilent() || cause.isIndirect()) {
-            return;
-        }
-
-        Object rootCause = cause.getRootCause();
-
-        if (rootCause instanceof Player) {
-            Player player = (Player) rootCause;
-
-            long now = System.currentTimeMillis();
-            Long lastTime = WGMetadata.getIfPresent(player, DENY_MESSAGE_KEY, Long.class);
-            if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {
-                RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
-                LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
-                String message = query.queryValue(BukkitAdapter.adapt(location), localPlayer, Flags.DENY_MESSAGE);
-                formatAndSendDenyMessage(what, localPlayer, message);
-                WGMetadata.put(player, DENY_MESSAGE_KEY, now);
-            }
-        }
+        // Messages disabled - no chat messages will be sent for protection violations
+        return;
     }
 
     static void formatAndSendDenyMessage(String what, LocalPlayer localPlayer, String message) {
-        if (message == null || message.isEmpty()) return;
-        message = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(localPlayer, message);
-        message = CommandUtils.replaceColorMacros(message);
-        localPlayer.printRaw(message.replace("%what%", what));
+        // Messages disabled - no denial messages will be sent
+        return;
     }
 
     /**

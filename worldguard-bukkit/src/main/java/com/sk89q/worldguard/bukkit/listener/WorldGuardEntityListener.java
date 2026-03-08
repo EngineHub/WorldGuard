@@ -613,63 +613,108 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
+        try {
+            ConfigurationManager cfg = getConfig();
+
+            if (cfg.activityHaltToggle) {
+                event.setCancelled(true);
+                return;
+            }
+
+            WorldConfiguration wcfg = getWorldConfig(event.getEntity().getWorld());
+
+            // allow spawning of creatures from plugins
+            if (!wcfg.blockPluginSpawning && Entities.isPluginSpawning(event.getSpawnReason())) {
+                return;
+            }
+
+            // armor stands are living entities, but we check them as blocks/non-living entities, so ignore them here
+            if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
+                return;
+            }
+
+            if (wcfg.allowTamedSpawns
+                    && event.getEntity() instanceof Tameable // nullsafe check
+                    && ((Tameable) event.getEntity()).isTamed()) {
+                return;
+            }
+
+            EntityType entityType = event.getEntityType();
+
+            com.sk89q.worldedit.world.entity.EntityType weEntityType = BukkitAdapter.adapt(entityType);
+
+            if (weEntityType != null && wcfg.blockCreatureSpawn.contains(weEntityType)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            Location eventLoc = event.getLocation();
+
+            if (wcfg.useRegions && cfg.useRegionsCreatureSpawnEvent) {
+                ApplicableRegionSet set =
+                        WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(eventLoc));
+
+                if (!set.testState(null, Flags.MOB_SPAWNING)) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                Set<com.sk89q.worldedit.world.entity.EntityType> entityTypes = set.queryValue(null, Flags.DENY_SPAWN);
+                if (entityTypes != null && weEntityType != null && entityTypes.contains(weEntityType)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            if (wcfg.blockGroundSlimes && entityType == EntityType.SLIME
+                    && eventLoc.getY() >= 60
+                    && event.getSpawnReason() == SpawnReason.NATURAL) {
+                event.setCancelled(true);
+                return;
+            }
+        } catch (Exception e) {
+            WorldGuard.logger.warning("[WorldGuard] Exception in creature spawn handler at "
+                    + event.getLocation() + ": " + e.getMessage());
+        }
+    }
+
+    /**
+     * MONITOR-priority fallback for threaded servers (Canvas/Folia) where event
+     * cancellation from the HIGH handler may not be reliably respected due to
+     * async entity spawning. If the entity still spawned in a MOB_SPAWNING=DENY
+     * region, forcefully remove it.
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCreatureSpawnMonitor(CreatureSpawnEvent event) {
+        WorldConfiguration wcfg = getWorldConfig(event.getEntity().getWorld());
         ConfigurationManager cfg = getConfig();
 
-        if (cfg.activityHaltToggle) {
-            event.setCancelled(true);
+        if (!wcfg.useRegions || !cfg.useRegionsCreatureSpawnEvent) {
             return;
         }
-
-        WorldConfiguration wcfg = getWorldConfig(event.getEntity().getWorld());
-
-        // allow spawning of creatures from plugins
         if (!wcfg.blockPluginSpawning && Entities.isPluginSpawning(event.getSpawnReason())) {
             return;
         }
-
-        // armor stands are living entities, but we check them as blocks/non-living entities, so ignore them here
         if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
             return;
         }
-
         if (wcfg.allowTamedSpawns
-                && event.getEntity() instanceof Tameable // nullsafe check
+                && event.getEntity() instanceof Tameable
                 && ((Tameable) event.getEntity()).isTamed()) {
             return;
         }
 
-        EntityType entityType = event.getEntityType();
-
-        com.sk89q.worldedit.world.entity.EntityType weEntityType = BukkitAdapter.adapt(entityType);
-
-        if (weEntityType != null && wcfg.blockCreatureSpawn.contains(weEntityType)) {
-            event.setCancelled(true);
-            return;
-        }
-
-        Location eventLoc = event.getLocation();
-
-        if (wcfg.useRegions && cfg.useRegionsCreatureSpawnEvent) {
-            ApplicableRegionSet set =
-                    WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(eventLoc));
+        try {
+            ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer()
+                    .createQuery().getApplicableRegions(BukkitAdapter.adapt(event.getLocation()));
 
             if (!set.testState(null, Flags.MOB_SPAWNING)) {
                 event.setCancelled(true);
-                return;
+                event.getEntity().remove();
             }
-
-            Set<com.sk89q.worldedit.world.entity.EntityType> entityTypes = set.queryValue(null, Flags.DENY_SPAWN);
-            if (entityTypes != null && weEntityType != null && entityTypes.contains(weEntityType)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (wcfg.blockGroundSlimes && entityType == EntityType.SLIME
-                && eventLoc.getY() >= 60
-                && event.getSpawnReason() == SpawnReason.NATURAL) {
-            event.setCancelled(true);
-            return;
+        } catch (Exception e) {
+            WorldGuard.logger.warning("[WorldGuard] Exception in creature spawn monitor handler at "
+                    + event.getLocation() + ": " + e.getMessage());
         }
     }
 

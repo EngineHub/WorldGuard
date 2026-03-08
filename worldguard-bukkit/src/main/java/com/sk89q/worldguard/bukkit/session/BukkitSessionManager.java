@@ -26,6 +26,7 @@ import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.util.Entities;
+import com.sk89q.worldguard.bukkit.util.task.SchedulerAdapterFactory;
 import com.sk89q.worldguard.session.AbstractSessionManager;
 import com.sk89q.worldguard.session.Session;
 import org.bukkit.Bukkit;
@@ -66,9 +67,22 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
 
     @Override
     public void run() {
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-            get(localPlayer).tick(localPlayer);
+        WorldGuardPlugin plugin = WorldGuardPlugin.inst();
+        if (SchedulerAdapterFactory.isFolia()) {
+            // On Folia, player.getLocation() and region access must happen on the
+            // player's own region thread, not the global region thread this timer
+            // runs on. Dispatch each player's tick to their entity scheduler.
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                SchedulerAdapterFactory.getAdapter().runTaskFor(plugin, player, () -> {
+                    get(localPlayer).tick(localPlayer);
+                });
+            }
+        } else {
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                get(localPlayer).tick(localPlayer);
+            }
         }
     }
 

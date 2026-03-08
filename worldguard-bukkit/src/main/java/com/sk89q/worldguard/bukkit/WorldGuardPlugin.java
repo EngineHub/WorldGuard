@@ -49,6 +49,9 @@ import com.sk89q.worldguard.bukkit.listener.PlayerMoveListener;
 import com.sk89q.worldguard.bukkit.listener.RegionFlagsListener;
 import com.sk89q.worldguard.bukkit.listener.RegionProtectionListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardBlockListener;
+import com.sk89q.worldguard.bukkit.util.task.SchedulerAdapter;
+import com.sk89q.worldguard.bukkit.util.task.SchedulerAdapterFactory;
+import com.sk89q.worldguard.bukkit.util.task.ScheduledTask;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardCommandBookListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardEntityListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardHangingListener;
@@ -107,6 +110,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     private static BukkitWorldGuardPlatform platform;
     private final CommandsManager<Actor> commands;
     private PlayerMoveListener playerMoveListener;
+    private SchedulerAdapter scheduler;
+    private ScheduledTask sessionTask;
 
     private static final int BSTATS_PLUGIN_ID = 3283;
 
@@ -145,6 +150,10 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
 
+        // Initialize scheduler adapter for Folia compatibility
+        scheduler = SchedulerAdapterFactory.getAdapter(this);
+        getLogger().info("Server platform: " + SchedulerAdapterFactory.getPlatformInfo());
+
         PermissionsResolverManager.initialize(this);
 
         WorldGuard.getInstance().setPlatform(platform = new BukkitWorldGuardPlatform()); // Initialise WorldGuard
@@ -163,7 +172,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             reg.register(GeneralCommands.class);
         }
 
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
+        sessionTask = scheduler.runTaskTimer(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
 
         // Register events
         getServer().getPluginManager().registerEvents(sessionManager, this);
@@ -204,7 +213,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
-        Bukkit.getScheduler().runTask(this, () -> {
+        scheduler.runTask(this, () -> {
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                 ProcessPlayerEvent event = new ProcessPlayerEvent(player);
                 Events.fire(event);
@@ -264,7 +273,13 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         WorldGuard.getInstance().disable();
-        this.getServer().getScheduler().cancelTasks(this);
+        if (scheduler != null) {
+            scheduler.cancelTasks(this);
+            // Properly shutdown fallback scheduler if it's being used
+            if (scheduler instanceof com.sk89q.worldguard.bukkit.util.task.FallbackSchedulerAdapter) {
+                ((com.sk89q.worldguard.bukkit.util.task.FallbackSchedulerAdapter) scheduler).shutdown();
+            }
+        }
     }
 
     @Override

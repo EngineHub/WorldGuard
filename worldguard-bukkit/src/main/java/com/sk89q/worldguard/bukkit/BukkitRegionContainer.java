@@ -29,6 +29,9 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.bukkit.util.task.SchedulerAdapter;
+import com.sk89q.worldguard.bukkit.util.task.SchedulerAdapterFactory;
+import com.sk89q.worldguard.bukkit.util.task.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.event.EventHandler;
@@ -51,6 +54,7 @@ public class BukkitRegionContainer extends RegionContainer {
     private static final int CACHE_INVALIDATION_INTERVAL = 2;
 
     private final WorldGuardPlugin plugin;
+    private ScheduledTask cacheInvalidationTask;
 
     /**
      * Create a new instance.
@@ -94,11 +98,16 @@ public class BukkitRegionContainer extends RegionContainer {
             }
         }, plugin);
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, cache::invalidateAll, CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
+        SchedulerAdapter scheduler = SchedulerAdapterFactory.getAdapter();
+        cacheInvalidationTask = scheduler.runTaskTimer(plugin, cache::invalidateAll, 
+                CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
     }
 
     public void shutdown() {
         container.shutdown();
+        if (cacheInvalidationTask != null) {
+            cacheInvalidationTask.cancel();
+        }
     }
 
     @Override

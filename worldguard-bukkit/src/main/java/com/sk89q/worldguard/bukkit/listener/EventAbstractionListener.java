@@ -44,6 +44,7 @@ import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.bukkit.util.task.SchedulerAdapterFactory;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.flags.Flags;
 import io.papermc.lib.PaperLib;
@@ -1045,8 +1046,10 @@ public class EventAbstractionListener extends AbstractListener {
             }
 
             if (event.isCancelled() && causeHolder instanceof Hopper && wcfg.breakDeniedHoppers) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(),
-                        () -> ((Hopper) causeHolder).getBlock().breakNaturally());
+                // Use location-aware scheduler for Folia compatibility
+                Location hopperLocation = ((Hopper) causeHolder).getBlock().getLocation();
+                SchedulerAdapterFactory.getAdapter().runTaskAtLater(getPlugin(), hopperLocation,
+                        () -> ((Hopper) causeHolder).getBlock().breakNaturally(), 1);
             } else {
                 entry.setCancelled(event.isCancelled());
             }
