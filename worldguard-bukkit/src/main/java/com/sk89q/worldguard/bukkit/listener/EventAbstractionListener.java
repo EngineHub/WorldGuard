@@ -210,8 +210,8 @@ public class EventAbstractionListener extends AbstractListener {
     }
 
     private boolean isExemptBlock(Material material) {
-        // Determines if the block is exempt from BlockMultiPlaceEvent check
-        // Canceling BlockMultiPlaceEvent from these source blocks causes item duplication bug
+        // Generating an End Portal from Bedrock/End_Portal_Frame should not trigger BlockMultiPlaceEvent
+        // Canceling this event for these blocks causes an upstream item duplication bug.
         // https://github.com/PaperMC/Paper/issues/13586
         return switch (material) {
             case BEDROCK, END_PORTAL_FRAME -> true;
@@ -221,8 +221,6 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockMultiPlace(BlockMultiPlaceEvent event) {
-        // Allow end_portal generation if player can interact with block
-        // avoiding upstream issues
         if (isExemptBlock(event.getBlockPlaced().getType())) {
             return;
         }
