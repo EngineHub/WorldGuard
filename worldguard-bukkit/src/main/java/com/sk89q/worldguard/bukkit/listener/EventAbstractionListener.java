@@ -210,6 +210,9 @@ public class EventAbstractionListener extends AbstractListener {
     }
 
     private boolean isExemptBlock(Material material) {
+        // Determines if the block is exempt from BlockMultiPlaceEvent check
+        // Canceling BlockMultiPlaceEvent from these source blocks causes item duplication bug
+        // https://github.com/PaperMC/Paper/issues/13586
         return switch (material) {
             case BEDROCK, END_PORTAL_FRAME -> true;
             default -> false;
