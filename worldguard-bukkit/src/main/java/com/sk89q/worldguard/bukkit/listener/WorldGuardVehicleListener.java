@@ -28,6 +28,7 @@ import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.util.Locations;
+import io.papermc.lib.PaperLib;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -55,21 +56,31 @@ public class WorldGuardVehicleListener extends AbstractListener {
         }
         World world = vehicle.getWorld();
         WorldConfiguration wcfg = getWorldConfig(world);
-
+        org.bukkit.Location from = event.getFrom();
+        org.bukkit.Location to = event.getTo();
         if (wcfg.useRegions) {
             // Did we move a block?
-            if (Locations.isDifferentBlock(BukkitAdapter.adapt(event.getFrom()), BukkitAdapter.adapt(event.getTo()))) {
+            if (Locations.isDifferentBlock(BukkitAdapter.adapt(from), BukkitAdapter.adapt(to))) {
                 for (Player player : playerPassengers) {
                     if (Entities.isNPC(player)) continue;
                     LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
                     Location lastValid;
                     if ((lastValid = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer)
-                            .testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.RIDE)) != null) {
+                            .testMoveTo(localPlayer, BukkitAdapter.adapt(to), MoveType.RIDE)) != null) {
                         vehicle.setVelocity(new Vector(0, 0, 0));
-                        vehicle.teleport(event.getFrom());
-                        if (Locations.isDifferentBlock(lastValid, BukkitAdapter.adapt(event.getFrom()))) {
+                        if (getPlugin().isFolia()) {
+                            PaperLib.teleportAsync(vehicle, from);
+                        } else {
+                            vehicle.teleport(from);
+                        }
+                        if (Locations.isDifferentBlock(lastValid, BukkitAdapter.adapt(from))) {
                             Vector dir = player.getLocation().getDirection();
-                            player.teleport(BukkitAdapter.adapt(lastValid).setDirection(dir));
+                            org.bukkit.Location playerTeleportLocation = BukkitAdapter.adapt(lastValid).setDirection(dir);
+                            if (getPlugin().isFolia()) {
+                                PaperLib.teleportAsync(player, playerTeleportLocation);
+                            } else {
+                                player.teleport(playerTeleportLocation);
+                            }
                         }
                         return;
                     }

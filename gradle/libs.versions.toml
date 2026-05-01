@@ -31,7 +31,7 @@ paperApi = "io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT"
 paperLib = "io.papermc:paperlib:1.0.8"
 
 dummypermscompat = "com.sk89q:dummypermscompat:1.10"
-bstats-bukkit = "org.bstats:bstats-bukkit:2.2.1"
+bstats-bukkit = "org.bstats:bstats-bukkit:3.2.1"
 
 prtree = "org.khelekore:prtree:1.5.0"
 

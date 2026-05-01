@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard.blacklist.target;
 
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+
 /**
  * A target is something that can have events attached to it.
  */
@@ -35,7 +38,18 @@ public interface Target {
      * Get a friendly name to be printed.
      *
      * @return a friendly name
+     * @deprecated Use {@link #getFriendlyNameComponent()} instead, which supports more complex formatting.
      */
+    @Deprecated
     String getFriendlyName();
+
+    /**
+     * Get a friendly name to be printed.
+     *
+     * @return a friendly name
+     */
+    default Component getFriendlyNameComponent() {
+        return TextComponent.of(getFriendlyName());
+    }
 
 }

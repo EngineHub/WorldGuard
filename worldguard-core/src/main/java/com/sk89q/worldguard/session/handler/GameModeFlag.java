@@ -59,7 +59,9 @@ public class GameModeFlag extends FlagValueChangeHandler<GameMode> {
     private void updateGameMode(LocalPlayer player, @Nullable GameMode newValue, World world) {
         if (!getSession().getManager().hasBypass(player, world) && newValue != null) {
             if (player.getGameMode() != newValue) {
-                originalGameMode = player.getGameMode();
+                if (originalGameMode == null) {
+                    originalGameMode = player.getGameMode();
+                }
                 player.setGameMode(newValue);
             } else if (originalGameMode == null) {
                 originalGameMode = WorldGuard.getInstance().getPlatform().getDefaultGameMode();

@@ -19,11 +19,12 @@
 
 package com.sk89q.worldguard.blacklist.target;
 
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.item.ItemType;
 
 public class ItemTarget implements Target {
 
-    private ItemType type;
+    private final ItemType type;
 
     public ItemTarget(ItemType type) {
         this.type = type;
@@ -31,7 +32,7 @@ public class ItemTarget implements Target {
 
     @Override
     public String getTypeId() {
-        return type.getId();
+        return type.id();
     }
 
     @Override
@@ -39,4 +40,8 @@ public class ItemTarget implements Target {
         return type.getName();
     }
 
+    @Override
+    public Component getFriendlyNameComponent() {
+        return type.getRichName();
+    }
 }

@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.blacklist.event;
 
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.formatting.text.serializer.plain.PlainComponentSerializer;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.target.Target;
 
@@ -40,7 +41,7 @@ abstract class BlockBlacklistEvent extends AbstractBlacklistEvent {
 
     @Override
     public String getLoggerMessage() {
-        return getPlayerName() + " tried to " + getDescription() + " " + getTarget().getFriendlyName();
+        return getPlayerName() + " tried to " + getDescription() + " " + PlainComponentSerializer.INSTANCE.serialize(getTarget().getFriendlyNameComponent());
     }
 
     @Override
