@@ -1,4 +1,3 @@
-import org.jfrog.gradle.plugin.artifactory.dsl.ArtifactoryPluginConvention
 import org.jfrog.gradle.plugin.artifactory.task.ArtifactoryTask
 
 plugins {
@@ -13,7 +12,7 @@ if (!project.hasProperty(ARTIFACTORY_CONTEXT_URL)) ext[ARTIFACTORY_CONTEXT_URL] 
 if (!project.hasProperty(ARTIFACTORY_USER)) ext[ARTIFACTORY_USER] = "guest"
 if (!project.hasProperty(ARTIFACTORY_PASSWORD)) ext[ARTIFACTORY_PASSWORD] = ""
 
-configure<ArtifactoryPluginConvention> {
+artifactory {
     setContextUrl("${project.property(ARTIFACTORY_CONTEXT_URL)}")
     clientConfig.publisher.run {
         repoKey = when {

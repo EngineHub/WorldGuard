@@ -96,6 +96,9 @@ tasks.register<Jar>("sourcesJar") {
                 it.replaceFirst(textPattern, to)
             }
             path = path.replaceFirst(filePattern, "$1${to.replace('.', '/')}$2")
+            permissions {
+                unix("rw-r--r--")
+            }
         }
     }
     archiveClassifier.set("sources")
