@@ -26,16 +26,17 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class is mainly here to replace PaperLib, as it no longer fully functions on MC 26.1+.
  */
 public class PaperInterop {
+    private PaperInterop() {
+    }
 
     public static @Nullable InventoryHolder getHolder(@Nonnull Inventory inventory, boolean useSnapshot) {
         if (PaperLib.isPaper()) {
@@ -45,7 +46,7 @@ public class PaperInterop {
         return inventory.getHolder();
     }
 
-    public static @NotNull BlockState getBlockState(@Nonnull Block block, boolean useSnapshot) {
+    public static BlockState getBlockState(@Nonnull Block block, boolean useSnapshot) {
         if (PaperLib.isPaper()) {
             return block.getState(useSnapshot);
         }
@@ -53,7 +54,7 @@ public class PaperInterop {
         return block.getState();
     }
 
-    public static @NotNull CompletableFuture<Boolean> teleportAsync(@Nonnull Entity entity, @Nonnull Location location) {
+    public static CompletableFuture<Boolean> teleportAsync(@Nonnull Entity entity, @Nonnull Location location) {
         if (PaperLib.isPaper()) {
             return entity.teleportAsync(location);
         }
