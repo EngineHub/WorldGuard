@@ -1362,7 +1362,7 @@ public final class Materials {
         // yea, that's not all, there are some more
         return switch (type) {
             case PUMPKIN, MELON, CACTUS, SUGAR_CANE, BAMBOO, BAMBOO_SAPLING,
-                    SWEET_BERRY_BUSH, NETHER_WART, CAVE_VINES, CAVE_VINES_PLANT ->
+                 SWEET_BERRY_BUSH, NETHER_WART, CAVE_VINES, CAVE_VINES_PLANT, COCOA ->
                     true;
             default -> false;
         };
