@@ -169,6 +169,11 @@ public class PlayerMoveListener extends AbstractListener {
         }
 
         session.uninitialize(localPlayer);
+
+        // Drop the cached session and bypass entries so the manager does not
+        // keep the (now offline) player and their last world reachable until
+        // the caches expire.
+        WorldGuard.getInstance().getPlatform().getSessionManager().forget(localPlayer);
     }
 
     /**

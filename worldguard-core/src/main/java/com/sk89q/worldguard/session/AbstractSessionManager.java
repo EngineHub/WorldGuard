@@ -164,6 +164,35 @@ public abstract class AbstractSessionManager implements SessionManager {
         return getIfPresentInternal(new CacheKey(player));
     }
 
+    @Override
+    public void forget(LocalPlayer player) {
+        checkNotNull(player, "player");
+        UUID uuid = player.getUniqueId();
+        sessions.invalidate(new CacheKey(player));
+        bypassCache.asMap().keySet().removeIf(
+                tuple -> tuple.getPlayer().getUniqueId().equals(uuid));
+    }
+
+    @Override
+    public void forgetWorld(World world) {
+        checkNotNull(world, "world");
+        bypassCache.asMap().keySet().removeIf(tuple -> tuple.getWorld().equals(world));
+    }
+
+    /**
+     * Force the caches to evict any entries that have already expired.
+     *
+     * <p>The bypass cache uses {@code expireAfterWrite} and the session cache
+     * uses {@code expireAfterAccess}, but Guava only evicts expired entries
+     * lazily during cache operations. When the caches go idle, an expired
+     * entry can keep a strong reference to a player or world alive long after
+     * its logical lifetime. Calling this periodically bounds that retention.</p>
+     */
+    protected void cleanUpCaches() {
+        bypassCache.cleanUp();
+        sessions.cleanUp();
+    }
+
     private Session getIfPresentInternal(CacheKey cacheKey) {
         @Nullable Session session = sessions.getIfPresent(cacheKey);
         if (session != null) {

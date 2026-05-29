@@ -109,6 +109,32 @@ public interface SessionManager {
     @Nullable Session getIfPresent(LocalPlayer player);
 
     /**
+     * Forget a player, evicting any cached session and bypass information.
+     *
+     * <p>This should be called when a player is no longer being tracked
+     * (for example, when they disconnect) so that the session manager does
+     * not retain strong references to the player or the world they were last
+     * in until the caches happen to expire. Failing to forget a player keeps
+     * the underlying platform player object (and therefore its world)
+     * reachable for the lifetime of the cache entries.</p>
+     *
+     * @param player The player to forget
+     */
+    void forget(LocalPlayer player);
+
+    /**
+     * Forget any cached bypass information that references the given world.
+     *
+     * <p>This should be called when a world is unloaded so that the bypass
+     * cache does not retain a strong reference to the world (and the players
+     * that were last checked in it) until the cache entries happen to
+     * expire.</p>
+     *
+     * @param world The world to forget
+     */
+    void forgetWorld(World world);
+
+    /**
      * Get a player's session. A session will be created if there is no
      * existing session for the player.
      *
