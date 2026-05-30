@@ -165,15 +165,6 @@ public abstract class AbstractSessionManager implements SessionManager {
     }
 
     @Override
-    public void forget(LocalPlayer player) {
-        checkNotNull(player, "player");
-        UUID uuid = player.getUniqueId();
-        sessions.invalidate(new CacheKey(player));
-        bypassCache.asMap().keySet().removeIf(
-                tuple -> tuple.getPlayer().getUniqueId().equals(uuid));
-    }
-
-    @Override
     public void forgetWorld(World world) {
         checkNotNull(world, "world");
         bypassCache.asMap().keySet().removeIf(tuple -> tuple.getWorld().equals(world));
