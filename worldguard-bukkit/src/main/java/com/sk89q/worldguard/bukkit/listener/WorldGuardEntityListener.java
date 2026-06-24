@@ -789,8 +789,8 @@ public class WorldGuardEntityListener extends AbstractListener {
     public void onFoodChange(FoodLevelChangeEvent event) {
         if (event.getItem() != null) return;
         HumanEntity ent = event.getEntity();
-        if (Entities.isNPC(ent)) return;
         if (!(ent instanceof Player bukkitPlayer)) return;
+        if (Entities.isNPC(bukkitPlayer)) return;
         if (event.getFoodLevel() > ent.getFoodLevel()) return;
 
         LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(bukkitPlayer);
