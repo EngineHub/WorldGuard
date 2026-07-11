@@ -1,5 +1,6 @@
 [versions]
-worldedit = "7.3.18"
+worldedit = "7.4.0"
+crankcase = "0.1.0"
 
 # Minimum versions we apply to make dependencies support newer Java
 minimumAsm = "9.7"
@@ -10,10 +11,14 @@ minimumTinyRemapper = "0.8.11"
 
 [libraries]
 
-licenser = "gradle.plugin.org.cadixdev.gradle:licenser:0.6.1"
-grgit = "org.ajoberstar.grgit:grgit-gradle:5.2.2"
-shadow = "com.github.johnrengelman:shadow:8.1.1"
-jfrog-buildinfo = "org.jfrog.buildinfo:build-info-extractor-gradle:5.2.0"
+crankcase-java = { module = "org.enginehub.crankcase:java", version.ref = "crankcase" }
+crankcase-javaLibrary = { module = "org.enginehub.crankcase:java-library", version.ref = "crankcase" }
+crankcase-common = { module = "org.enginehub.crankcase:common", version.ref = "crankcase" }
+crankcase-licensing = { module = "org.enginehub.crankcase:licensing", version.ref = "crankcase" }
+crankcase-git = { module = "org.enginehub.crankcase:git", version.ref = "crankcase" }
+crankcase-publishing = { module = "org.enginehub.crankcase:publishing", version.ref = "crankcase" }
+
+shadow = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.3.2"
 
 squirrelid = "org.enginehub:squirrelid:0.3.2"
 
@@ -22,12 +27,7 @@ autoService = "com.google.auto.service:auto-service:1.1.1"
 jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
 jetbrains-annotations = "org.jetbrains:annotations:24.1.0"
 
-junit-bom = "org.junit:junit-bom:5.10.2"
-junit-jupiter-api.module = "org.junit.jupiter:junit-jupiter-api"
-junit-jupiter-params.module = "org.junit.jupiter:junit-jupiter-params"
-junit-jupiter-engine.module = "org.junit.jupiter:junit-jupiter-engine"
-
-paperApi = "io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT"
+paperApi = "io.papermc.paper:paper-api:26.1.2.build.+"
 paperLib = "io.papermc:paperlib:1.0.8"
 
 dummypermscompat = "com.sk89q:dummypermscompat:1.10"

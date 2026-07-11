@@ -1,11 +1,8 @@
 plugins {
-    id("java")
     id("maven-publish")
-    id("buildlogic.common-java")
-    id("buildlogic.artifactory-sub")
+    id("buildlogic.common-java-library")
+    id("org.enginehub.crankcase.publishing")
 }
-
-ext["internalVersion"] = "$version+${rootProject.ext["gitCommitHash"]}"
 
 publishing {
     publications {
