@@ -32,15 +32,12 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
-import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
-import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -59,6 +56,7 @@ import com.sk89q.worldguard.protection.regions.RegionQuery.QueryOption;
 import com.sk89q.worldguard.protection.util.WorldEditRegionConverter;
 
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 class RegionCommandsBase {
@@ -178,11 +176,13 @@ class RegionCommandsBase {
      *
      * @param regionManager the region manager
      * @param player the player
+     * @param rgCmd the command to construct when clicking one of multiple items
+     * @param permissionPredicate a predicate to filter regions based on permission access
      * @return a region
      * @throws CommandException thrown if no region was found
      */
-    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, String rgCmd) throws CommandException {
-        return checkRegionStandingIn(regionManager, player, false, rgCmd);
+    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, String rgCmd, Predicate<ProtectedRegion> permissionPredicate) throws CommandException {
+        return checkRegionStandingIn(regionManager, player, false, rgCmd, permissionPredicate);
     }
 
     /**
@@ -197,13 +197,17 @@ class RegionCommandsBase {
      * @param regionManager the region manager
      * @param player the player
      * @param allowGlobal whether to search for a global region if no others are found
+     * @param rgCmd the command to construct when clicking one of multiple items
+     * @param permissionPredicate a predicate to filter regions based on permission access
      * @return a region
      * @throws CommandException thrown if no region was found
      */
-    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, boolean allowGlobal, String rgCmd) throws CommandException {
+    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, boolean allowGlobal, String rgCmd, Predicate<ProtectedRegion> permissionPredicate) throws CommandException {
         ApplicableRegionSet set = regionManager.getApplicableRegions(player.getLocation().toVector().toBlockPoint(), QueryOption.SORT);
 
-        if (set.size() == 0) {
+        Set<ProtectedRegion> filteredRegions = set.getRegions().stream().filter(permissionPredicate).collect(Collectors.toSet());
+
+        if (filteredRegions.isEmpty()) {
             if (allowGlobal) {
                 ProtectedRegion global = checkExistingRegion(regionManager, "__global__", true);
                 player.printDebug("You're not standing in any " +
@@ -213,12 +217,12 @@ class RegionCommandsBase {
             throw new CommandException(
                     "You're not standing in a region. " +
                             "Specify an ID if you want to select a specific region.");
-        } else if (set.size() > 1) {
+        } else if (filteredRegions.size() > 1) {
             boolean first = true;
 
             final TextComponent.Builder builder = TextComponent.builder("");
             builder.append(TextComponent.of("Current regions: ", TextColor.GOLD));
-            for (ProtectedRegion region : set) {
+            for (ProtectedRegion region : filteredRegions) {
                 if (!first) {
                     builder.append(TextComponent.of(", "));
                 }
@@ -234,7 +238,7 @@ class RegionCommandsBase {
             throw new CommandException("You're standing in several regions (please pick one).");
         }
 
-        return set.iterator().next();
+        return filteredRegions.iterator().next();
     }
 
     /**
