@@ -534,6 +534,19 @@ public class WorldGuardBlockListener extends AbstractListener {
                 return;
             }
         }
+
+        if (oldType == Material.LAVA && !Materials.isLiquid(newType)) {
+            if (wcfg.disableLavaHarden) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.LAVA_HARDEN))) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     /*

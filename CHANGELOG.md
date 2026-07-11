@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.18
+
+* Add lava-harden flag for cobblestone/stone/obsidian/basalt forming
+
 ## 7.0.17
 
 * Fix cocoa not being treated as a crop in relevant flags
