@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.destroystokyo.paper.event.entity.EntityZapEvent;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
@@ -39,6 +40,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -66,8 +68,10 @@ import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.CreeperPowerEvent;
@@ -90,6 +94,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Set;
@@ -106,6 +111,18 @@ public class WorldGuardEntityListener extends AbstractListener {
      */
     public WorldGuardEntityListener(WorldGuardPlugin plugin) {
         super(plugin);
+    }
+
+    @Override
+    public void registerEvents() {
+        super.registerEvents();
+
+        PluginManager pm = getPlugin().getServer().getPluginManager();
+        if (PaperLib.isPaper()) {
+            pm.registerEvents(new PaperListener(), getPlugin());
+        } else {
+            pm.registerEvents(new SpigotListener(), getPlugin());
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -741,9 +758,7 @@ public class WorldGuardEntityListener extends AbstractListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPigZap(PigZapEvent event) {
-        final Entity entity = event.getEntity();
+    private static void handlePigZap(Entity entity, Cancellable event) {
         WorldConfiguration wcfg = getWorldConfig(entity.getWorld());
 
         if (wcfg.disablePigZap) {
@@ -881,6 +896,22 @@ public class WorldGuardEntityListener extends AbstractListener {
             return true;
         }
         return false;
+    }
+
+    private static class PaperListener implements Listener {
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        public void onEntityZap(EntityZapEvent event) {
+            if (event.getEntityType() == EntityType.PIG) {
+                handlePigZap(event.getEntity(), event);
+            }
+        }
+    }
+
+    private static class SpigotListener implements Listener {
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        public void onPigZap(PigZapEvent event) {
+            handlePigZap(event.getEntity(), event);
+        }
     }
 
 }
