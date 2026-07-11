@@ -478,7 +478,8 @@ public class WorldGuardBlockListener extends AbstractListener {
 
         WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
-        Material type = event.getNewState().getType();
+        Material oldType = event.getBlock().getType();
+        Material newType = event.getNewState().getType();
 
         if (event instanceof EntityBlockFormEvent) {
             if (((EntityBlockFormEvent) event).getEntity() instanceof Snowman) {
@@ -490,7 +491,7 @@ public class WorldGuardBlockListener extends AbstractListener {
             return;
         }
 
-        if (type == Material.ICE) {
+        if (newType == Material.ICE) {
             if (wcfg.disableIceFormation) {
                 event.setCancelled(true);
                 return;
@@ -502,7 +503,7 @@ public class WorldGuardBlockListener extends AbstractListener {
             }
         }
 
-        if (type == Material.SNOW) {
+        if (newType == Material.SNOW) {
             if (wcfg.disableSnowFormation) {
                 event.setCancelled(true);
                 return;
@@ -522,7 +523,7 @@ public class WorldGuardBlockListener extends AbstractListener {
             }
         }
 
-        if (Materials.isUnwaxedCopper(event.getBlock().getType())) {
+        if (Materials.isUnwaxedCopper(oldType)) {
             if (wcfg.disableCopperBlockFade) {
                 event.setCancelled(true);
                 return;
