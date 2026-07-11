@@ -980,6 +980,9 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.NETHERITE_HORSE_ARMOR, 0);
         putMaterialTag(Tag.ITEMS_SPEARS, 0);
 
+        // 26.1
+        MATERIAL_FLAGS.put(Material.GOLDEN_DANDELION, 0);
+
         Stream.concat(Stream.concat(
                 Tag.CORAL_BLOCKS.getValues().stream(),
                 Tag.CORALS.getValues().stream()),
