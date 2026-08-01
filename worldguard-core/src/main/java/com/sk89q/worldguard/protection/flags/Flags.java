@@ -45,7 +45,7 @@ public final class Flags {
     public static final List<String> INBUILT_FLAGS = Collections.unmodifiableList(INBUILT_FLAGS_LIST);
 
     // Overrides membership check
-    public static final StateFlag PASSTHROUGH = register(new StateFlag("passthrough", false));
+    public static final StateFlag PASSTHROUGH = register(new StateFlag("passthrough", false, null));
     public static final SetFlag<String> NONPLAYER_PROTECTION_DOMAINS = register(new SetFlag<>("nonplayer-protection-domains", null, new StringFlag(null)));
 
     // This flag is unlike the others. It forces the checking of region membership
