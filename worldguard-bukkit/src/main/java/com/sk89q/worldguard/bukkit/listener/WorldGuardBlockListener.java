@@ -423,10 +423,13 @@ public class WorldGuardBlockListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(world);
 
         if (wcfg.simulateSponge && wcfg.redstoneSponges) {
-            EventDebounce.Entry entry = redstoneDebounce.getIfNotPresent(
-                    new BlockRedstoneKey(blockTo), event);
-            if (entry == null) {
-                return; // Debounced — event already fired within the window
+            BlockRedstoneKey key = new BlockRedstoneKey(blockTo);
+            // BlockRedstoneEvent is not Cancellable, so use the
+            // non-cancellable overload to skip the 27-block sponge
+            // search when the same block has been checked within
+            // the debounce window.
+            if (redstoneDebounce.getIfNotPresent(key) == null) {
+                return;
             }
 
             int ox = blockTo.getX();
@@ -448,7 +451,6 @@ public class WorldGuardBlockListener extends AbstractListener {
                 }
             }
 
-            entry.setCancelled(false);
             return;
         }
     }
