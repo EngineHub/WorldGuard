@@ -23,6 +23,8 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.listener.debounce.BlockRedstoneKey;
+import com.sk89q.worldguard.bukkit.listener.debounce.EventDebounce;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
@@ -66,6 +68,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 public class WorldGuardBlockListener extends AbstractListener {
 
+    private final EventDebounce<BlockRedstoneKey> redstoneDebounce = EventDebounce.create(5000);
 
     /**
      * Construct the object.
@@ -409,6 +412,8 @@ public class WorldGuardBlockListener extends AbstractListener {
 
     /*
      * Called when redstone changes.
+     * Debounced to avoid server lag from rapid redstone fluctuations
+     * (e.g. 300 arrows on a pressure plate triggering repeated sponge checks).
      */
     @EventHandler(priority = EventPriority.HIGH)
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
@@ -418,6 +423,12 @@ public class WorldGuardBlockListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(world);
 
         if (wcfg.simulateSponge && wcfg.redstoneSponges) {
+            EventDebounce.Entry entry = redstoneDebounce.getIfNotPresent(
+                    new BlockRedstoneKey(blockTo), event);
+            if (entry == null) {
+                return; // Debounced — event already fired within the window
+            }
+
             int ox = blockTo.getX();
             int oy = blockTo.getY();
             int oz = blockTo.getZ();
@@ -437,6 +448,7 @@ public class WorldGuardBlockListener extends AbstractListener {
                 }
             }
 
+            entry.setCancelled(false);
             return;
         }
     }
