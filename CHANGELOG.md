@@ -1,5 +1,31 @@
 # Changelog
 
+## 7.0.18
+
+* Add lava-harden flag for cobblestone/stone/obsidian/basalt forming.
+* Replace PigZapEvent on Paper to avoid startup warnings.
+* Avoid unnecessary NPC checks to improve performance in some situations.
+* Filtered "multiple regions" messages in commands to only show regions that the player has permission to use the command on.
+* Fixed potential corruption that can occur in extreme region / slow hardware setups where it hasn't finished saving by the next save attempt.
+
+## 7.0.17
+
+* Fix cocoa not being treated as a crop in relevant flags.
+* Fix overlapping game mode flags sometimes not storing the expected previous game mode.
+* Replace PaperLib functionality that doesn't behave as expected on MC 26.1+.
+
+## 7.0.16
+
+* Update to 1.21.11.
+* Added experimental Folia support.
+* Workaround an issue where some item/block names aren't adequately translated by the client.
+* Workaround a duplication bug in Paper.
+
+## 7.0.15
+
+* Update to 1.21.10
+* Improve region file loading compatibility with NIO Java APIs
+
 ## 7.0.14
 
 * Update to 1.21.5

@@ -33,7 +33,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.Collection;
+import java.util.function.Consumer;
+
 
 /**
  * Keeps tracks of sessions and also does session-related handling
@@ -46,13 +47,25 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
      * information for all players.
      */
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void resetAllStates() {
-        Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
-        for (Player player : players) {
-            BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
-            Session session = getIfPresent(bukkitPlayer);
-            if (session != null) {
-                session.resetState(bukkitPlayer);
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            Runnable task = () -> {
+                BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
+                Session session = getIfPresent(bukkitPlayer);
+                if (session != null) {
+                    session.resetState(bukkitPlayer);
+                }
+            };
+            if (WorldGuardPlugin.inst().isFolia()) {
+                player.getScheduler().run(WorldGuardPlugin.inst(), new Consumer() {
+                    @Override
+                    public void accept(Object ignored) {
+                        task.run();
+                    }
+                }, null);
+            } else {
+                task.run();
             }
         }
     }
@@ -65,10 +78,23 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     }
 
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void run() {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-            get(localPlayer).tick(localPlayer);
+            Runnable task = () -> {
+                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                get(localPlayer).tick(localPlayer);
+            };
+            if (WorldGuardPlugin.inst().isFolia()) {
+                player.getScheduler().run(WorldGuardPlugin.inst(), new Consumer() {
+                    @Override
+                    public void accept(Object ignored) {
+                        task.run();
+                    }
+                }, null);
+            } else {
+                task.run();
+            }
         }
     }
 
@@ -79,7 +105,7 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
                     && WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).fakePlayerBuildOverride) {
                 return true;
             }
-            if (!((BukkitPlayer) player).getPlayer().isOnline()) {
+            if (!bukkitPlayer.getPlayer().isOnline()) {
                 return false;
             }
         }

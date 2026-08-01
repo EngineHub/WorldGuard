@@ -58,28 +58,27 @@ public class InvincibilityListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
         Entity victim = event.getEntity();
-        if (Entities.isNPC(victim)) return;
+        if (!(victim instanceof Player player)) return;
+        if (Entities.isNPC(player)) return;
 
-        if (victim instanceof Player player) {
-            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
-            if (isInvincible(localPlayer)) {
-                player.setFireTicks(0);
-                event.setCancelled(true);
+        if (isInvincible(localPlayer)) {
+            player.setFireTicks(0);
+            event.setCancelled(true);
 
-                if (event instanceof EntityDamageByEntityEvent) {
-                    EntityDamageByEntityEvent byEntityEvent = (EntityDamageByEntityEvent) event;
-                    Entity attacker = byEntityEvent.getDamager();
+            if (event instanceof EntityDamageByEntityEvent) {
+                EntityDamageByEntityEvent byEntityEvent = (EntityDamageByEntityEvent) event;
+                Entity attacker = byEntityEvent.getDamager();
 
-                    if (attacker instanceof Projectile && ((Projectile) attacker).getShooter() instanceof Entity) {
-                        attacker = (Entity) ((Projectile) attacker).getShooter();
-                    }
+                if (attacker instanceof Projectile && ((Projectile) attacker).getShooter() instanceof Entity) {
+                    attacker = (Entity) ((Projectile) attacker).getShooter();
+                }
 
-                    if (getWorldConfig(player.getWorld()).regionInvinciblityRemovesMobs
-                            && attacker instanceof LivingEntity && !(attacker instanceof Player)
-                            && !(attacker instanceof Tameable && ((Tameable) attacker).isTamed())) {
-                        attacker.remove();
-                    }
+                if (getWorldConfig(player.getWorld()).regionInvinciblityRemovesMobs
+                        && attacker instanceof LivingEntity && !(attacker instanceof Player)
+                        && !(attacker instanceof Tameable && ((Tameable) attacker).isTamed())) {
+                    attacker.remove();
                 }
             }
         }
@@ -88,27 +87,25 @@ public class InvincibilityListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityCombust(EntityCombustEvent event) {
         Entity entity = event.getEntity();
-        if (Entities.isNPC(entity)) return;
+        if (!(entity instanceof Player player)) return;
+        if (Entities.isNPC(player)) return;
 
-        if (entity instanceof Player player) {
-            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
-            if (isInvincible(localPlayer)) {
-                event.setCancelled(true);
-            }
+        if (isInvincible(localPlayer)) {
+            event.setCancelled(true);
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
-        if (Entities.isNPC(event.getEntity())) return;
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (Entities.isNPC(player)) return;
 
-        if (event.getEntity() instanceof Player player) {
-            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
-            if (event.getFoodLevel() < player.getFoodLevel() && isInvincible(localPlayer)) {
-                event.setCancelled(true);
-            }
+        if (event.getFoodLevel() < player.getFoodLevel() && isInvincible(localPlayer)) {
+            event.setCancelled(true);
         }
     }
 

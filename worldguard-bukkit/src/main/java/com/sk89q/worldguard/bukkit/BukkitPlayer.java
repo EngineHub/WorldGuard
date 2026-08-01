@@ -25,6 +25,7 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.util.PaperInterop;
 import com.sk89q.worldguard.util.MessagingUtil;
 import io.papermc.lib.PaperLib;
 import org.bukkit.BanList.Type;
@@ -188,7 +189,7 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
 
     @Override
     public void teleport(Location location, String successMessage, String failMessage) {
-        PaperLib.teleportAsync(getPlayer(), BukkitAdapter.adapt(location))
+        PaperInterop.teleportAsync(getPlayer(), BukkitAdapter.adapt(location))
                 .thenApply(success -> {
                     if (success) {
                         // The success message can be cleared via flag

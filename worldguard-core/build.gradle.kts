@@ -1,7 +1,4 @@
-import org.cadixdev.gradle.licenser.LicenseExtension
-
 plugins {
-    `java-library`
     id("buildlogic.core-and-platform")
 }
 
@@ -35,12 +32,6 @@ dependencies {
 tasks.compileJava {
     dependsOn(":worldguard-libs:build")
     options.compilerArgs.add("-Aarg.name.key.prefix=")
-}
-
-configure<LicenseExtension> {
-    exclude {
-        it.file.startsWith(project.layout.buildDirectory.get().asFile)
-    }
 }
 
 configure<PublishingExtension> {

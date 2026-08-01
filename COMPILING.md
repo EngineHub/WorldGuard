@@ -1,8 +1,8 @@
 Compiling
 =========
 
-You can compile WorldGuard as long as you have some version of Java greater than or equal to 21 installed. 
-Gradle will download JDK 21 specifically if needed, but it needs some version of Java to bootstrap from.
+You can compile WorldGuard as long as you have some version of Java greater than or equal to 25 installed.
+Gradle will download JDK 25 specifically if needed, but it needs some version of Java to bootstrap from.
 
 The build process uses Gradle, which you do *not* need to download. WorldGuard is a multi-module project with three modules:
 

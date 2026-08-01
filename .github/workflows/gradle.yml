@@ -1,0 +1,48 @@
+name: Gradle Build
+on:
+  push:
+    branches:
+      - 'master'
+      - 'version/*'
+  pull_request:
+  merge_group:
+
+jobs:
+  build:
+    name: Build WorldGuard on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: ${{ !(github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/version/')) }}
+
+      - name: Execute Gradle build
+        run: ./gradlew build -s
+
+      - uses: actions/upload-artifact@v6
+        name: Archive Reports
+        if: always()
+        with:
+          name: reports for ${{ matrix.os }}
+          path: '**/build/reports/**'
+
+      - uses: actions/upload-artifact@v6
+        name: Archive Logs
+        if: always()
+        with:
+          name: logs for ${{ matrix.os }}
+          path: '**/*.log'

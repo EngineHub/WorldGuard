@@ -52,6 +52,7 @@ import org.yaml.snakeyaml.representer.Representer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -120,7 +121,7 @@ public class YamlRegionFile implements RegionDatabase {
         YAMLProcessor config = createYamlProcessor(file);
         try {
             config.load();
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | NoSuchFileException e) {
             return new HashSet<>(loaded.values());
         } catch (IOException | ParserException e) {
             throw new StorageException("Failed to load region data from '" + file + "'", e);
@@ -195,63 +196,65 @@ public class YamlRegionFile implements RegionDatabase {
     public void saveAll(Set<ProtectedRegion> regions) throws StorageException {
         checkNotNull(regions);
 
-        File tempFile = new File(file.getParentFile(), file.getName() + ".tmp");
-        YAMLProcessor config = createYamlProcessor(tempFile);
+        synchronized (YamlRegionFile.class) {
+            File tempFile = new File(file.getParentFile(), file.getName() + ".tmp");
+            YAMLProcessor config = createYamlProcessor(tempFile);
 
-        config.clear();
+            config.clear();
 
-        YAMLNode regionsNode = config.addNode("regions");
-        Map<String, Object> map = regionsNode.getMap();
+            YAMLNode regionsNode = config.addNode("regions");
+            Map<String, Object> map = regionsNode.getMap();
 
-        for (ProtectedRegion region : regions) {
-            Map<String, Object> nodeMap = new HashMap<>();
-            map.put(region.getId(), nodeMap);
-            YAMLNode node = new YAMLNode(nodeMap, false);
+            for (ProtectedRegion region : regions) {
+                Map<String, Object> nodeMap = new HashMap<>();
+                map.put(region.getId(), nodeMap);
+                YAMLNode node = new YAMLNode(nodeMap, false);
 
-            if (region instanceof ProtectedCuboidRegion) {
-                ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
-                node.setProperty("type", "cuboid");
-                node.setProperty("min", cuboid.getMinimumPoint());
-                node.setProperty("max", cuboid.getMaximumPoint());
-            } else if (region instanceof ProtectedPolygonalRegion) {
-                ProtectedPolygonalRegion poly = (ProtectedPolygonalRegion) region;
-                node.setProperty("type", "poly2d");
-                node.setProperty("min-y", poly.getMinimumPoint().y());
-                node.setProperty("max-y", poly.getMaximumPoint().y());
+                if (region instanceof ProtectedCuboidRegion) {
+                    ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
+                    node.setProperty("type", "cuboid");
+                    node.setProperty("min", cuboid.getMinimumPoint());
+                    node.setProperty("max", cuboid.getMaximumPoint());
+                } else if (region instanceof ProtectedPolygonalRegion) {
+                    ProtectedPolygonalRegion poly = (ProtectedPolygonalRegion) region;
+                    node.setProperty("type", "poly2d");
+                    node.setProperty("min-y", poly.getMinimumPoint().y());
+                    node.setProperty("max-y", poly.getMaximumPoint().y());
 
-                List<Map<String, Object>> points = new ArrayList<>();
-                for (BlockVector2 point : poly.getPoints()) {
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("x", point.x());
-                    data.put("z", point.z());
-                    points.add(data);
+                    List<Map<String, Object>> points = new ArrayList<>();
+                    for (BlockVector2 point : poly.getPoints()) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("x", point.x());
+                        data.put("z", point.z());
+                        points.add(data);
+                    }
+
+                    node.setProperty("points", points);
+                } else if (region instanceof GlobalProtectedRegion) {
+                    node.setProperty("type", "global");
+                } else {
+                    node.setProperty("type", region.getClass().getCanonicalName());
                 }
 
-                node.setProperty("points", points);
-            } else if (region instanceof GlobalProtectedRegion) {
-                node.setProperty("type", "global");
-            } else {
-                node.setProperty("type", region.getClass().getCanonicalName());
+                node.setProperty("priority", region.getPriority());
+                node.setProperty("flags", getFlagData(region));
+                node.setProperty("owners", getDomainData(region.getOwners()));
+                node.setProperty("members", getDomainData(region.getMembers()));
+
+                ProtectedRegion parent = region.getParent();
+                if (parent != null) {
+                    node.setProperty("parent", parent.getId());
+                }
             }
 
-            node.setProperty("priority", region.getPriority());
-            node.setProperty("flags", getFlagData(region));
-            node.setProperty("owners", getDomainData(region.getOwners()));
-            node.setProperty("members", getDomainData(region.getMembers()));
+            config.setHeader(FILE_HEADER);
+            config.save();
 
-            ProtectedRegion parent = region.getParent();
-            if (parent != null) {
-                node.setProperty("parent", parent.getId());
+            //noinspection ResultOfMethodCallIgnored
+            file.delete();
+            if (!tempFile.renameTo(file)) {
+                throw new StorageException("Failed to rename temporary regions file to " + file.getAbsolutePath());
             }
-        }
-
-        config.setHeader(FILE_HEADER);
-        config.save();
-
-        //noinspection ResultOfMethodCallIgnored
-        file.delete();
-        if (!tempFile.renameTo(file)) {
-            throw new StorageException("Failed to rename temporary regions file to " + file.getAbsolutePath());
         }
     }
 

@@ -52,7 +52,7 @@ public class NotifyEntryFlag extends FlagValueChangeHandler<Boolean> {
     protected boolean onSetValue(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Boolean currentValue, Boolean lastValue, MoveType moveType) {
         if (!currentValue) {
             // If the current value is false, we do not notify
-            return false;
+            return true;
         }
 
         StringBuilder regionList = new StringBuilder();

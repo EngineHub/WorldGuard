@@ -19,11 +19,12 @@
 
 package com.sk89q.worldguard.blacklist.target;
 
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.block.BlockType;
 
 public class BlockTarget implements Target {
 
-    private BlockType type;
+    private final BlockType type;
 
     public BlockTarget(BlockType type) {
         this.type = type;
@@ -31,11 +32,16 @@ public class BlockTarget implements Target {
 
     @Override
     public String getTypeId() {
-        return type.getId();
+        return type.id();
     }
 
     @Override
     public String getFriendlyName() {
         return type.getName();
+    }
+
+    @Override
+    public Component getFriendlyNameComponent() {
+        return type.getRichName();
     }
 }

@@ -410,7 +410,7 @@ public class RegionProtectionListener extends AbstractListener {
         final Entity entity = event.getEntity();
         final EntityType type = entity.getType();
         if (Entities.isHostile(entity) || Entities.isAmbient(entity)
-                || Entities.isNPC(entity) || entity instanceof Player) {
+                || entity instanceof Player || Entities.isNPC(entity)) {
             canUse = event.getRelevantFlags().isEmpty() || query.queryState(BukkitAdapter.adapt(target), associable, combine(event)) != State.DENY;
             what = "use that";
         /* Paintings, item frames, etc. */

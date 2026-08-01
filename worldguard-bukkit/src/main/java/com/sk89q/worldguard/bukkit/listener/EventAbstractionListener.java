@@ -44,6 +44,7 @@ import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.bukkit.util.PaperInterop;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.flags.Flags;
 import io.papermc.lib.PaperLib;
@@ -163,6 +164,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class EventAbstractionListener extends AbstractListener {
@@ -209,8 +211,21 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
+    private boolean isExemptBlock(Material material) {
+        // Generating an End Portal from Bedrock/End_Portal_Frame should not trigger BlockMultiPlaceEvent
+        // Canceling this event for these blocks causes an upstream item duplication bug.
+        // https://github.com/PaperMC/Paper/issues/13586
+        return switch (material) {
+            case BEDROCK, END_PORTAL_FRAME -> true;
+            default -> false;
+        };
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onBlockMultiPlace(BlockMultiPlaceEvent event) {
+        if (isExemptBlock(event.getBlockPlaced().getType())) {
+            return;
+        }
         List<Block> placed = event.getReplacedBlockStates().stream().map(BlockState::getBlock).collect(Collectors.toList());
         int origAmt = placed.size();
         PlaceBlockEvent delegateEvent = new PlaceBlockEvent(event, create(event.getPlayer()), event.getBlock().getWorld(),
@@ -1001,15 +1016,16 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
-        InventoryHolder holder = PaperLib.getHolder(event.getInventory(), false).getHolder();
+        InventoryHolder holder = PaperInterop.getHolder(event.getInventory(), false);
         if (holder instanceof Entity && holder == event.getPlayer()) return;
 
         handleInventoryHolderUse(event, create(event.getPlayer()), holder);
     }
 
     @EventHandler(ignoreCancelled = true)
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
-        InventoryHolder causeHolder = PaperLib.getHolder(event.getInitiator(), false).getHolder();
+        InventoryHolder causeHolder = PaperInterop.getHolder(event.getInitiator(), false);
 
         WorldConfiguration wcfg = null;
         if (causeHolder instanceof Hopper
@@ -1023,8 +1039,8 @@ public class EventAbstractionListener extends AbstractListener {
         Entry entry;
 
         if ((entry = moveItemDebounce.tryDebounce(event)) != null) {
-            InventoryHolder sourceHolder = PaperLib.getHolder(event.getSource(), false).getHolder();
-            InventoryHolder targetHolder = PaperLib.getHolder(event.getDestination(), false).getHolder();
+            InventoryHolder sourceHolder = PaperInterop.getHolder(event.getSource(), false);
+            InventoryHolder targetHolder = PaperInterop.getHolder(event.getDestination(), false);
 
             Cause cause;
 
@@ -1044,9 +1060,19 @@ public class EventAbstractionListener extends AbstractListener {
                 handleInventoryHolderUse(event, cause, targetHolder);
             }
 
-            if (event.isCancelled() && causeHolder instanceof Hopper && wcfg.breakDeniedHoppers) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(),
-                        () -> ((Hopper) causeHolder).getBlock().breakNaturally());
+            if (event.isCancelled() && causeHolder instanceof Hopper hopper && wcfg.breakDeniedHoppers) {
+                Runnable task = () -> hopper.getBlock().breakNaturally();
+
+                if (WorldGuardPlugin.inst().isFolia()) {
+                    Bukkit.getRegionScheduler().run(getPlugin(), hopper.getLocation(), new Consumer() {
+                        @Override
+                        public void accept(Object ignored) {
+                            task.run();
+                        }
+                    });
+                } else {
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), task);
+                }
             } else {
                 entry.setCancelled(event.isCancelled());
             }

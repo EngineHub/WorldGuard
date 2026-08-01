@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.blacklist.logger;
 
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.formatting.text.serializer.plain.PlainComponentSerializer;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 import com.sk89q.worldguard.blacklist.target.Target;
@@ -225,7 +226,7 @@ public class FileHandler implements LoggerHandler {
     }
 
     private void logEvent(BlacklistEvent event, String text, Target target, BlockVector3 pos, String comment) {
-        log(event.getPlayer(), "Tried to " + text + " " + target.getFriendlyName() + " " + getCoordinates(pos), comment);
+        log(event.getPlayer(), "Tried to " + text + " " + PlainComponentSerializer.INSTANCE.serialize(target.getFriendlyNameComponent()) + " " + getCoordinates(pos), comment);
     }
 
     @Override

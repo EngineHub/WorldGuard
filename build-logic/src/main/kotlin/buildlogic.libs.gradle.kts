@@ -1,10 +1,9 @@
 plugins {
     id("java-base")
     id("maven-publish")
-    id("com.github.johnrengelman.shadow")
-    id("com.jfrog.artifactory")
+    id("com.gradleup.shadow")
     id("buildlogic.common")
-    id("buildlogic.artifactory-sub")
+    id("org.enginehub.crankcase.publishing")
 }
 
 // A horrible hack because `softwareComponentFactory` has to be gotten via plugin
@@ -119,7 +118,7 @@ val apiElements = project.configurations.register("apiElements") {
         attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
         attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
         attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
-        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
     }
     outgoing.artifact(tasks.named("jar"))
 }
@@ -134,7 +133,7 @@ val runtimeElements = project.configurations.register("runtimeElements") {
         attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
         attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
         attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
-        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
     }
     outgoing.artifact(tasks.named("jar"))
 }

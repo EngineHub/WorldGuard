@@ -19,14 +19,18 @@
 
 package com.sk89q.worldguard.util.formatting.component;
 
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 
 public class BlacklistNotify extends Notify {
 
     public BlacklistNotify(BlacklistEvent event, String comment) {
         super(event.getCauseName(), " (" + event.getDescription() + ") ");
-        append(TextComponent.of(event.getTarget().getFriendlyName() + (comment != null ? " (" + comment + ")" : "") + ".", TextColor.WHITE));
+        Component base = event.getTarget().getFriendlyNameComponent();
+        if (comment != null) {
+            base = base.append(TextComponent.of(" (" + comment + ")"));
+        }
+        append(base);
     }
 }
