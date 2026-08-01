@@ -34,9 +34,7 @@ import com.sk89q.worldguard.protection.PermissiveRegionSet;
 import com.sk89q.worldguard.protection.RegionResultSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.MapFlag;
-import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -131,293 +129,107 @@ public class RegionQuery {
     }
 
     /**
-     * Returns true if the BUILD flag allows the action in the location, but it
-     * can be overridden by a list of other flags. The BUILD flag will not
-     * override the other flags, but the other flags can override BUILD. If
-     * neither BUILD or any of the flags permit the action, then false will
-     * be returned.
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#testBuild(RegionAssociable, StateFlag...)
+     * .testBuild(RegionAssociable, StateFlag...)}
      *
-     * <p>Use this method when checking flags that are related to build
-     * protection. For example, lighting fire in a region should not be
-     * permitted unless the player is a member of the region or the
-     * LIGHTER flag allows it. However, the LIGHTER flag should be able
-     * to allow lighting fires even if BUILD is set to DENY.</p>
-     *
-     * <p>How this method works (BUILD can be overridden by other flags but
-     * not the other way around) is inconsistent, but it's required for
-     * legacy reasons.</p>
-     *
-     * <p>This method does not check the region bypass permission. That must
-     * be done by the calling code.</p>
-     *
-     * @param location the location
-     * @param player an optional player, which would be used to determine the region group to apply
-     * @param flag the flag
-     * @return true if the result was {@code ALLOW}
-     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
+     * @deprecated use {@link #testBuild(Location, RegionAssociable, StateFlag...)} instead, will be removed in WorldGuard 8
      */
-    public boolean testBuild(Location location, LocalPlayer player, StateFlag... flag) {
-        if (flag.length == 0) {
-            return testState(location, player, Flags.BUILD);
-        }
-
-        return StateFlag.test(StateFlag.combine(
-                StateFlag.denyToNone(queryState(location, player, Flags.BUILD)),
-                queryState(location, player, flag)));
+    @Deprecated(forRemoval = true)
+    public boolean testBuild(Location location, LocalPlayer subject, StateFlag... flags) {
+        return getApplicableRegions(location).testBuild(subject, flags);
     }
 
     /**
-     * Returns true if the BUILD flag allows the action in the location, but it
-     * can be overridden by a list of other flags. The BUILD flag will not
-     * override the other flags, but the other flags can override BUILD. If
-     * neither BUILD or any of the flags permit the action, then false will
-     * be returned.
-     *
-     * <p>Use this method when checking flags that are related to build
-     * protection. For example, lighting fire in a region should not be
-     * permitted unless the player is a member of the region or the
-     * LIGHTER flag allows it. However, the LIGHTER flag should be able
-     * to allow lighting fires even if BUILD is set to DENY.</p>
-     *
-     * <p>How this method works (BUILD can be overridden by other flags but
-     * not the other way around) is inconsistent, but it's required for
-     * legacy reasons.</p>
-     *
-     * <p>This method does not check the region bypass permission. That must
-     * be done by the calling code.</p>
-     *
-     * @param location the location
-     * @param associable an optional associable
-     * @param flag the flag
-     * @return true if the result was {@code ALLOW}
-     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#testBuild(RegionAssociable, StateFlag...)
+     * .testBuild(RegionAssociable, StateFlag...)}
      */
-    public boolean testBuild(Location location, RegionAssociable associable, StateFlag... flag) {
-        if (flag.length == 0) {
-            return testState(location, associable, Flags.BUILD);
-        }
-
-        return StateFlag.test(StateFlag.combine(
-                StateFlag.denyToNone(queryState(location, associable, Flags.BUILD)),
-                queryState(location, associable, flag)));
+    public boolean testBuild(Location location, RegionAssociable subject, StateFlag... flags) {
+        return getApplicableRegions(location).testBuild(subject, flags);
     }
 
     /**
-     * Returns true if the BUILD flag allows the action in the location, but it
-     * can be overridden by a list of other flags. The BUILD flag will not
-     * override the other flags, but the other flags can override BUILD. If
-     * neither BUILD or any of the flags permit the action, then false will
-     * be returned.
-     *
-     * <p>Use this method when checking flags that are related to build
-     * protection. For example, lighting fire in a region should not be
-     * permitted unless the player is a member of the region or the
-     * LIGHTER flag allows it. However, the LIGHTER flag should be able
-     * to allow lighting fires even if BUILD is set to DENY.</p>
-     *
-     * <p>This method does include parameters for a {@link MapFlag}.</p>
-     *
-     * <p>How this method works (BUILD can be overridden by other flags but
-     * not the other way around) is inconsistent, but it's required for
-     * legacy reasons.</p>
-     *
-     * <p>This method does not check the region bypass permission. That must
-     * be done by the calling code.</p>
-     *
-     * @param location the location
-     * @param associable an optional associable
-     * @param mapFlag the MapFlag
-     * @param key the key for the MapFlag
-     * @param fallback the fallback flag for MapFlag
-     * @param flag the flags
-     * @return true if the result was {@code ALLOW}
-     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#testBuild(RegionAssociable, MapFlag, Object, StateFlag, StateFlag...)
+     * .testBuild(RegionAssociable, MapFlag, Object, StateFlag, StateFlag...)}
      */
-    public <K> boolean testBuild(Location location, RegionAssociable associable, MapFlag<K, State> mapFlag, K key,
-                                 @Nullable StateFlag fallback, StateFlag... flag) {
-        if (mapFlag == null)
-            return testBuild(location, associable, flag);
-
-        if (flag.length == 0) {
-            return StateFlag.test(StateFlag.combine(
-                    StateFlag.denyToNone(queryState(location, associable, Flags.BUILD)),
-                    queryMapValue(location, associable, mapFlag, key, fallback)
-            ));
-        }
-
-        return StateFlag.test(StateFlag.combine(
-                StateFlag.denyToNone(queryState(location, associable, Flags.BUILD)),
-                queryMapValue(location, associable, mapFlag, key, fallback),
-                queryState(location, associable, flag)
-        ));
+    public <K> boolean testBuild(Location location, RegionAssociable subject, MapFlag<K, State> flag, K key,
+                                 @Nullable StateFlag fallback, StateFlag... flags) {
+        return getApplicableRegions(location).testBuild(subject, flag, key, fallback, flags);
     }
 
     /**
-     * Test whether the (effective) value for a list of state flags equals
-     * {@code ALLOW}.
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#testState(RegionAssociable, StateFlag...)
+     * .testState(RegionAssociable, StateFlag...)}
      *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
-     * {@link Flags#BUILD} flag is in the list of flags.</p>
-     *
-     * <p>This method does not check the region bypass permission. That must
-     * be done by the calling code.</p>
-     *
-     * @param location the location
-     * @param player an optional player, which would be used to determine the region group to apply
-     * @param flag the flag
-     * @return true if the result was {@code ALLOW}
-     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
+     * @deprecated use {@link #testState(Location, RegionAssociable, StateFlag...)} instead, will be removed in WorldGuard 8
      */
-    public boolean testState(Location location, @Nullable LocalPlayer player, StateFlag... flag) {
-        return StateFlag.test(queryState(location, player, flag));
+    @Deprecated(forRemoval = true)
+    public boolean testState(Location location, @Nullable LocalPlayer subject, StateFlag... flags) {
+        return getApplicableRegions(location).testState(subject, flags);
     }
 
     /**
-     * Test whether the (effective) value for a list of state flags equals
-     * {@code ALLOW}.
-     *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
-     * {@link Flags#BUILD} flag is in the list of flags.</p>
-     *
-     * <p>This method does not check the region bypass permission. That must
-     * be done by the calling code.</p>
-     *
-     * @param location the location
-     * @param associable an optional associable
-     * @param flag the flag
-     * @return true if the result was {@code ALLOW}
-     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#testState(RegionAssociable, StateFlag...)
+     * .testState(RegionAssociable, StateFlag...)}
      */
-    public boolean testState(Location location, @Nullable RegionAssociable associable, StateFlag... flag) {
-        return StateFlag.test(queryState(location, associable, flag));
+    public boolean testState(Location location, @Nullable RegionAssociable subject, StateFlag... flags) {
+        return getApplicableRegions(location).testState(subject, flags);
     }
 
     /**
-     * Get the (effective) value for a list of state flags. The rules of
-     * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
-     * and {@code ALLOW} overrides {@code NONE}. One flag may override another.
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#queryState(RegionAssociable, StateFlag...)
+     * .queryState(RegionAssociable, StateFlag...)}
      *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
-     * {@link Flags#BUILD} flag is in the list of flags.</p>
-     *
-     * @param location the location
-     * @param player an optional player, which would be used to determine the region groups that apply
-     * @param flags a list of flags to check
-     * @return a state
-     * @see RegionResultSet#queryState(RegionAssociable, StateFlag...)
+     * @deprecated use {@link #queryState(Location, RegionAssociable, StateFlag...)} instead, will be removed in WorldGuard 8
+     */
+    @Deprecated(forRemoval = true)
+    @Nullable
+    public State queryState(Location location, @Nullable LocalPlayer subject, StateFlag... flags) {
+        return getApplicableRegions(location).queryState(subject, flags);
+    }
+
+    /**
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#queryState(RegionAssociable, StateFlag...)
+     * .queryState(RegionAssociable, StateFlag...)}
      */
     @Nullable
-    public State queryState(Location location, @Nullable LocalPlayer player, StateFlag... flags) {
-        return getApplicableRegions(location).queryState(player, flags);
+    public State queryState(Location location, @Nullable RegionAssociable subject, StateFlag... flags) {
+        return getApplicableRegions(location).queryState(subject, flags);
     }
 
     /**
-     * Get the (effective) value for a list of state flags. The rules of
-     * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
-     * and {@code ALLOW} overrides {@code NONE}. One flag may override another.
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#queryValue(RegionAssociable, Flag)
+     * .queryValue(RegionAssociable, Flag)}
      *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
-     * {@link Flags#BUILD} flag is in the list of flags.</p>
-     *
-     * @param location the location
-     * @param associable an optional associable
-     * @param flags a list of flags to check
-     * @return a state
-     * @see RegionResultSet#queryState(RegionAssociable, StateFlag...)
+     * @deprecated use {@link #queryValue(Location, RegionAssociable, Flag)} instead, will be removed in WorldGuard 8
+     */
+    @Deprecated(forRemoval = true)
+    @Nullable
+    public <V> V queryValue(Location location, @Nullable LocalPlayer subject, Flag<V> flag) {
+        return getApplicableRegions(location).queryValue(subject, flag);
+    }
+
+    /**
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#queryValue(RegionAssociable, Flag)
+     * .queryValue(RegionAssociable, Flag)}
      */
     @Nullable
-    public State queryState(Location location, @Nullable RegionAssociable associable, StateFlag... flags) {
-        return getApplicableRegions(location).queryState(associable, flags);
+    public <V> V queryValue(Location location, @Nullable RegionAssociable subject, Flag<V> flag) {
+        return getApplicableRegions(location).queryValue(subject, flag);
     }
 
     /**
-     * Get the effective value for a flag. If there are multiple values
-     * (for example, multiple overlapping regions with
-     * the same priority may have the same flag set), then the selected
-     * (or "winning") value will depend on the flag type.
-     *
-     * <p>Only some flag types actually have a strategy for picking the
-     * "best value." For most types, the actual value that is chosen to be
-     * returned is undefined (it could be any value). As of writing, the only
-     * type of flag that actually has a strategy for picking a value is the
-     * {@link StateFlag}.</p>
-     *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
-     * {@link Flags#BUILD} flag is the flag being queried.</p>
-     *
-     * @param location the location
-     * @param player an optional player, which would be used to determine the region group to apply
-     * @param flag the flag
-     * @return a value, which could be {@code null}
-     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
-     */
-    @Nullable
-    public <V> V queryValue(Location location, @Nullable LocalPlayer player, Flag<V> flag) {
-        return getApplicableRegions(location).queryValue(player, flag);
-    }
-
-    /**
-     * Get the effective value for a flag. If there are multiple values
-     * (for example, multiple overlapping regions with
-     * the same priority may have the same flag set), then the selected
-     * (or "winning") value will depend on the flag type.
-     *
-     * <p>Only some flag types actually have a strategy for picking the
-     * "best value." For most types, the actual value that is chosen to be
-     * returned is undefined (it could be any value). As of writing, the only
-     * type of flag that actually has a strategy for picking a value is the
-     * {@link StateFlag}.</p>
-     *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
-     * {@link Flags#BUILD} flag is the flag being queried.</p>
-     *
-     * @param location the location
-     * @param associable an optional associable
-     * @param flag the flag
-     * @return a value, which could be {@code null}
-     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
-     */
-    @Nullable
-    public <V> V queryValue(Location location, @Nullable RegionAssociable associable, Flag<V> flag) {
-        return getApplicableRegions(location).queryValue(associable, flag);
-    }
-
-    /**
-     * Get the effective value for a key in a {@link MapFlag}. If there are multiple values
-     * (for example, if there are multiple regions with the same priority
-     * but with different farewell messages set, there would be multiple
-     * completing values), then the selected (or "winning") value will be undefined.
-     *
-     * <p>A subject can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * subject is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the subject, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flag the flag of type {@link MapFlag}
-     * @param key the key for the map flag
-     * @return a value, which could be {@code null}
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#queryMapValue(RegionAssociable, MapFlag, Object)
+     * .queryMapValue(RegionAssociable, MapFlag, Object)}
      */
     @Nullable
     public <V, K> V queryMapValue(Location location, @Nullable RegionAssociable subject, MapFlag<K, V> flag, K key) {
@@ -425,73 +237,43 @@ public class RegionQuery {
     }
 
     /**
-     * Get the effective value for a key in a {@link MapFlag}. If there are multiple values
-     * (for example, if there are multiple regions with the same priority
-     * but with different farewell messages set, there would be multiple
-     * completing values), then the selected (or "winning") value will be undefined.
-     *
-     * <p>A subject can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * subject is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the subject, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * <p>It's possible to provide a fallback flag for the case when the key doesn't
-     * exist in the {@link MapFlag}.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flag the flag of type {@link MapFlag}
-     * @param key the key for the map flag
-     * @param fallback the fallback flag
-     * @return a value, which could be {@code null}
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#queryMapValue(RegionAssociable, MapFlag, Object, Flag)
+     * .queryMapValue(RegionAssociable, MapFlag, Object, Flag)}
      */
     @Nullable
-    public <V, K> V queryMapValue(Location location, @Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, Flag<V> fallback) {
+    public <V, K> V queryMapValue(Location location, @Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, @Nullable Flag<V> fallback) {
         return getApplicableRegions(location).queryMapValue(subject, flag, key, fallback);
     }
 
     /**
-     * Get the effective values for a flag, returning a collection of all
-     * values. It is up to the caller to determine which value, if any,
-     * from the collection will be used.
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#queryAllValues(RegionAssociable, Flag)
+     * .queryAllValues(RegionAssociable, Flag)}
      *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
-     * {@link Flags#BUILD} flag is the flag being queried.</p>
-     *
-     * @param location the location
-     * @param player an optional player, which would be used to determine the region group to apply
-     * @param flag the flag
-     * @return a collection of values
-     * @see RegionResultSet#queryAllValues(RegionAssociable, Flag)
+     * @deprecated use {@link #queryAllValues(Location, RegionAssociable, Flag)} instead, will be removed in WorldGuard 8
      */
-    public <V> Collection<V> queryAllValues(Location location, @Nullable LocalPlayer player, Flag<V> flag) {
-        return getApplicableRegions(location).queryAllValues(player, flag);
+    @Deprecated(forRemoval = true)
+    public <V> Collection<V> queryAllValues(Location location, @Nullable LocalPlayer subject, Flag<V> flag) {
+        return getApplicableRegions(location).queryAllValues(subject, flag);
     }
 
     /**
-     * Get the effective values for a flag, returning a collection of all
-     * values. It is up to the caller to determine which value, if any,
-     * from the collection will be used.
-     *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
-     * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
-     * {@link Flags#BUILD} flag is the flag being queried.</p>
-     *
-     * @param location the location
-     * @param associable an optional associable
-     * @param flag the flag
-     * @return a collection of values
-     * @see RegionResultSet#queryAllValues(RegionAssociable, Flag)
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#queryAllValues(RegionAssociable, Flag)
+     * .queryAllValues(RegionAssociable, Flag)}
      */
-    public <V> Collection<V> queryAllValues(Location location, @Nullable RegionAssociable associable, Flag<V> flag) {
-        return getApplicableRegions(location).queryAllValues(associable, flag);
+    public <V> Collection<V> queryAllValues(Location location, @Nullable RegionAssociable subject, Flag<V> flag) {
+        return getApplicableRegions(location).queryAllValues(subject, flag);
+    }
+
+    /**
+     * Convenience method for
+     * {@link #getApplicableRegions(Location)}{@link ApplicableRegionSet#queryAllValues(RegionAssociable, Flag, boolean)
+     * .queryAllValues(RegionAssociable, Flag, boolean)}
+     */
+    public <V> Collection<V> queryAllValues(Location location, @Nullable RegionAssociable subject, Flag<V> flag, boolean acceptOne) {
+        return getApplicableRegions(location).queryAllValues(subject, flag, acceptOne);
     }
 
     /**
