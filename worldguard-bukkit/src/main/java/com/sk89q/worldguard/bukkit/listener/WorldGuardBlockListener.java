@@ -423,8 +423,13 @@ public class WorldGuardBlockListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(world);
 
         if (wcfg.simulateSponge && wcfg.redstoneSponges) {
-            BlockRedstoneKey key = new BlockRedstoneKey(blockTo,
-                    event.getOldCurrent(), event.getNewCurrent());
+            boolean oldPowered = event.getOldCurrent() != 0;
+            boolean newPowered = event.getNewCurrent() != 0;
+            if (oldPowered == newPowered) {
+                return;
+            }
+
+            BlockRedstoneKey key = new BlockRedstoneKey(blockTo, newPowered);
             // BlockRedstoneEvent is not Cancellable, so use the
             // non-cancellable overload to skip the 27-block sponge
             // search when the same transition has been checked within
