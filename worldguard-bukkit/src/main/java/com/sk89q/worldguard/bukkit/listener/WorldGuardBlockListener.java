@@ -68,7 +68,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 public class WorldGuardBlockListener extends AbstractListener {
 
-    private final EventDebounce<BlockRedstoneKey> redstoneDebounce = EventDebounce.create(5000);
+    private final EventDebounce<BlockRedstoneKey> redstoneDebounce = EventDebounce.create(50);
 
     /**
      * Construct the object.
@@ -423,10 +423,11 @@ public class WorldGuardBlockListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(world);
 
         if (wcfg.simulateSponge && wcfg.redstoneSponges) {
-            BlockRedstoneKey key = new BlockRedstoneKey(blockTo);
+            BlockRedstoneKey key = new BlockRedstoneKey(blockTo,
+                    event.getOldCurrent(), event.getNewCurrent());
             // BlockRedstoneEvent is not Cancellable, so use the
             // non-cancellable overload to skip the 27-block sponge
-            // search when the same block has been checked within
+            // search when the same transition has been checked within
             // the debounce window.
             if (redstoneDebounce.getIfNotPresent(key) == null) {
                 return;

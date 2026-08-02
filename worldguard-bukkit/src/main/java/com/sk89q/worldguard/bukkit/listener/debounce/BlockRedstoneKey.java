@@ -26,9 +26,9 @@ import java.util.Objects;
 /**
  * A key for debouncing BlockRedstoneEvents.
  *
- * Identifies a redstone change by the block location, so that rapid
- * redstone fluctuations (e.g. from a pressure plate activated by
- * multiple arrows) are coalesced into a single sponge check.
+ * Identifies a redstone change by the block location and power-state
+ * transition, so that repeated events for the same transition are coalesced
+ * into a single sponge check.
  */
 public class BlockRedstoneKey {
 
@@ -36,12 +36,16 @@ public class BlockRedstoneKey {
     private final int x;
     private final int y;
     private final int z;
+    private final int oldCurrent;
+    private final int newCurrent;
 
-    public BlockRedstoneKey(Block block) {
+    public BlockRedstoneKey(Block block, int oldCurrent, int newCurrent) {
         this.worldName = block.getWorld().getName();
         this.x = block.getX();
         this.y = block.getY();
         this.z = block.getZ();
+        this.oldCurrent = oldCurrent;
+        this.newCurrent = newCurrent;
     }
 
     @Override
@@ -50,11 +54,12 @@ public class BlockRedstoneKey {
         if (!(o instanceof BlockRedstoneKey)) return false;
         BlockRedstoneKey that = (BlockRedstoneKey) o;
         return x == that.x && y == that.y && z == that.z
+                && oldCurrent == that.oldCurrent && newCurrent == that.newCurrent
                 && worldName.equals(that.worldName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(worldName, x, y, z);
+        return Objects.hash(worldName, x, y, z, oldCurrent, newCurrent);
     }
 }
