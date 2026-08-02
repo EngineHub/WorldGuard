@@ -61,6 +61,7 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SulfurCube;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.WindCharge;
@@ -487,7 +488,7 @@ public class WorldGuardEntityListener extends AbstractListener {
                 event.blockList().clear();
                 return;
             }
-        } else if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart) {
+        } else if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart || ent instanceof SulfurCube) {
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;
@@ -615,7 +616,8 @@ public class WorldGuardEntityListener extends AbstractListener {
                 return;
             }
         } else if (event.getEntityType() == EntityType.TNT
-                || event.getEntityType() == EntityType.TNT_MINECART) {
+                || event.getEntityType() == EntityType.TNT_MINECART
+                || event.getEntityType() == EntityType.SULFUR_CUBE) {
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;

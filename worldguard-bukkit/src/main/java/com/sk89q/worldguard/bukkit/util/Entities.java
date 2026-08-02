@@ -43,6 +43,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.entity.Steerable;
+import org.bukkit.entity.SulfurCube;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
@@ -78,7 +79,9 @@ public final class Entities {
      * @return true if TNT based
      */
     public static boolean isTNTBased(Entity entity) {
-        return entity instanceof TNTPrimed || entity instanceof ExplosiveMinecart;
+        return entity instanceof TNTPrimed
+                || entity instanceof ExplosiveMinecart
+                || entity instanceof SulfurCube sulfurCube && sulfurCube.canExplode();
     }
 
     /**
@@ -265,6 +268,7 @@ public final class Entities {
             case Wither wither -> Flags.WITHER_DAMAGE;
             case Creeper creeper -> Flags.CREEPER_EXPLOSION;
             case TNTPrimed tnt -> Flags.TNT;
+            case SulfurCube sulfurCube -> Flags.TNT;
             case ExplosiveMinecart minecart -> Flags.TNT;
             case EnderDragon dragon -> Flags.ENDERDRAGON_BLOCK_DAMAGE;
             case null, default -> Flags.OTHER_EXPLOSION;

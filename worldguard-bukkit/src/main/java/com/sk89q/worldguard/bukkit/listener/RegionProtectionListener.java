@@ -57,6 +57,7 @@ import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SulfurCube;
 import org.bukkit.entity.Tameable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
@@ -222,7 +223,7 @@ public class RegionProtectionListener extends AbstractListener {
                 String what;
 
                 /* TNT */
-                if (event.getCause().find(EntityType.TNT, EntityType.TNT_MINECART) != null) {
+                if (event.getCause().find(EntityType.TNT, EntityType.TNT_MINECART, EntityType.SULFUR_CUBE) != null) {
                     canBreak = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.BLOCK_BREAK, Flags.TNT));
                     what = "use dynamite";
 

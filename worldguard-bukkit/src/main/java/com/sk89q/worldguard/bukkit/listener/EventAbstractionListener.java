@@ -83,6 +83,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SulfurCube;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.WindCharge;
@@ -895,7 +896,18 @@ public class EventAbstractionListener extends AbstractListener {
         if (matchingItem != null && hasInteractBypass(world, matchingItem)) {
             useEntityEvent.setAllowed(true);
         }
-        Events.fireToCancel(event, useEntityEvent);
+        if (!Events.fireToCancel(event, useEntityEvent)) {
+            /* Sulfur cube doesn't have API for interaction/ignition source tracking */
+            if(entity instanceof SulfurCube) {
+                /* Remove player in case of using shears */
+                if(item.getType() == Material.SHEARS) {
+                    Cause.untrackParentCause(entity);
+                /* Save player overwise */
+                } else {
+                    Cause.trackParentCause(entity, player);
+                }
+            }
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -917,6 +929,8 @@ public class EventAbstractionListener extends AbstractListener {
                 eventToFire.getRelevantFlags().add(Flags.FIREWORK_DAMAGE);
             } else if (damager instanceof Creeper) {
                 eventToFire.getRelevantFlags().add(Flags.CREEPER_EXPLOSION);
+            } else if (damager instanceof SulfurCube) {
+                eventToFire.getRelevantFlags().add(Flags.TNT);
             }
             if (Events.fireToCancel(event, eventToFire)) {
                 if (damager instanceof Tameable && damager instanceof Mob) {
