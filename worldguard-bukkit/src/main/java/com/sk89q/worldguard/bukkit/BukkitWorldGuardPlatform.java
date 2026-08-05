@@ -29,6 +29,14 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.event.region.RegionAddEvent;
+import com.sk89q.worldguard.bukkit.event.region.RegionDeleteEvent;
+import com.sk89q.worldguard.bukkit.event.region.RegionFlagChangeEvent;
+import com.sk89q.worldguard.bukkit.event.region.RegionMemberChangeEvent;
+import com.sk89q.worldguard.bukkit.event.region.RegionPriorityChangeEvent;
+import com.sk89q.worldguard.bukkit.event.region.RegionRedefineEvent;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.profile.resolver.PaperPlayerService;
@@ -55,6 +63,7 @@ import com.sk89q.worldguard.util.profile.resolver.HttpRepositoryService;
 import com.sk89q.worldguard.util.profile.resolver.ProfileService;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permissible;
@@ -273,5 +282,79 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean callRegionAddEvent(World world, ProtectedRegion region, @Nullable Object actor) {
+        if (!(world instanceof BukkitWorld)) return true;
+        org.bukkit.World bWorld = ((BukkitWorld) world).getWorld();
+        RegionAddEvent event = new RegionAddEvent(bWorld, region, actor instanceof CommandSender ? (CommandSender) actor : null);
+        Bukkit.getPluginManager().callEvent(event);
+        return !event.isCancelled();
+    }
+
+    @Override
+    public boolean callRegionDeleteEvent(World world, ProtectedRegion region,
+                                         RemovalStrategy removalStrategy, @Nullable Object actor) {
+        if (!(world instanceof BukkitWorld)) return true;
+        org.bukkit.World bWorld = ((BukkitWorld) world).getWorld();
+        RegionDeleteEvent event = new RegionDeleteEvent(bWorld, region, removalStrategy,
+                actor instanceof CommandSender ? (CommandSender) actor : null);
+        Bukkit.getPluginManager().callEvent(event);
+        return !event.isCancelled();
+    }
+
+    @Override
+    public boolean callRegionRedefineEvent(World world, ProtectedRegion oldRegion,
+                                           ProtectedRegion newRegion, @Nullable Object actor) {
+        if (!(world instanceof BukkitWorld)) return true;
+        org.bukkit.World bWorld = ((BukkitWorld) world).getWorld();
+        RegionRedefineEvent event = new RegionRedefineEvent(bWorld, oldRegion, newRegion,
+                actor instanceof CommandSender ? (CommandSender) actor : null);
+        Bukkit.getPluginManager().callEvent(event);
+        return !event.isCancelled();
+    }
+
+    @Override
+    public boolean callRegionFlagChangeEvent(World world, ProtectedRegion region, Flag<?> flag,
+                                             @Nullable Object newValue, @Nullable Object actor) {
+        if (!(world instanceof BukkitWorld)) return true;
+        org.bukkit.World bWorld = ((BukkitWorld) world).getWorld();
+        RegionFlagChangeEvent event = new RegionFlagChangeEvent(bWorld, region, flag, newValue,
+                actor instanceof CommandSender ? (CommandSender) actor : null);
+        Bukkit.getPluginManager().callEvent(event);
+        return !event.isCancelled();
+    }
+
+    @Override
+    public boolean callRegionMemberChangeEvent(World world, ProtectedRegion region, String changeType,
+                                               @Nullable Object domain, @Nullable Object actor) {
+        if (!(world instanceof BukkitWorld)) return true;
+        org.bukkit.World bWorld = ((BukkitWorld) world).getWorld();
+        com.sk89q.worldguard.domains.DefaultDomain dd =
+                domain instanceof com.sk89q.worldguard.domains.DefaultDomain
+                        ? (com.sk89q.worldguard.domains.DefaultDomain) domain
+                        : new com.sk89q.worldguard.domains.DefaultDomain();
+        RegionMemberChangeEvent.ChangeType ct;
+        try {
+            ct = RegionMemberChangeEvent.ChangeType.valueOf(changeType);
+        } catch (IllegalArgumentException e) {
+            return true;
+        }
+        RegionMemberChangeEvent event = new RegionMemberChangeEvent(bWorld, region, ct, dd,
+                actor instanceof CommandSender ? (CommandSender) actor : null);
+        Bukkit.getPluginManager().callEvent(event);
+        return !event.isCancelled();
+    }
+
+    @Override
+    public boolean callRegionPriorityChangeEvent(World world, ProtectedRegion region, int oldPriority,
+                                                 int newPriority, @Nullable Object actor) {
+        if (!(world instanceof BukkitWorld)) return true;
+        org.bukkit.World bWorld = ((BukkitWorld) world).getWorld();
+        RegionPriorityChangeEvent event = new RegionPriorityChangeEvent(bWorld, region, oldPriority, newPriority,
+                actor instanceof CommandSender ? (CommandSender) actor : null);
+        Bukkit.getPluginManager().callEvent(event);
+        return !event.isCancelled();
     }
 }
