@@ -40,6 +40,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.listener.BlacklistListener;
+import com.sk89q.worldguard.bukkit.listener.PaperPreSpawnListener;
 import com.sk89q.worldguard.bukkit.listener.BlockedPotionsListener;
 import com.sk89q.worldguard.bukkit.listener.BuildPermissionListener;
 import com.sk89q.worldguard.bukkit.listener.ChestProtectionListener;
@@ -186,6 +187,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardPlayerListener(this)).registerEvents();
         (new WorldGuardBlockListener(this)).registerEvents();
         (new WorldGuardEntityListener(this)).registerEvents();
+        if (PaperLib.isPaper()) {
+            (new PaperPreSpawnListener(this)).registerEvents();
+        }
         (new WorldGuardWeatherListener(this)).registerEvents();
         (new WorldGuardVehicleListener(this)).registerEvents();
         (new WorldGuardServerListener(this)).registerEvents();
