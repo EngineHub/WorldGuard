@@ -658,13 +658,11 @@ public class WorldGuardEntityListener extends AbstractListener {
             return;
         }
 
-        handleCreatureSpawn(event, event.getLocation(), event.getEntityType(), event.getSpawnReason());
+        handleCreatureSpawn(event, event.getLocation(), event.getEntityType(), event.getSpawnReason(), cfg, wcfg);
     }
 
-    private static void handleCreatureSpawn(Cancellable event, Location location, EntityType entityType, SpawnReason spawnReason) {
-        ConfigurationManager cfg = getConfig();
-        WorldConfiguration wcfg = getWorldConfig(location.getWorld());
-
+    private static void handleCreatureSpawn(Cancellable event, Location location, EntityType entityType, SpawnReason spawnReason,
+                                            ConfigurationManager cfg, WorldConfiguration wcfg) {
         com.sk89q.worldedit.world.entity.EntityType weEntityType = BukkitAdapter.adapt(entityType);
 
         if (weEntityType != null && wcfg.blockCreatureSpawn.contains(weEntityType)) {
@@ -939,7 +937,8 @@ public class WorldGuardEntityListener extends AbstractListener {
                 return;
             }
 
-            handleCreatureSpawn(event, event.getSpawnLocation(), event.getType(), event.getReason());
+            Location spawnLoc = event.getSpawnLocation();
+            handleCreatureSpawn(event, spawnLoc, event.getType(), event.getReason(), cfg, getWorldConfig(spawnLoc.getWorld()));
         }
     }
 
