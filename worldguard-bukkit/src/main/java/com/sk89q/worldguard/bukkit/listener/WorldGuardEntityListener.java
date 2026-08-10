@@ -914,12 +914,24 @@ public class WorldGuardEntityListener extends AbstractListener {
          * Applies the natural spawn checks from {@link WorldGuardEntityListener#onCreatureSpawn} before the
          * server constructs the entity. The CreatureSpawnEvent checks fire at the very
          * end of the spawn pipeline, after the position was picked, the placement
-         * checks ran and the mob was constructed and finalized. Since a cancelled
-         * spawn never counts toward the mob cap, the natural spawner keeps retrying
-         * the same area at full rate, so regions that deny mob spawning become
-         * permanent spawn attempt hotspots. Cancelling the pre spawn event instead
-         * also ends the remaining attempts for the chunk in that spawn cycle, which
-         * collapses the retry pressure as well.
+         * checks ran and the mob was constructed and finalized, so a region that denies
+         * mob spawning pays for a mob to be built and thrown away on every attempt.
+         * Cancelling here skips the placement checks, the construction and
+         * finalizeSpawn for a spawn that was going to be refused anyway.
+         *
+         * Cancelling does not end the chunk's remaining attempts. Only
+         * setShouldAbortSpawn(true) makes the spawner return early; a plain cancel
+         * falls through to the next candidate position exactly like a failed
+         * placement check.
+         *
+         * Note that Paper fires this event for every candidate position, before the
+         * light, block and collision checks, so the region query below runs
+         * considerably more often than the CreatureSpawnEvent one did. On Paper with
+         * per-player-mob-spawns enabled, which is the default, every cancelled pre
+         * spawn is also charged to a per player mob backoff counter that is added to
+         * the mob cap of every player within tick view distance and bleeds off one per
+         * spawn cycle, so a large denied region can suppress spawning in neighbouring
+         * chunks that allow mobs.
          *
          * Only NATURAL spawns are handled here; every other spawn reason keeps going
          * through the CreatureSpawnEvent checks unchanged.
