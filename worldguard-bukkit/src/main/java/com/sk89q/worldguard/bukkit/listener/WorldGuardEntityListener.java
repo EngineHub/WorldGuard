@@ -923,7 +923,7 @@ public class WorldGuardEntityListener extends AbstractListener {
          * Only NATURAL spawns are handled here; every other spawn reason keeps going
          * through the CreatureSpawnEvent checks unchanged.
          */
-        @EventHandler(ignoreCancelled = true)
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onPreCreatureSpawn(PreCreatureSpawnEvent event) {
             if (event.getReason() != SpawnReason.NATURAL) {
                 return;
