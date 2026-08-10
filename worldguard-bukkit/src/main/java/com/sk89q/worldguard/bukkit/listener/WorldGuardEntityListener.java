@@ -658,7 +658,12 @@ public class WorldGuardEntityListener extends AbstractListener {
             return;
         }
 
-        EntityType entityType = event.getEntityType();
+        handleCreatureSpawn(event, event.getLocation(), event.getEntityType(), event.getSpawnReason());
+    }
+
+    private static void handleCreatureSpawn(Cancellable event, Location location, EntityType entityType, SpawnReason spawnReason) {
+        ConfigurationManager cfg = getConfig();
+        WorldConfiguration wcfg = getWorldConfig(location.getWorld());
 
         com.sk89q.worldedit.world.entity.EntityType weEntityType = BukkitAdapter.adapt(entityType);
 
@@ -667,11 +672,9 @@ public class WorldGuardEntityListener extends AbstractListener {
             return;
         }
 
-        Location eventLoc = event.getLocation();
-
         if (wcfg.useRegions && cfg.useRegionsCreatureSpawnEvent) {
             ApplicableRegionSet set =
-                    WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(eventLoc));
+                    WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(location));
 
             if (!set.testState(null, Flags.MOB_SPAWNING)) {
                 event.setCancelled(true);
@@ -686,8 +689,8 @@ public class WorldGuardEntityListener extends AbstractListener {
         }
 
         if (wcfg.blockGroundSlimes && entityType == EntityType.SLIME
-                && eventLoc.getY() >= 60
-                && event.getSpawnReason() == SpawnReason.NATURAL) {
+                && location.getY() >= 60
+                && spawnReason == SpawnReason.NATURAL) {
             event.setCancelled(true);
             return;
         }
@@ -936,36 +939,7 @@ public class WorldGuardEntityListener extends AbstractListener {
                 return;
             }
 
-            Location eventLoc = event.getSpawnLocation();
-            WorldConfiguration wcfg = getWorldConfig(eventLoc.getWorld());
-
-            EntityType entityType = event.getType();
-            com.sk89q.worldedit.world.entity.EntityType weEntityType = BukkitAdapter.adapt(entityType);
-
-            if (weEntityType != null && wcfg.blockCreatureSpawn.contains(weEntityType)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.useRegions && cfg.useRegionsCreatureSpawnEvent) {
-                ApplicableRegionSet set =
-                        WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(eventLoc));
-
-                if (!set.testState(null, Flags.MOB_SPAWNING)) {
-                    event.setCancelled(true);
-                    return;
-                }
-
-                Set<com.sk89q.worldedit.world.entity.EntityType> entityTypes = set.queryValue(null, Flags.DENY_SPAWN);
-                if (entityTypes != null && weEntityType != null && entityTypes.contains(weEntityType)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            if (wcfg.blockGroundSlimes && entityType == EntityType.SLIME && eventLoc.getY() >= 60) {
-                event.setCancelled(true);
-            }
+            handleCreatureSpawn(event, event.getSpawnLocation(), event.getType(), event.getReason());
         }
     }
 
