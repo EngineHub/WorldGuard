@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.destroystokyo.paper.event.entity.EntityZapEvent;
+import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
@@ -905,6 +906,65 @@ public class WorldGuardEntityListener extends AbstractListener {
         public void onEntityZap(EntityZapEvent event) {
             if (event.getEntityType() == EntityType.PIG) {
                 handlePigZap(event.getEntity(), event);
+            }
+        }
+
+        /**
+         * Applies the natural spawn checks from {@link WorldGuardEntityListener#onCreatureSpawn} before the
+         * server constructs the entity. The CreatureSpawnEvent checks fire at the very
+         * end of the spawn pipeline, after the position was picked, the placement
+         * checks ran and the mob was constructed and finalized. Since a cancelled
+         * spawn never counts toward the mob cap, the natural spawner keeps retrying
+         * the same area at full rate, so regions that deny mob spawning become
+         * permanent spawn attempt hotspots. Cancelling the pre spawn event instead
+         * also ends the remaining attempts for the chunk in that spawn cycle, which
+         * collapses the retry pressure as well.
+         *
+         * Only NATURAL spawns are handled here; every other spawn reason keeps going
+         * through the CreatureSpawnEvent checks unchanged.
+         */
+        @EventHandler(ignoreCancelled = true)
+        public void onPreCreatureSpawn(PreCreatureSpawnEvent event) {
+            if (event.getReason() != SpawnReason.NATURAL) {
+                return;
+            }
+
+            ConfigurationManager cfg = getConfig();
+
+            if (cfg.activityHaltToggle) {
+                event.setCancelled(true);
+                return;
+            }
+
+            Location eventLoc = event.getSpawnLocation();
+            WorldConfiguration wcfg = getWorldConfig(eventLoc.getWorld());
+
+            EntityType entityType = event.getType();
+            com.sk89q.worldedit.world.entity.EntityType weEntityType = BukkitAdapter.adapt(entityType);
+
+            if (weEntityType != null && wcfg.blockCreatureSpawn.contains(weEntityType)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions && cfg.useRegionsCreatureSpawnEvent) {
+                ApplicableRegionSet set =
+                        WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(eventLoc));
+
+                if (!set.testState(null, Flags.MOB_SPAWNING)) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                Set<com.sk89q.worldedit.world.entity.EntityType> entityTypes = set.queryValue(null, Flags.DENY_SPAWN);
+                if (entityTypes != null && weEntityType != null && entityTypes.contains(weEntityType)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            if (wcfg.blockGroundSlimes && entityType == EntityType.SLIME && eventLoc.getY() >= 60) {
+                event.setCancelled(true);
             }
         }
     }
