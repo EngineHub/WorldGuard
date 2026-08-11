@@ -944,6 +944,10 @@ public class WorldGuardEntityListener extends AbstractListener {
 
             ConfigurationManager cfg = getConfig();
 
+            if (!cfg.useRegionsPreCreatureSpawnEvent) {
+                return;
+            }
+
             if (cfg.activityHaltToggle) {
                 event.setCancelled(true);
                 return;
