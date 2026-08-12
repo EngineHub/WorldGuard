@@ -766,7 +766,7 @@ thvortex, Rutr, Glitchfinder, and DarthAndroid.
 * Vector flags can now be set to the current location with the value "here" and to a specific position with x,y,z.
 * Made /region info show the region you're in if you don't specify an id explicitly.
 * Prevent block ignition from lightning strikes if lightning is blocked in region. Fixes #1175
-* Correctly check both WEPIF and superperms in WorldGurdPlugin.broadcastNotification()
+* Correctly check both WEPIF and superperms in WorldGuardPlugin.broadcastNotification()
 * Destroy fire blocks when fire-spread is disallowed
 * Added a construct flag that can be used to restrict block placing/destroying in zones to certain roles.
 * Added FallingSand to list of intensive entities to be removed with /halt-activiy.
