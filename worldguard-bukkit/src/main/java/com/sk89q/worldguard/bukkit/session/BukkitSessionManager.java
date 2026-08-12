@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.session;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -32,6 +33,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.function.Consumer;
 
@@ -96,6 +98,16 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
                 task.run();
             }
         }
+
+        // Force eviction of expired bypass/session entries. Without this the
+        // caches only evict lazily, so an idle entry can keep a player (and
+        // their world) reachable long after its logical lifetime.
+        cleanUpCaches();
+    }
+
+    @EventHandler
+    public void onWorldUnload(WorldUnloadEvent event) {
+        forgetWorld(BukkitAdapter.adapt(event.getWorld()));
     }
 
     @Override
