@@ -162,6 +162,11 @@ public final class RegionCommands extends RegionCommandsBase {
         RegionAdder task = new RegionAdder(manager, region);
         task.addOwnersFromCommand(args, 2);
 
+        // Fire a platform event so other plugins can cancel region creation.
+        if (!WorldGuard.getInstance().getPlatform().callRegionAddEvent(world, region, sender)) {
+            throw new CommandException("Region creation was cancelled by a plugin.");
+        }
+
         final String description = String.format("Adding region '%s'", region.getId());
         AsyncCommandBuilder.wrap(task, sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
@@ -212,6 +217,11 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         region.copyFrom(existing);
+
+        // Fire a platform event so other plugins can cancel boundary changes.
+        if (!WorldGuard.getInstance().getPlatform().callRegionRedefineEvent(world, existing, region, sender)) {
+            throw new CommandException("Region redefine was cancelled by a plugin.");
+        }
 
         RegionAdder task = new RegionAdder(manager, region);
 
@@ -595,6 +605,10 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Set the flag value if a value was set
         if (value != null) {
+            // Fire a platform event so other plugins can cancel flag changes.
+            if (!WorldGuard.getInstance().getPlatform().callRegionFlagChangeEvent(world, existing, foundFlag, value, sender)) {
+                throw new CommandException("Region flag change was cancelled by a plugin.");
+            }
             // Set the flag if [value] was given even if [-g group] was given as well
             try {
                 value = setFlag(existing, foundFlag, sender, value).toString();
@@ -608,6 +622,10 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // No value? Clear the flag, if -g isn't specified
         } else if (!args.hasFlag('g')) {
+            // Fire a platform event for flag clearing (newValue == null signals clearing).
+            if (!WorldGuard.getInstance().getPlatform().callRegionFlagChangeEvent(world, existing, foundFlag, null, sender)) {
+                throw new CommandException("Region flag change was cancelled by a plugin.");
+            }
             // Clear the flag only if neither [value] nor [-g group] was given
             existing.setFlag(foundFlag, null);
 
@@ -726,6 +744,12 @@ public final class RegionCommands extends RegionCommandsBase {
             throw new CommandPermissionsException();
         }
 
+        // Fire a platform event so other plugins can cancel priority changes.
+        if (!WorldGuard.getInstance().getPlatform().callRegionPriorityChangeEvent(
+                world, existing, existing.getPriority(), priority, sender)) {
+            throw new CommandException("Region priority change was cancelled by a plugin.");
+        }
+
         existing.setPriority(priority);
 
         sender.print("Priority of '" + existing.getId() + "' set to " + priority + " (higher numbers override).");
@@ -832,6 +856,14 @@ public final class RegionCommands extends RegionCommandsBase {
             task.setRemovalStrategy(RemovalStrategy.REMOVE_CHILDREN);
         } else if (unsetParent) {
             task.setRemovalStrategy(RemovalStrategy.UNSET_PARENT_IN_CHILDREN);
+        }
+
+        // Fire a platform event so other plugins can cancel region deletion.
+        RemovalStrategy effectiveStrategy = task.getRemovalStrategy() != null
+                ? task.getRemovalStrategy()
+                : RemovalStrategy.UNSET_PARENT_IN_CHILDREN;
+        if (!WorldGuard.getInstance().getPlatform().callRegionDeleteEvent(world, existing, effectiveStrategy, sender)) {
+            throw new CommandException("Region deletion was cancelled by a plugin.");
         }
 
         final String description = String.format("Removing region '%s' in '%s'", existing.getId(), world.getName());
