@@ -48,6 +48,7 @@ import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
 import com.sk89q.worldguard.bukkit.listener.InvincibilityListener;
 import com.sk89q.worldguard.bukkit.listener.PlayerModesListener;
 import com.sk89q.worldguard.bukkit.listener.PlayerMoveListener;
+import com.sk89q.worldguard.bukkit.listener.RegionCommandTabCompleteListener;
 import com.sk89q.worldguard.bukkit.listener.RegionFlagsListener;
 import com.sk89q.worldguard.bukkit.listener.RegionProtectionListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardBlockListener;
@@ -197,6 +198,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new ChestProtectionListener(this)).registerEvents();
         (new RegionProtectionListener(this)).registerEvents();
         (new RegionFlagsListener(this)).registerEvents();
+        getServer().getPluginManager().registerEvents(new RegionCommandTabCompleteListener(), this);
         (new WorldRulesListener(this)).registerEvents();
         (new BlockedPotionsListener(this)).registerEvents();
         (new EventAbstractionListener(this)).registerEvents();
