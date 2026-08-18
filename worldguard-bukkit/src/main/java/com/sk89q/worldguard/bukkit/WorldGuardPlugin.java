@@ -561,7 +561,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         try {
             // Folia is Paper-based, so this is a good first check.
             if (PaperLib.isPaper()) {
-                return ServerBuildInfo.buildInfo().isBrandCompatible(net.kyori.adventure.key.Key.key("papermc", "folia"));
+                Class.forName("io.papermc.paper.threadedregions.RegionizedServer"); // Simpler
+                return true;
             }
         } catch (Throwable t) {
             // Ignore, this likely means an outdated version.
