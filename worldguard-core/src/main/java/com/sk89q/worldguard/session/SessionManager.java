@@ -41,14 +41,14 @@ public interface SessionManager {
     boolean hasBypass(LocalPlayer player, World world);
 
     /**
-     * Re-initialize handlers and clear "last position," "last state," etc.
-     * information for all players.
+     * Restore handler-managed state, re-initialize handlers, and clear
+     * "last position," "last state," etc. information for all players.
      */
     void resetAllStates();
 
     /**
-     * Re-initialize handlers and clear "last position," "last state," etc.
-     * information.
+     * Restore handler-managed state, re-initialize handlers, and clear
+     * "last position," "last state," etc. information.
      *
      * @param player The player
      */
