@@ -597,7 +597,9 @@ public final class RegionCommands extends RegionCommandsBase {
         if (value != null) {
             // Set the flag if [value] was given even if [-g group] was given as well
             try {
-                value = setFlag(existing, foundFlag, sender, value).toString();
+                Object parsedValue = setFlag(existing, foundFlag, sender, value);
+                // Some flags (e.g. StateFlag) parse "none" to a null value to clear the flag.
+                value = parsedValue == null ? "none" : parsedValue.toString();
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }
