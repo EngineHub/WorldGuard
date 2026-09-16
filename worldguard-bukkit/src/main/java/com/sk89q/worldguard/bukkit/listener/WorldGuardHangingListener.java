@@ -92,13 +92,20 @@ public class WorldGuardHangingListener extends AbstractListener {
                     event.setCancelled(true);
                 }
             }
-        } else {
-            // Explosions from mobs are not covered by HangingBreakByEntity
-            if (hanging instanceof Painting && wcfg.blockEntityPaintingDestroy
-                    && event.getCause() == RemoveCause.EXPLOSION) {
+        } else if (event.getCause() == RemoveCause.EXPLOSION || event.getCause() == RemoveCause.PHYSICS) {
+            // Explosions from mobs, and physics-caused breaks (e.g. a boat colliding
+            // with the hanging entity), are not covered by HangingBreakByEntityEvent,
+            // so there's no attacker entity available to check here.
+            // See EngineHub/WorldGuard#1434 for the PHYSICS case (boats breaking item frames).
+            if (hanging instanceof Painting
+                    && (wcfg.blockEntityPaintingDestroy
+                    || (wcfg.useRegions
+                    && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(hanging.getLocation()), (RegionAssociable) null, Flags.ENTITY_PAINTING_DESTROY))))) {
                 event.setCancelled(true);
-            } else if (hanging instanceof ItemFrame && wcfg.blockEntityItemFrameDestroy
-                    && event.getCause() == RemoveCause.EXPLOSION) {
+            } else if (hanging instanceof ItemFrame
+                    && (wcfg.blockEntityItemFrameDestroy
+                    || (wcfg.useRegions
+                    && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(hanging.getLocation()), (RegionAssociable) null, Flags.ENTITY_ITEM_FRAME_DESTROY))))) {
                 event.setCancelled(true);
             }
         }
