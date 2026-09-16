@@ -343,7 +343,15 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
-        Block block = event.getBlock();
+        Block block;
+        try {
+            block = event.getBlock();
+        } catch (NullPointerException e) {
+            // Some platforms can fire this event referencing a block whose location no
+            // longer resolves to a loaded world. Nothing useful can be done, so bail out.
+            // See EngineHub/WorldGuard#2238
+            return;
+        }
         Entity entity = event.getEntity();
         Material toType = event.getTo();
         Material fromType = block.getType();

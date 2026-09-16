@@ -812,9 +812,19 @@ public class WorldGuardEntityListener extends AbstractListener {
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         Entity ent = event.getEntity();
 
+        Block changedBlock;
+        try {
+            changedBlock = event.getBlock();
+        } catch (NullPointerException e) {
+            // Some platforms can fire this event referencing a block whose location no
+            // longer resolves to a loaded world. Nothing useful can be done, so bail out.
+            // See EngineHub/WorldGuard#2238
+            return;
+        }
+
         WorldConfiguration wcfg = getWorldConfig(ent.getWorld());
         if (ent instanceof FallingBlock) {
-            Material id = event.getBlock().getType();
+            Material id = changedBlock.getType();
 
             if (id == Material.GRAVEL && wcfg.noPhysicsGravel) {
                 event.setCancelled(true);
@@ -836,7 +846,7 @@ public class WorldGuardEntityListener extends AbstractListener {
                 return;
             }
             if (wcfg.useRegions) {
-                Location location = event.getBlock().getLocation();
+                Location location = changedBlock.getLocation();
                 if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(location), (RegionAssociable) null, Flags.WITHER_DAMAGE))) {
                     event.setCancelled(true);
                     return;
