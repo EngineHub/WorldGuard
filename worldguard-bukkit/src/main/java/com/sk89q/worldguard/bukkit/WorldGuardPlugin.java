@@ -53,6 +53,7 @@ import com.sk89q.worldguard.bukkit.listener.RegionProtectionListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardBlockListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardCommandBookListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardEntityListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardCanvasListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardHangingListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardPlayerListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardServerListener;
@@ -190,6 +191,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardVehicleListener(this)).registerEvents();
         (new WorldGuardServerListener(this)).registerEvents();
         (new WorldGuardHangingListener(this)).registerEvents();
+        if (this.isCanvas()) {
+            (new WorldGuardCanvasListener(this)).registerEvents();
+        }
 
         // Modules
         (playerMoveListener = new PlayerMoveListener(this)).registerEvents();
@@ -573,6 +577,28 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     public boolean isFolia() {
         return folia.getValue();
+    }
+
+    private final LazyReference<Boolean> canvas = LazyReference.from(() -> {
+        try {
+            Class.forName("io.canvasmc.canvas.event.EntityTeleportAsyncEvent");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    });
+
+    /**
+     * Whether the server exposes CanvasMC's own teleport event API
+     * ({@code io.canvasmc.canvas.event.EntityTeleportAsyncEvent}). Canvas (a Folia
+     * fork) documents that the vanilla {@link org.bukkit.event.player.PlayerTeleportEvent}
+     * does not reliably fire for entity-driven teleports under region threading, and
+     * added this replacement instead of fixing the old API.
+     *
+     * @see <a href="https://docs.canvasmc.io/canvas/developers/api/events/">Canvas events docs</a>
+     */
+    public boolean isCanvas() {
+        return canvas.getValue();
     }
 
 }

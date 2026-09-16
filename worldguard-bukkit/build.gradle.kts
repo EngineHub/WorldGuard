@@ -20,6 +20,13 @@ dependencies {
         exclude("org.slf4j", "slf4j-api")
         exclude("junit", "junit")
     }
+    // Vendored locally: just the 3 io.canvasmc.canvas.event.*TeleportAsyncEvent* class
+    // files (extracted from canvas-api), not the whole canvas-api jar - that jar bundles
+    // its own full copy of org.bukkit.* compiled for a newer JDK, which conflicts with
+    // paperApi on the compile classpath. CanvasMC doesn't publish canvas-api for this old
+    // a version line anyway. Only used at compile time - see WorldGuardCanvasListener
+    // and WorldGuardPlugin#isCanvas().
+    "compileOnly"(files("libs/canvas-teleport-events.jar"))
 
     "implementation"(libs.paperLib)
     "implementation"(libs.bstats.bukkit)

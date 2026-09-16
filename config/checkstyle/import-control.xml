@@ -31,6 +31,7 @@
       <allow pkg="com.destroystokyo.paper"/>
       <allow pkg="io.papermc.paper"/>
       <allow pkg="org.spigotmc" />
+      <allow pkg="io.canvasmc.canvas"/>
     </subpackage>
 
   </subpackage>
