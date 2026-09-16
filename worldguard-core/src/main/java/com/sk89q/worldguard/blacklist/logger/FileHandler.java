@@ -121,7 +121,8 @@ public class FileHandler implements LoggerHandler {
             } else if (group.matches("%Y")) {
                 rep = String.valueOf(calendar.get(Calendar.YEAR));
             } else if (group.matches("%m")) {
-                rep = String.format("%02d", calendar.get(Calendar.MONTH));
+                // Calendar.MONTH is 0-indexed (January = 0), but the %m log path token should be 1-indexed.
+                rep = String.format("%02d", calendar.get(Calendar.MONTH) + 1);
             } else if (group.matches("%d")) {
                 rep = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH));
             } else if (group.matches("%W")) {
