@@ -30,10 +30,13 @@ import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import io.canvasmc.canvas.event.EntityTeleportAsyncEvent;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Re-implements the ENDERPEARL/CHORUS_TELEPORT flag checks using Canvas's own
@@ -102,6 +105,11 @@ public class WorldGuardCanvasListener extends AbstractListener {
                 player.sendMessage(message);
             }
             event.setCancelled(true);
+            // The pearl/fruit is consumed before this event fires, so give it back.
+            if (player.getGameMode() != GameMode.CREATIVE) {
+                Material refund = cause == TeleportCause.ENDER_PEARL ? Material.ENDER_PEARL : Material.CHORUS_FRUIT;
+                player.getInventory().addItem(new ItemStack(refund, 1));
+            }
         }
     }
 

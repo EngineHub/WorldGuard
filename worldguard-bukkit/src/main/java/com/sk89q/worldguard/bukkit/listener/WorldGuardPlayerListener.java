@@ -382,6 +382,10 @@ public class WorldGuardPlayerListener extends AbstractListener {
                             player.sendMessage(message);
                         }
                         event.setCancelled(true);
+                        // The pearl is consumed on throw, before this event fires, so give it back.
+                        if (player.getGameMode() != org.bukkit.GameMode.CREATIVE) {
+                            player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL, 1));
+                        }
                         return;
                     }
                 }
@@ -401,6 +405,10 @@ public class WorldGuardPlayerListener extends AbstractListener {
                             player.sendMessage(message);
                         }
                         event.setCancelled(true);
+                        // The fruit is consumed on eating, before this event fires, so give it back.
+                        if (player.getGameMode() != org.bukkit.GameMode.CREATIVE) {
+                            player.getInventory().addItem(new ItemStack(Material.CHORUS_FRUIT, 1));
+                        }
                         return;
                     }
                 }
