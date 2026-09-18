@@ -23,6 +23,8 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.listener.debounce.BlockRedstoneKey;
+import com.sk89q.worldguard.bukkit.listener.debounce.EventDebounce;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
@@ -66,6 +68,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 public class WorldGuardBlockListener extends AbstractListener {
 
+    private final EventDebounce<BlockRedstoneKey> redstoneDebounce = EventDebounce.create(50);
 
     /**
      * Construct the object.
@@ -409,6 +412,8 @@ public class WorldGuardBlockListener extends AbstractListener {
 
     /*
      * Called when redstone changes.
+     * Debounced to avoid server lag from rapid redstone fluctuations
+     * (e.g. 300 arrows on a pressure plate triggering repeated sponge checks).
      */
     @EventHandler(priority = EventPriority.HIGH)
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
@@ -418,6 +423,21 @@ public class WorldGuardBlockListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(world);
 
         if (wcfg.simulateSponge && wcfg.redstoneSponges) {
+            boolean oldPowered = event.getOldCurrent() != 0;
+            boolean newPowered = event.getNewCurrent() != 0;
+            if (oldPowered == newPowered) {
+                return;
+            }
+
+            BlockRedstoneKey key = new BlockRedstoneKey(blockTo, newPowered);
+            // BlockRedstoneEvent is not Cancellable, so use the
+            // non-cancellable overload to skip the 27-block sponge
+            // search when the same transition has been checked within
+            // the debounce window.
+            if (redstoneDebounce.getIfNotPresent(key) == null) {
+                return;
+            }
+
             int ox = blockTo.getX();
             int oy = blockTo.getY();
             int oz = blockTo.getZ();
