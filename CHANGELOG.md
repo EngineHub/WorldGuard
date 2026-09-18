@@ -1,5 +1,12 @@
 # Changelog
 
+## 7.0.19
+
+* Require 26.2+.
+* Improved handling for TNT inside of sulfur cubes.
+* Improve performance of mob spawn prevention on Paper servers in some situations.
+* Improved handling of certain flags when `/wg flushstates` is run, or in certain login situations.
+
 ## 7.0.18
 
 * Add lava-harden flag for cobblestone/stone/obsidian/basalt forming.
