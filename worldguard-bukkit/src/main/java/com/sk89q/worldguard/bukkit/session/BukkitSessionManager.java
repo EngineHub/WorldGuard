@@ -43,8 +43,8 @@ import java.util.function.Consumer;
 public class BukkitSessionManager extends AbstractSessionManager implements Runnable, Listener {
 
     /**
-     * Re-initialize handlers and clear "last position," "last state," etc.
-     * information for all players.
+     * Restore handler-managed state, re-initialize handlers, and clear
+     * "last position," "last state," etc. information for all players.
      */
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -72,9 +72,14 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
 
     @EventHandler
     public void onPlayerProcess(ProcessPlayerEvent event) {
-        // Pre-load a session
+        // Create a new session or re-initialize a cached one.
         LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
-        get(player).initialize(player);
+        Session session = getIfPresent(player);
+        if (session == null) {
+            get(player); // this also initializes the new session
+        } else {
+            session.resetState(player); // old sessions need explicit re-initialization 
+        }
     }
 
     @Override

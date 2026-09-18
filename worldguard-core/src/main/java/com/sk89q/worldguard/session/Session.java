@@ -161,11 +161,12 @@ public class Session {
     }
 
     /**
-     * Re-initialize the session.
+     * Restore handler-managed state and then re-initialize the session.
      *
      * @param player The player
      */
     public void resetState(LocalPlayer player) {
+        uninitialize(player);
         initialize(player);
         needRefresh.set(true);
     }
