@@ -1258,7 +1258,11 @@ public class EventAbstractionListener extends AbstractListener {
 
         // Handle created boats
         if (item != null && Materials.isBoat(item.getType())) {
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), Materials.getRelatedEntity(item.getType())));
+            EntityType entityType = Materials.getRelatedEntity(item.getType());
+            if (entityType == null) {
+                entityType = EntityType.OAK_BOAT;
+            }
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), entityType));
             return;
         }
 

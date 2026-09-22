@@ -81,14 +81,13 @@ public final class Materials {
         ENTITY_ITEMS.put(EntityType.ARMOR_STAND, Material.ARMOR_STAND);
         ENTITY_ITEMS.put(EntityType.END_CRYSTAL, Material.END_CRYSTAL);
 
-        for (String wood : new String[]{"OAK", "SPRUCE", "BIRCH", "JUNGLE", "ACACIA", "DARK_OAK", "MANGROVE", "CHERRY", "PALE_OAK"}) {
-            String regular = wood + "_BOAT";
-            String chest = wood + "_CHEST_BOAT";
-            ENTITY_ITEMS.put(EntityType.valueOf(regular), Material.getMaterial(regular));
-            ENTITY_ITEMS.put(EntityType.valueOf(chest), Material.getMaterial(chest));
-        }
-        ENTITY_ITEMS.put(EntityType.BAMBOO_RAFT, Material.BAMBOO_RAFT);
-        ENTITY_ITEMS.put(EntityType.BAMBOO_CHEST_RAFT, Material.BAMBOO_CHEST_RAFT);
+        // All boat items should have an entity equivalent, so we can use the tag to map them out.
+        Tag.ITEMS_BOATS.getValues().forEach(mat -> {
+            EntityType entityEquivalent = Registry.ENTITY_TYPE.get(mat.getKey());
+            if (entityEquivalent != null) {
+                ENTITY_ITEMS.put(entityEquivalent, mat);
+            }
+        });
 
         // preset some tags to a default value, override some of them:
         putMaterialTag(Tag.DOORS, MODIFIED_ON_RIGHT);
