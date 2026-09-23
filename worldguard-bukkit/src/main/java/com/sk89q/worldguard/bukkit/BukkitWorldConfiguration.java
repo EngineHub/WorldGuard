@@ -192,6 +192,8 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
         noPhysicsGravel = getBoolean("physics.no-physics-gravel", false);
         noPhysicsSand = getBoolean("physics.no-physics-sand", false);
+        noPhysicsConcretePowder = getBoolean("physics.no-physics-concrete-powder", false);
+        noPhysicsAnvil = getBoolean("physics.no-physics-anvil",false);
         ropeLadders = getBoolean("physics.vine-like-rope-ladders", false);
         allowPortalAnywhere = getBoolean("physics.allow-portal-anywhere", false);
         preventWaterDamage = new HashSet<>(convertLegacyBlocks(getStringList("physics.disable-water-damage-blocks", null)));

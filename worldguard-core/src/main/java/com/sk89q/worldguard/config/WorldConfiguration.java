@@ -81,6 +81,8 @@ public abstract class WorldConfiguration {
     public boolean pumpkinScuba;
     public boolean noPhysicsGravel;
     public boolean noPhysicsSand;
+    public boolean noPhysicsConcretePowder;
+    public boolean noPhysicsAnvil;
     public boolean ropeLadders;
     public boolean allowPortalAnywhere;
     public Set<String> preventWaterDamage;
