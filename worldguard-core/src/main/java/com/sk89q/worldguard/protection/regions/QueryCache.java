@@ -57,6 +57,16 @@ public class QueryCache {
         checkNotNull(option);
 
         CacheKey key = new CacheKey(location);
+
+        // Fast path: avoid locking if the result is already cached
+        Map<QueryOption, ApplicableRegionSet> existing = cache.get(key);
+        if (existing != null) {
+            ApplicableRegionSet result = existing.get(option);
+            if (result != null) {
+                return result;
+            }
+        }
+
         return cache.compute(key, (k, v) -> option.createCache(manager, location, v)).get(option);
     }
 
