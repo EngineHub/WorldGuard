@@ -143,6 +143,9 @@ public class Session {
         for (Handler handler : handlers.values()) {
             handler.uninitialize(player, location, set);
         }
+
+        lastValid = null;
+        lastRegionSet = null;
     }
 
     /**
