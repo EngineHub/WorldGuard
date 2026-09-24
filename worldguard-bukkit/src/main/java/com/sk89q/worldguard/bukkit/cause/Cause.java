@@ -331,10 +331,16 @@ public final class Cause {
                     }
                 } else if (o instanceof Creeper c) {
                     indirect = true;
-                    addAll(c.getTarget(), c.getIgniter());
+                    if (!WorldGuardPlugin.inst().isFolia()
+                            || Bukkit.isOwnedByCurrentRegion(c)) {
+                        addAll(c.getTarget(), c.getIgniter());
+                    }
                 } else if (o instanceof Creature c) {
                     indirect = true;
-                    addAll(c.getTarget());
+                    if (!WorldGuardPlugin.inst().isFolia()
+                            || Bukkit.isOwnedByCurrentRegion(c)) {
+                        addAll(c.getTarget());
+                    }
                 } else if (o instanceof BlockProjectileSource) {
                     addAll(((BlockProjectileSource) o).getBlock());
                 } else if (o instanceof LightningStrike && PaperLib.isPaper() &&
