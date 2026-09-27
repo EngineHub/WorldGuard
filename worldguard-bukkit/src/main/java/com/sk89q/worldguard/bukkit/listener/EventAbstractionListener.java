@@ -668,8 +668,13 @@ public class EventAbstractionListener extends AbstractListener {
         Player player = event.getPlayer();
         Block blockClicked = event.getBlockClicked();
         Block blockAffected;
-
-        if (blockClicked.getBlockData() instanceof Waterlogged) {
+        boolean canPlaceInside = false;
+        // Can be placed inside blocks only when not sneaking
+        if (!player.isSneaking()) {
+            canPlaceInside = (event.getBucket() != Material.LAVA_BUCKET && blockClicked.getBlockData() instanceof Waterlogged)
+                    || (Materials.isCauldron(blockClicked.getType()) && Materials.isCauldronBucketType(event.getBucket()));
+        }
+        if (canPlaceInside) {
             blockAffected = blockClicked;
         } else {
             blockAffected = blockClicked.getRelative(event.getBlockFace());
