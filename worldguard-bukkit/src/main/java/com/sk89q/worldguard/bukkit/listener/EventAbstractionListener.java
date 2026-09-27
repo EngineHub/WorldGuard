@@ -668,8 +668,11 @@ public class EventAbstractionListener extends AbstractListener {
         Player player = event.getPlayer();
         Block blockClicked = event.getBlockClicked();
         Block blockAffected;
-
-        if (blockClicked.getBlockData() instanceof Waterlogged) {
+        // https://github.com/PaperMC/Paper/issues/12239
+        // POWDER_SNOW_BUCKET does not trigger PlayerBucketEmptyEvent
+        // Lava buckets are always placed outside the block
+        // Water can be placed inside blocks only when not sneaking
+        if (event.getBucket() != Material.LAVA_BUCKET && !player.isSneaking() && blockClicked.getBlockData() instanceof Waterlogged) {
             blockAffected = blockClicked;
         } else {
             blockAffected = blockClicked.getRelative(event.getBlockFace());
