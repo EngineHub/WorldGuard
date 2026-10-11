@@ -27,7 +27,7 @@ autoService = "com.google.auto.service:auto-service:1.1.1"
 jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
 jetbrains-annotations = "org.jetbrains:annotations:24.1.0"
 
-paperApi = "io.papermc.paper:paper-api:26.2.build.+"
+paperApi = "io.papermc.paper:paper-api:26.3.build.+"
 paperLib = "io.papermc:paperlib:1.0.8"
 
 dummypermscompat = "com.sk89q:dummypermscompat:1.10"
