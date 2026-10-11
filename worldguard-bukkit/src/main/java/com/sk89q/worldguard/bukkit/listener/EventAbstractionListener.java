@@ -1386,7 +1386,9 @@ public class EventAbstractionListener extends AbstractListener {
 
         @EventHandler(ignoreCancelled = true)
         public void onEntityBreak(EntityBreakEvent event) {
-            if (event.getEntity() instanceof Hanging) return;
+            if (event.getEntity() instanceof Hanging) {
+                return;
+            }
 
             if (event instanceof EntityBreakByEntityEvent entityEvent) {
                 Entity remover = entityEvent.getRemover();
