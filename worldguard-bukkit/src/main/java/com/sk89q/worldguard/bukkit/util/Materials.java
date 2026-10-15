@@ -1057,6 +1057,7 @@ public final class Materials {
         return switch (type) {
             case LAVA_BUCKET -> Material.LAVA;
             case WATER_BUCKET -> Material.WATER;
+            case POWDER_SNOW_BUCKET -> Material.POWDER_SNOW;
             default -> Material.WATER;
         };
     }
@@ -1582,5 +1583,20 @@ public final class Materials {
 
     public static boolean isSculkGrowth(Material mat) {
         return mat == Material.SCULK || mat == Material.SCULK_VEIN;
+    }
+
+    public static boolean isCauldron(Material mat) {
+        return switch (mat) {
+            case CAULDRON, LAVA_CAULDRON, POWDER_SNOW_CAULDRON, WATER_CAULDRON -> true;
+            default -> false;
+        };
+    }
+
+    // Other buckets containing mobs cannot be placed inside cauldrons
+    public static boolean isCauldronBucketType(Material mat) {
+        return switch (mat) {
+            case WATER_BUCKET, LAVA_BUCKET, POWDER_SNOW_BUCKET -> true;
+            default -> false;
+        };
     }
 }
