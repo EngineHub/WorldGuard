@@ -597,11 +597,14 @@ public final class RegionCommands extends RegionCommandsBase {
         if (value != null) {
             // Set the flag if [value] was given even if [-g group] was given as well
             try {
-                value = setFlag(existing, foundFlag, sender, value).toString();
+                Object parsedValue = setFlag(existing, foundFlag, sender, value);
+                value = parsedValue == null ? null : parsedValue.toString();
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }
+        }
 
+        if (value != null) {
             if (!args.hasFlag('h')) {
                 sender.print("Region flag " + foundFlag.getName() + " set on '" + regionId + "' to '" + value + "'.");
             }
