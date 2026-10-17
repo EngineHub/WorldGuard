@@ -80,6 +80,7 @@ public final class Materials {
         ENTITY_ITEMS.put(EntityType.EGG, Material.EGG);
         ENTITY_ITEMS.put(EntityType.ARMOR_STAND, Material.ARMOR_STAND);
         ENTITY_ITEMS.put(EntityType.END_CRYSTAL, Material.END_CRYSTAL);
+        ENTITY_ITEMS.put(EntityType.CUSHION, Material.WHITE_CUSHION);
 
         // All boat items should have an entity equivalent, so we can use the tag to map them out.
         Tag.ITEMS_BOATS.getValues().forEach(mat -> {
