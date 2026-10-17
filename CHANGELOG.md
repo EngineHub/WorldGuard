@@ -1,5 +1,14 @@
 # Changelog
 
+## 7.0.20
+
+* Require 26.3+.
+* Fixed poplar boats causing errors in some situations.
+* Support Paper's new EntityBreakEvent (used for cushion destruction) in protection.
+* Improved handling of buckets on waterlogged blocks when sneaking.
+* Fixed a Folia error caused by entity actions occuring across Folia region boundaries.
+* Improved command feedback when setting a state flag to "none".
+
 ## 7.0.19
 
 * Require 26.2+.
