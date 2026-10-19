@@ -128,6 +128,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityKnockbackByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
@@ -779,6 +780,19 @@ public class EventAbstractionListener extends AbstractListener {
                 }
                 break;
             default:
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityPlace(EntityPlaceEvent event) {
+        if (event.getEntityType() != EntityType.CUSHION) {
+            return;
+        }
+
+        Events.fireToCancel(event, new SpawnEntityEvent(event, create(event.getPlayer()), event.getEntity()));
+
+        if (event.isCancelled() && event.getPlayer() != null) {
+            playDenyEffect(event.getPlayer(), event.getEntity().getLocation());
         }
     }
 
