@@ -1275,7 +1275,7 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         // Handle created cushions
-        if (item != null && Tag.ITEMS_CUSHIONS.isTagged(item.getType())) {
+        if (item != null && Materials.isCushion(item.getType())) {
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.CUSHION));
             return;
         }
