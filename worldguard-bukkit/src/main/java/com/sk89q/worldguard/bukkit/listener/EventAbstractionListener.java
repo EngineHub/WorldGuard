@@ -785,10 +785,6 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityPlace(EntityPlaceEvent event) {
-        if (event.getEntityType() != EntityType.CUSHION) {
-            return;
-        }
-
         Events.fireToCancel(event, new SpawnEntityEvent(event, create(event.getPlayer()), event.getEntity()));
 
         if (event.isCancelled() && event.getPlayer() != null) {
@@ -1268,36 +1264,40 @@ public class EventAbstractionListener extends AbstractListener {
             return;
         }
 
-        // Handle created Minecarts
-        if (item != null && Materials.isMinecart(item.getType())) {
-            EntityType entityType = Materials.getRelatedEntity(item.getType());
-            if (entityType == null) {
-                entityType = EntityType.MINECART;
+        // Player placements are checked at the entity's final position by onEntityPlace.
+        // Retain the item-based checks for dispensers.
+        if (event instanceof BlockDispenseEvent) {
+            // Handle created Minecarts
+            if (item != null && Materials.isMinecart(item.getType())) {
+                EntityType entityType = Materials.getRelatedEntity(item.getType());
+                if (entityType == null) {
+                    entityType = EntityType.MINECART;
+                }
+                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, clicked.getLocation().add(0.5, 0, 0.5), entityType));
+                return;
             }
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, clicked.getLocation().add(0.5, 0, 0.5), entityType));
-            return;
-        }
 
-        // Handle created boats
-        if (item != null && Materials.isBoat(item.getType())) {
-            EntityType entityType = Materials.getRelatedEntity(item.getType());
-            if (entityType == null) {
-                entityType = EntityType.OAK_BOAT;
+            // Handle created boats
+            if (item != null && Materials.isBoat(item.getType())) {
+                EntityType entityType = Materials.getRelatedEntity(item.getType());
+                if (entityType == null) {
+                    entityType = EntityType.OAK_BOAT;
+                }
+                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), entityType));
+                return;
             }
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), entityType));
-            return;
-        }
 
-        // Handle created armor stands
-        if (item != null && item.getType() == Material.ARMOR_STAND) {
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.ARMOR_STAND));
-            return;
-        }
+            // Handle created armor stands
+            if (item != null && item.getType() == Material.ARMOR_STAND) {
+                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.ARMOR_STAND));
+                return;
+            }
 
-        if (item != null && item.getType() == Material.END_CRYSTAL) { /*&& placed.getType() == Material.BEDROCK) {*/ // in vanilla you can only place them on bedrock but who knows what plugins will add
-                                                                                                                        // may be overprotective as a result, but better than being underprotective
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.END_CRYSTAL));
-            return;
+            if (item != null && item.getType() == Material.END_CRYSTAL) { /*&& placed.getType() == Material.BEDROCK) {*/ // in vanilla you can only place them on bedrock but who knows what plugins will add
+                                                                                                                            // may be overprotective as a result, but better than being underprotective
+                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.END_CRYSTAL));
+                return;
+            }
         }
 
         // Handle created spawn eggs
