@@ -1265,39 +1265,38 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         // Player placements are checked at the entity's final position by onEntityPlace.
-        // Retain the item-based checks for dispensers.
-        if (event instanceof BlockDispenseEvent) {
-            // Handle created Minecarts
-            if (item != null && Materials.isMinecart(item.getType())) {
-                EntityType entityType = Materials.getRelatedEntity(item.getType());
-                if (entityType == null) {
-                    entityType = EntityType.MINECART;
-                }
-                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, clicked.getLocation().add(0.5, 0, 0.5), entityType));
-                return;
-            }
+        boolean fromDispenser = event instanceof BlockDispenseEvent;
 
-            // Handle created boats
-            if (item != null && Materials.isBoat(item.getType())) {
-                EntityType entityType = Materials.getRelatedEntity(item.getType());
-                if (entityType == null) {
-                    entityType = EntityType.OAK_BOAT;
-                }
-                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), entityType));
-                return;
+        // Handle created Minecarts
+        if (fromDispenser && item != null && Materials.isMinecart(item.getType())) {
+            EntityType entityType = Materials.getRelatedEntity(item.getType());
+            if (entityType == null) {
+                entityType = EntityType.MINECART;
             }
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, clicked.getLocation().add(0.5, 0, 0.5), entityType));
+            return;
+        }
 
-            // Handle created armor stands
-            if (item != null && item.getType() == Material.ARMOR_STAND) {
-                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.ARMOR_STAND));
-                return;
+        // Handle created boats
+        if (fromDispenser && item != null && Materials.isBoat(item.getType())) {
+            EntityType entityType = Materials.getRelatedEntity(item.getType());
+            if (entityType == null) {
+                entityType = EntityType.OAK_BOAT;
             }
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), entityType));
+            return;
+        }
 
-            if (item != null && item.getType() == Material.END_CRYSTAL) { /*&& placed.getType() == Material.BEDROCK) {*/ // in vanilla you can only place them on bedrock but who knows what plugins will add
-                                                                                                                            // may be overprotective as a result, but better than being underprotective
-                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.END_CRYSTAL));
-                return;
-            }
+        // Handle created armor stands
+        if (fromDispenser && item != null && item.getType() == Material.ARMOR_STAND) {
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.ARMOR_STAND));
+            return;
+        }
+
+        if (fromDispenser && item != null && item.getType() == Material.END_CRYSTAL) { /*&& placed.getType() == Material.BEDROCK) {*/ // in vanilla you can only place them on bedrock but who knows what plugins will add
+                                                                                                                        // may be overprotective as a result, but better than being underprotective
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.END_CRYSTAL));
+            return;
         }
 
         // Handle created spawn eggs
