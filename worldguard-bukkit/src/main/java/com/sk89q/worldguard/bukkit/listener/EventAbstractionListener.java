@@ -128,7 +128,6 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityKnockbackByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
@@ -784,15 +783,6 @@ public class EventAbstractionListener extends AbstractListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onEntityPlace(EntityPlaceEvent event) {
-        Events.fireToCancel(event, new SpawnEntityEvent(event, create(event.getPlayer()), event.getEntity()));
-
-        if (event.isCancelled() && event.getPlayer() != null) {
-            playDenyEffect(event.getPlayer(), event.getEntity().getLocation());
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
     public void onHangingPlace(HangingPlaceEvent event) {
         Events.fireToCancel(event, new SpawnEntityEvent(event, create(event.getPlayer()), event.getEntity()));
 
@@ -1264,11 +1254,8 @@ public class EventAbstractionListener extends AbstractListener {
             return;
         }
 
-        // Player placements are checked at the entity's final position by onEntityPlace.
-        boolean fromDispenser = event instanceof BlockDispenseEvent;
-
         // Handle created Minecarts
-        if (fromDispenser && item != null && Materials.isMinecart(item.getType())) {
+        if (item != null && Materials.isMinecart(item.getType())) {
             EntityType entityType = Materials.getRelatedEntity(item.getType());
             if (entityType == null) {
                 entityType = EntityType.MINECART;
@@ -1278,7 +1265,7 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         // Handle created boats
-        if (fromDispenser && item != null && Materials.isBoat(item.getType())) {
+        if (item != null && Materials.isBoat(item.getType())) {
             EntityType entityType = Materials.getRelatedEntity(item.getType());
             if (entityType == null) {
                 entityType = EntityType.OAK_BOAT;
@@ -1287,13 +1274,19 @@ public class EventAbstractionListener extends AbstractListener {
             return;
         }
 
+        // Handle created cushions
+        if (item != null && Tag.ITEMS_CUSHIONS.isTagged(item.getType())) {
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.CUSHION));
+            return;
+        }
+
         // Handle created armor stands
-        if (fromDispenser && item != null && item.getType() == Material.ARMOR_STAND) {
+        if (item != null && item.getType() == Material.ARMOR_STAND) {
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.ARMOR_STAND));
             return;
         }
 
-        if (fromDispenser && item != null && item.getType() == Material.END_CRYSTAL) { /*&& placed.getType() == Material.BEDROCK) {*/ // in vanilla you can only place them on bedrock but who knows what plugins will add
+        if (item != null && item.getType() == Material.END_CRYSTAL) { /*&& placed.getType() == Material.BEDROCK) {*/ // in vanilla you can only place them on bedrock but who knows what plugins will add
                                                                                                                         // may be overprotective as a result, but better than being underprotective
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.END_CRYSTAL));
             return;
