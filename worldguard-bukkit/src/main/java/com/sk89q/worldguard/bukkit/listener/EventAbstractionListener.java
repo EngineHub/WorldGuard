@@ -1274,6 +1274,12 @@ public class EventAbstractionListener extends AbstractListener {
             return;
         }
 
+        // Handle created cushions
+        if (item != null && Materials.isCushion(item.getType())) {
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.CUSHION));
+            return;
+        }
+
         // Handle created armor stands
         if (item != null && item.getType() == Material.ARMOR_STAND) {
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.ARMOR_STAND));

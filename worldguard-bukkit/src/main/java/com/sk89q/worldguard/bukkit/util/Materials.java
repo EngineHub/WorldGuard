@@ -1182,6 +1182,16 @@ public final class Materials {
     }
 
     /**
+     * Test whether the given material is a Cushion.
+     *
+     * @param material the material
+     * @return true if a Cushion item
+     */
+    public static boolean isCushion(Material material) {
+        return Tag.ITEMS_CUSHIONS.isTagged(material);
+    }
+
+    /**
      * Test whether the given material is a Shulker Box.
      *
      * @param material the material
