@@ -48,6 +48,8 @@ import com.sk89q.worldguard.bukkit.util.PaperInterop;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.flags.Flags;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.event.entity.EntityBreakByEntityEvent;
+import io.papermc.paper.event.entity.EntityBreakEvent;
 import io.papermc.paper.event.entity.EntityPushedByEntityAttackEvent;
 import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import org.bukkit.Bukkit;
@@ -77,6 +79,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -668,8 +671,13 @@ public class EventAbstractionListener extends AbstractListener {
         Player player = event.getPlayer();
         Block blockClicked = event.getBlockClicked();
         Block blockAffected;
-
-        if (blockClicked.getBlockData() instanceof Waterlogged) {
+        boolean canPlaceInside = false;
+        // Can be placed inside blocks only when not sneaking
+        if (!player.isSneaking()) {
+            canPlaceInside = (event.getBucket() != Material.LAVA_BUCKET && blockClicked.getBlockData() instanceof Waterlogged)
+                    || (Materials.isCauldron(blockClicked.getType()) && Materials.isCauldronBucketType(event.getBucket()));
+        }
+        if (canPlaceInside) {
             blockAffected = blockClicked;
         } else {
             blockAffected = blockClicked.getRelative(event.getBlockFace());
@@ -1258,7 +1266,11 @@ public class EventAbstractionListener extends AbstractListener {
 
         // Handle created boats
         if (item != null && Materials.isBoat(item.getType())) {
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), Materials.getRelatedEntity(item.getType())));
+            EntityType entityType = Materials.getRelatedEntity(item.getType());
+            if (entityType == null) {
+                entityType = EntityType.OAK_BOAT;
+            }
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), entityType));
             return;
         }
 
@@ -1375,6 +1387,26 @@ public class EventAbstractionListener extends AbstractListener {
         @EventHandler(ignoreCancelled = true)
         public void onEntityKnockbackByEntity(EntityPushedByEntityAttackEvent event) {
             handleKnockback(event, event.getPushedBy());
+        }
+
+        @EventHandler(ignoreCancelled = true)
+        public void onEntityBreak(EntityBreakEvent event) {
+            if (event.getEntity() instanceof Hanging) {
+                return;
+            }
+
+            if (event instanceof EntityBreakByEntityEvent entityEvent) {
+                Entity remover = entityEvent.getRemover();
+                Events.fireToCancel(event, new DestroyEntityEvent(event, create(remover), event.getEntity()));
+
+                if (event.isCancelled() && remover instanceof Player player) {
+                    playDenyEffect(player, event.getEntity().getLocation());
+                }
+            } else if (event.getCause() == EntityBreakEvent.RemoveCause.EXPLOSION) {
+                DestroyEntityEvent destroyEntityEvent = new DestroyEntityEvent(event, Cause.unknown(), event.getEntity());
+                destroyEntityEvent.getRelevantFlags().add(Flags.OTHER_EXPLOSION);
+                Events.fireToCancel(event, destroyEntityEvent);
+            }
         }
     }
 
