@@ -561,8 +561,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         try {
             // Folia is Paper-based, so this is a good first check.
             if (PaperLib.isPaper()) {
-                Class.forName("io.papermc.paper.threadedregions.RegionizedServer"); // Simpler
-                return true;
+                return getWorldEdit().isFolia(); // Delegate check to WorldEdit
             }
         } catch (Throwable t) {
             // Ignore, this likely means an outdated version.
