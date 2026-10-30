@@ -95,6 +95,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -129,6 +130,7 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityKnockbackByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
@@ -397,6 +399,19 @@ public class EventAbstractionListener extends AbstractListener {
             eventToFire.getRelevantFlags().add(Flags.WIND_CHARGE_BURST);
         }
         Events.fireToCancel(event, eventToFire);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityTarget(EntityTargetEvent event) {
+        if (!(event.getEntity() instanceof Creeper creeper)) {
+            return;
+        }
+
+        if (event.getTarget() instanceof Player player) {
+            Cause.trackParentCause(creeper, player);
+        } else if (event.getReason() != EntityTargetEvent.TargetReason.TARGET_DIED) {
+            Cause.untrackParentCause(creeper);
+        }
     }
 
     @SuppressWarnings("UnstableApiUsage")
