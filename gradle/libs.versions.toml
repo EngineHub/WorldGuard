@@ -1,5 +1,5 @@
 [versions]
-worldedit = "7.4.4"
+worldedit = "7.4.6"
 crankcase = "0.1.0"
 
 # Minimum versions we apply to make dependencies support newer Java
