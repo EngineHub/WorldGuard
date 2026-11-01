@@ -177,7 +177,8 @@ public class RegionProtectionListener extends AbstractListener {
 
             /* Flint and steel, fire charge, etc. */
             if (Materials.isFire(type)) {
-                Material causeType = event.getCause().getFirstBlockType();
+                Block causeBlock = event.getCause().getFirstBlock();
+                Material causeType = causeBlock != null ? causeBlock.getType() : null;
                 boolean fire = causeType != null && Materials.isFire(causeType);
                 boolean lava = causeType != null && Materials.isLava(causeType);
                 List<StateFlag> flags = new ArrayList<>();
