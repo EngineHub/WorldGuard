@@ -1327,7 +1327,7 @@ public final class Materials {
     }
 
     public static boolean isBed(Material material) {
-        return Tag.BEDS.isTagged(material);
+        return Tag.BEDS.isTagged(material) || material == Material.STRAW_BED;
     }
 
     public static boolean isAnvil(Material material) {
