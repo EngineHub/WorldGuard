@@ -616,6 +616,9 @@ public class WorldGuardEntityListener extends AbstractListener {
                 event.setCancelled(true);
                 return;
             }
+            if (ent instanceof Creeper creeper && creeper.getTarget() instanceof Player player) {
+                Cause.trackParentCause(creeper, player);
+            }
         } else if (event.getEntityType() == EntityType.TNT
                 || event.getEntityType() == EntityType.TNT_MINECART
                 || event.getEntityType() == EntityType.SULFUR_CUBE) {
