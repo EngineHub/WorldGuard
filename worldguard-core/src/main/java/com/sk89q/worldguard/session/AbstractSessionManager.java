@@ -21,8 +21,6 @@ package com.sk89q.worldguard.session;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -43,7 +41,6 @@ import com.sk89q.worldguard.session.handler.WaterBreathing;
 import com.sk89q.worldguard.session.handler.WeatherLockFlag;
 
 import javax.annotation.Nullable;
-import java.lang.ref.WeakReference;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -61,19 +58,12 @@ public abstract class AbstractSessionManager implements SessionManager {
 
     private static final BiPredicate<String, LocalPlayer> BYPASS_PERMISSION_TEST = (worldName, player) -> player.hasPermission("worldguard.region.bypass." + worldName);
 
-    private final LoadingCache<BypassCacheKey, Boolean> bypassCache = CacheBuilder.newBuilder()
+    private final Cache<BypassCacheKey, Boolean> bypassCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
             .expireAfterWrite(Duration.ofSeconds(2))
-            .build(CacheLoader.from(tuple -> {
-                LocalPlayer player = tuple.playerRef.get();
-                if (player == null) {
-                    // Player has been garbage collected, so we can't check permissions.
-                    return false;
-                }
-                return BYPASS_PERMISSION_TEST.test(tuple.worldName, player);
-            }));
+            .build();
 
-    private final Cache<SessionCacheKey, Session> sessions = CacheBuilder.newBuilder()
+    private final Cache<UUID, Session> sessions = CacheBuilder.newBuilder()
             .expireAfterAccess(Duration.ofMinutes(SESSION_LIFETIME))
             .build();
 
@@ -151,13 +141,19 @@ public abstract class AbstractSessionManager implements SessionManager {
             return BYPASS_PERMISSION_TEST.test(world.getName(), player);
         }
 
-        return bypassCache.getUnchecked(new BypassCacheKey(world.getName(), player));
+        var bypassCacheKey = new BypassCacheKey(world.getName(), player.getUniqueId());
+        Boolean bypass = bypassCache.getIfPresent(bypassCacheKey);
+        if (bypass == null) {
+            bypass = BYPASS_PERMISSION_TEST.test(world.getName(), player);
+            bypassCache.put(bypassCacheKey, bypass);
+        }
+        return bypass;
     }
 
     @Override
     public void resetState(LocalPlayer player) {
         checkNotNull(player, "player");
-        @Nullable Session session = getIfPresentInternal(new SessionCacheKey(player));
+        @Nullable Session session = getIfPresentInternal(player);
         if (session != null) {
             session.resetState(player);
         }
@@ -166,13 +162,13 @@ public abstract class AbstractSessionManager implements SessionManager {
     @Override
     @Nullable
     public Session getIfPresent(LocalPlayer player) {
-        return getIfPresentInternal(new SessionCacheKey(player));
+        return getIfPresentInternal(player);
     }
 
-    private Session getIfPresentInternal(SessionCacheKey cacheKey) {
-        @Nullable Session session = sessions.getIfPresent(cacheKey);
+    private Session getIfPresentInternal(LocalPlayer player) {
+        @Nullable Session session = sessions.getIfPresent(player.getUniqueId());
         if (session != null) {
-            session.ensureInitialized(cacheKey.playerRef.get(), this::initializeSession);
+            session.ensureInitialized(player, this::initializeSession);
             return session;
         }
         return null;
@@ -180,7 +176,11 @@ public abstract class AbstractSessionManager implements SessionManager {
 
     @Override
     public Session get(LocalPlayer player) {
-        Session session = sessions.asMap().computeIfAbsent(new SessionCacheKey(player), (_) -> new Session(this));
+        Session session = sessions.getIfPresent(player.getUniqueId());
+        if (session == null) {
+            session = new Session(this);
+            sessions.put(player.getUniqueId(), session);
+        }
         session.ensureInitialized(player, this::initializeSession);
         return session;
     }
@@ -197,53 +197,6 @@ public abstract class AbstractSessionManager implements SessionManager {
         session.initialize(player);
     }
 
-    protected static final class SessionCacheKey {
-        final WeakReference<LocalPlayer> playerRef;
-        final UUID uuid;
-
-        SessionCacheKey(LocalPlayer player) {
-            this.playerRef = new WeakReference<>(player);
-            this.uuid = player.getUniqueId();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            SessionCacheKey cacheKey = (SessionCacheKey) o;
-            return uuid.equals(cacheKey.uuid);
-        }
-
-        @Override
-        public int hashCode() {
-            return uuid.hashCode();
-        }
-    }
-
-    protected static final class BypassCacheKey {
-        final WeakReference<LocalPlayer> playerRef;
-        final String worldName;
-        final UUID playerUUID;
-
-        BypassCacheKey(String worldName, LocalPlayer player) {
-            this.playerRef = new WeakReference<>(player);
-            this.worldName = worldName;
-            this.playerUUID = player.getUniqueId();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            BypassCacheKey that = (BypassCacheKey) o;
-            return worldName.equals(that.worldName) && playerUUID.equals(that.playerUUID);
-        }
-
-        @Override
-        public int hashCode() {
-            int result = worldName.hashCode();
-            result = 31 * result + playerUUID.hashCode();
-            return result;
-        }
+    record BypassCacheKey(String worldName, UUID playerUUID) {
     }
 }
