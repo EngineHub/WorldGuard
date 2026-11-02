@@ -631,6 +631,13 @@ public class WorldGuardEntityListener extends AbstractListener {
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCreeperPrime(ExplosionPrimeEvent event) {
+        if (event.getEntity() instanceof Creeper creeper && creeper.getTarget() instanceof Player player) {
+            Cause.trackParentCause(creeper, player);
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         ConfigurationManager cfg = getConfig();
