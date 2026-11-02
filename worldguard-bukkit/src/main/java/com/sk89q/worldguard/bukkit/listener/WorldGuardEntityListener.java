@@ -616,6 +616,9 @@ public class WorldGuardEntityListener extends AbstractListener {
                 event.setCancelled(true);
                 return;
             }
+            if (ent instanceof Creeper creeper && creeper.getTarget() instanceof Player player) {
+                Cause.trackParentCause(creeper, player);
+            }
         } else if (event.getEntityType() == EntityType.TNT
                 || event.getEntityType() == EntityType.TNT_MINECART
                 || event.getEntityType() == EntityType.SULFUR_CUBE) {
@@ -628,13 +631,6 @@ public class WorldGuardEntityListener extends AbstractListener {
                 event.setCancelled(true);
                 return;
             }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onCreeperPrime(ExplosionPrimeEvent event) {
-        if (event.getEntity() instanceof Creeper creeper && creeper.getTarget() instanceof Player player) {
-            Cause.trackParentCause(creeper, player);
         }
     }
 
