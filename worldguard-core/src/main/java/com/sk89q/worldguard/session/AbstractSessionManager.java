@@ -56,7 +56,7 @@ public abstract class AbstractSessionManager implements SessionManager {
     public static final int RUN_DELAY = 20;
     public static final long SESSION_LIFETIME = 10;
 
-    private static final BiPredicate<String, LocalPlayer> BYPASS_PERMISSION_TEST = (worldName, player) -> player.hasPermission("worldguard.region.bypass." + worldName);
+    private static final BiPredicate<World, LocalPlayer> BYPASS_PERMISSION_TEST = (world, player) -> player.hasPermission("worldguard.region.bypass." + world.getName());
 
     private final Cache<BypassCacheKey, Boolean> bypassCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
@@ -138,11 +138,11 @@ public abstract class AbstractSessionManager implements SessionManager {
         }
 
         if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().disablePermissionCache) {
-            return BYPASS_PERMISSION_TEST.test(world.getName(), player);
+            return BYPASS_PERMISSION_TEST.test(world, player);
         }
 
         var bypassCacheKey = new BypassCacheKey(world.getName(), player.getUniqueId());
-        return bypassCache.asMap().computeIfAbsent(bypassCacheKey, (_) -> BYPASS_PERMISSION_TEST.test(world.getName(), player));
+        return bypassCache.asMap().computeIfAbsent(bypassCacheKey, (_) -> BYPASS_PERMISSION_TEST.test(world, player));
     }
 
     @Override
