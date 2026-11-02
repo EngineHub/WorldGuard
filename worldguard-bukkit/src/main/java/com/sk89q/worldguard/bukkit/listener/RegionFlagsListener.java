@@ -62,9 +62,11 @@ public class RegionFlagsListener extends AbstractListener {
 
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
-        Block causeBlock = event.getCause().getFirstBlock();
-        if (causeBlock != null && Materials.isPistonBlock(causeBlock.getType())) {
-            event.filter(testState(query, Flags.PISTONS), false);
+        Block block;
+        if ((block = event.getCause().getFirstBlock()) != null) {
+            if (Materials.isPistonBlock(block.getType())) {
+                event.filter(testState(query, Flags.PISTONS), false);
+            }
         }
 
         if (event.getCause().find(EntityType.SNOW_GOLEM) != null) {
@@ -83,9 +85,11 @@ public class RegionFlagsListener extends AbstractListener {
         WorldConfiguration config = getWorldConfig(event.getWorld());
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
-        Block causeBlock = event.getCause().getFirstBlock();
-        if (causeBlock != null && Materials.isPistonBlock(causeBlock.getType())) {
-            event.filter(testState(query, Flags.PISTONS), false);
+        Block block;
+        if ((block = event.getCause().getFirstBlock()) != null) {
+            if (Materials.isPistonBlock(block.getType())) {
+                event.filter(testState(query, Flags.PISTONS), false);
+            }
         }
 
         if (event.getCause().find(EntityType.CREEPER) != null) { // Creeper

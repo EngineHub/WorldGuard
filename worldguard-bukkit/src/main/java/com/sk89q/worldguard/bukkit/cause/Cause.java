@@ -176,17 +176,12 @@ public final class Cause {
         return null;
     }
 
-    /**
-     * Get the first causing block if it is accessible from the current thread.
-     * On Folia, the block may belong to a different region or world.
-     *
-     * @return the block, or null if there is no block or its region is not owned by the current thread
-     */
     @Nullable
     public Block getFirstBlock() {
         for (Object object : causes) {
-            if (object instanceof Block b) {
-                return WorldGuardPlugin.inst().isFolia() && !Bukkit.isOwnedByCurrentRegion(b.getLocation()) ? null : b;
+            if (object instanceof Block b && (!WorldGuardPlugin.inst().isFolia()
+                    || Bukkit.isOwnedByCurrentRegion(b.getLocation()))) {
+                return b;
             }
         }
 
