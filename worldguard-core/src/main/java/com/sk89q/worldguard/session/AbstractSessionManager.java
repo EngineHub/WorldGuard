@@ -44,11 +44,11 @@ import com.sk89q.worldguard.session.handler.WeatherLockFlag;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiPredicate;
 import java.util.logging.Level;
 
@@ -59,21 +59,26 @@ public abstract class AbstractSessionManager implements SessionManager {
     public static final int RUN_DELAY = 20;
     public static final long SESSION_LIFETIME = 10;
 
-    private static final BiPredicate<World, LocalPlayer> BYPASS_PERMISSION_TEST = (world, player) -> {
-        return player.hasPermission("worldguard.region.bypass." + world.getName());
-    };
+    private static final BiPredicate<String, LocalPlayer> BYPASS_PERMISSION_TEST = (worldName, player) -> player.hasPermission("worldguard.region.bypass." + worldName);
 
-    private final LoadingCache<WorldPlayerTuple, Boolean> bypassCache = CacheBuilder.newBuilder()
+    private final LoadingCache<BypassCacheKey, Boolean> bypassCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
-            .expireAfterWrite(2, TimeUnit.SECONDS)
-            .build(CacheLoader.from(tuple -> BYPASS_PERMISSION_TEST.test(tuple.getWorld(), tuple.getPlayer())));
+            .expireAfterWrite(Duration.ofSeconds(2))
+            .build(CacheLoader.from(tuple -> {
+                LocalPlayer player = tuple.playerRef.get();
+                if (player == null) {
+                    // Player has been garbage collected, so we can't check permissions.
+                    return false;
+                }
+                return BYPASS_PERMISSION_TEST.test(tuple.worldName, player);
+            }));
 
-    private final Cache<CacheKey, Session> sessions = CacheBuilder.newBuilder()
-            .expireAfterAccess(SESSION_LIFETIME, TimeUnit.MINUTES)
+    private final Cache<SessionCacheKey, Session> sessions = CacheBuilder.newBuilder()
+            .expireAfterAccess(Duration.ofMinutes(SESSION_LIFETIME))
             .build();
 
     private boolean hasCustom = false;
-    private List<Handler.Factory<? extends Handler>> handlers = new LinkedList<>();
+    private final List<Handler.Factory<? extends Handler>> handlers = new LinkedList<>();
 
     private static final List<Handler.Factory<? extends Handler>> defaultHandlers = new LinkedList<>();
 
@@ -143,16 +148,16 @@ public abstract class AbstractSessionManager implements SessionManager {
         }
 
         if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().disablePermissionCache) {
-            return BYPASS_PERMISSION_TEST.test(world, player);
+            return BYPASS_PERMISSION_TEST.test(world.getName(), player);
         }
 
-        return bypassCache.getUnchecked(new WorldPlayerTuple(world, player));
+        return bypassCache.getUnchecked(new BypassCacheKey(world.getName(), player));
     }
 
     @Override
     public void resetState(LocalPlayer player) {
         checkNotNull(player, "player");
-        @Nullable Session session = getIfPresentInternal(new CacheKey(player));
+        @Nullable Session session = getIfPresentInternal(new SessionCacheKey(player));
         if (session != null) {
             session.resetState(player);
         }
@@ -161,10 +166,10 @@ public abstract class AbstractSessionManager implements SessionManager {
     @Override
     @Nullable
     public Session getIfPresent(LocalPlayer player) {
-        return getIfPresentInternal(new CacheKey(player));
+        return getIfPresentInternal(new SessionCacheKey(player));
     }
 
-    private Session getIfPresentInternal(CacheKey cacheKey) {
+    private Session getIfPresentInternal(SessionCacheKey cacheKey) {
         @Nullable Session session = sessions.getIfPresent(cacheKey);
         if (session != null) {
             session.ensureInitialized(cacheKey.playerRef.get(), this::initializeSession);
@@ -175,7 +180,7 @@ public abstract class AbstractSessionManager implements SessionManager {
 
     @Override
     public Session get(LocalPlayer player) {
-        Session session = sessions.asMap().computeIfAbsent(new CacheKey(player), (k) -> new Session(this));
+        Session session = sessions.asMap().computeIfAbsent(new SessionCacheKey(player), (_) -> new Session(this));
         session.ensureInitialized(player, this::initializeSession);
         return session;
     }
@@ -192,27 +197,53 @@ public abstract class AbstractSessionManager implements SessionManager {
         session.initialize(player);
     }
 
-    protected static final class CacheKey {
+    protected static final class SessionCacheKey {
         final WeakReference<LocalPlayer> playerRef;
         final UUID uuid;
 
-        CacheKey(LocalPlayer player) {
-            playerRef = new WeakReference<>(player);
-            uuid = player.getUniqueId();
+        SessionCacheKey(LocalPlayer player) {
+            this.playerRef = new WeakReference<>(player);
+            this.uuid = player.getUniqueId();
         }
 
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            CacheKey cacheKey = (CacheKey) o;
+            SessionCacheKey cacheKey = (SessionCacheKey) o;
             return uuid.equals(cacheKey.uuid);
-
         }
 
         @Override
         public int hashCode() {
             return uuid.hashCode();
+        }
+    }
+
+    protected static final class BypassCacheKey {
+        final WeakReference<LocalPlayer> playerRef;
+        final String worldName;
+        final UUID playerUUID;
+
+        BypassCacheKey(String worldName, LocalPlayer player) {
+            this.playerRef = new WeakReference<>(player);
+            this.worldName = worldName;
+            this.playerUUID = player.getUniqueId();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            BypassCacheKey that = (BypassCacheKey) o;
+            return worldName.equals(that.worldName) && playerUUID.equals(that.playerUUID);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = worldName.hashCode();
+            result = 31 * result + playerUUID.hashCode();
+            return result;
         }
     }
 }

@@ -22,6 +22,7 @@ package com.sk89q.worldguard.session;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 
+@Deprecated(forRemoval = true)
 public class WorldPlayerTuple {
 
     private final World world;
