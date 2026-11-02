@@ -246,7 +246,7 @@ public class EventAbstractionListener extends AbstractListener {
         BlockState previousState = event.getBlockReplacedState();
 
         // Some blocks, like tall grass and fire, get replaced
-        if (previousState.getType() != Material.AIR && previousState.getType() != event.getBlockReplacedState().getType()) {
+        if (previousState.getType() != Material.AIR && previousState.getType() != event.getBlockPlaced().getType()) {
             Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getPlayer()), previousState.getLocation(), previousState.getType()));
         }
 

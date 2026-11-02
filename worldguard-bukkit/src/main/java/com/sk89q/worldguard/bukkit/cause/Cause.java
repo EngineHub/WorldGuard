@@ -179,7 +179,8 @@ public final class Cause {
     @Nullable
     public Block getFirstBlock() {
         for (Object object : causes) {
-            if (object instanceof Block b) {
+            if (object instanceof Block b && (!WorldGuardPlugin.inst().isFolia()
+                    || Bukkit.isOwnedByCurrentRegion(b.getLocation()))) {
                 return b;
             }
         }
