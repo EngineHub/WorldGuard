@@ -142,12 +142,7 @@ public abstract class AbstractSessionManager implements SessionManager {
         }
 
         var bypassCacheKey = new BypassCacheKey(world.getName(), player.getUniqueId());
-        Boolean bypass = bypassCache.getIfPresent(bypassCacheKey);
-        if (bypass == null) {
-            bypass = BYPASS_PERMISSION_TEST.test(world.getName(), player);
-            bypassCache.put(bypassCacheKey, bypass);
-        }
-        return bypass;
+        return bypassCache.asMap().computeIfAbsent(bypassCacheKey, (_) -> BYPASS_PERMISSION_TEST.test(world.getName(), player));
     }
 
     @Override
@@ -176,11 +171,7 @@ public abstract class AbstractSessionManager implements SessionManager {
 
     @Override
     public Session get(LocalPlayer player) {
-        Session session = sessions.getIfPresent(player.getUniqueId());
-        if (session == null) {
-            session = new Session(this);
-            sessions.put(player.getUniqueId(), session);
-        }
+        Session session = sessions.asMap().computeIfAbsent(player.getUniqueId(), (_) -> new Session(this));
         session.ensureInitialized(player, this::initializeSession);
         return session;
     }
