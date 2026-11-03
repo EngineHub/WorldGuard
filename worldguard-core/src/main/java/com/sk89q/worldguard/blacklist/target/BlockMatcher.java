@@ -31,7 +31,7 @@ public class BlockMatcher implements TargetMatcher {
 
     @Override
     public String getMatchedTypeId() {
-        return this.type.getId();
+        return this.type.id();
     }
 
     @Override

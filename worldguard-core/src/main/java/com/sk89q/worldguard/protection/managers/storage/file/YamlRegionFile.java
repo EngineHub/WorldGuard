@@ -333,7 +333,7 @@ public class YamlRegionFile implements RegionDatabase {
      */
     private YAMLProcessor createYamlProcessor(File file) {
         checkNotNull(file);
-        return new YAMLProcessor(file, false, YAMLFormat.COMPACT);
+        return new YAMLProcessor(file.toPath(), false, YAMLFormat.COMPACT);
     }
 
     /**

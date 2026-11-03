@@ -212,13 +212,13 @@ public abstract class WorldConfiguration {
             }
             ItemType legacyItem = LegacyMapper.getInstance().getItemFromLegacy(id, data);
             if (legacyItem != null) {
-                return legacyItem.getId();
+                return legacyItem.id();
             }
         } catch (NumberFormatException ignored) {
         }
         final ItemType itemType = ItemTypes.get(legacy);
         if (itemType != null) {
-            return itemType.getId();
+            return itemType.id();
         }
 
         return null;
@@ -242,13 +242,13 @@ public abstract class WorldConfiguration {
             }
             BlockState legacyBlock = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
             if (legacyBlock != null) {
-                return legacyBlock.getBlockType().getId();
+                return legacyBlock.getBlockType().id();
             }
         } catch (NumberFormatException ignored) {
         }
         final BlockType blockType = BlockTypes.get(legacy);
         if (blockType != null) {
-            return blockType.getId();
+            return blockType.id();
         }
 
         return null;

@@ -27,7 +27,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 public class AbstractEventDebounce<K> {
 
@@ -36,7 +36,7 @@ public class AbstractEventDebounce<K> {
     AbstractEventDebounce(int debounceTime) {
         cache = CacheBuilder.newBuilder()
                 .maximumSize(1000)
-                .expireAfterWrite(debounceTime, TimeUnit.MILLISECONDS)
+                .expireAfterWrite(Duration.ofMillis(debounceTime))
                 .concurrencyLevel(2)
                 .build(new CacheLoader<K, Entry>() {
                     @Override

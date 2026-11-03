@@ -37,9 +37,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +53,7 @@ public class Blacklist {
     private boolean useAsWhitelist;
     private LoadingCache<String, TrackedEvent> repeatingEventCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
-            .expireAfterAccess(30, TimeUnit.SECONDS)
+            .expireAfterAccess(Duration.ofSeconds(30))
             .build(CacheLoader.from(TrackedEvent::new));
 
     public Blacklist(boolean useAsWhitelist) {

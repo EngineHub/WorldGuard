@@ -44,7 +44,7 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
     public void load() {
         copyDefaults();
 
-        config = new YAMLProcessor(new File(getDataFolder(), "config.yml"), true, YAMLFormat.EXTENDED);
+        config = new YAMLProcessor(new File(getDataFolder(), "config.yml").toPath(), true, YAMLFormat.EXTENDED);
         try {
             config.load();
         } catch (IOException e) {

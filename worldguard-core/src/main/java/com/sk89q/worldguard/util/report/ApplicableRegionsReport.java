@@ -31,7 +31,7 @@ public class ApplicableRegionsReport extends DataReport {
 
     public ApplicableRegionsReport(LocalPlayer player) {
         super("Applicable regions");
-        BlockVector3 position = player.getBlockIn().toVector().toBlockPoint();
+        BlockVector3 position = player.getBlockLocation().toVector().toBlockPoint();
         append("Location", player.getWorld().getName() + " @ " + position);
         RegionManager mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(player.getWorld());
         if (mgr == null) {

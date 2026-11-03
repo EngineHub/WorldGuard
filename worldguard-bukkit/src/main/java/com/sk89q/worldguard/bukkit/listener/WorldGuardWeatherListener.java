@@ -82,7 +82,7 @@ public class WorldGuardWeatherListener extends AbstractListener {
             if (targetId == Material.AIR) {
                 targetId = target.getRelative(BlockFace.DOWN).getType();
             }
-            if (wcfg.disallowedLightningBlocks.contains(BukkitAdapter.asBlockType(targetId).getId())) {
+            if (wcfg.disallowedLightningBlocks.contains(BukkitAdapter.asBlockType(targetId).id())) {
                 event.setCancelled(true);
             }
         }
