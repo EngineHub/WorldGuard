@@ -26,12 +26,15 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.protection.flags.FlagContext;
+import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.session.SessionManager;
 import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 import com.sk89q.worldguard.util.profile.resolver.ProfileService;
 
+import javax.annotation.Nullable;
 import javax.annotation.Nullable;
 import java.nio.file.Path;
 
@@ -169,5 +172,105 @@ public interface WorldGuardPlatform {
     @Nullable
     default ProtectedRegion getSpawnProtection(World world) {
         return null;
+    }
+
+    /**
+     * Called just before a region is about to be defined (added) via command or API.
+     *
+     * <p>Implementations may fire a cancellable platform event here. If the
+     * event is cancelled this method must return {@code false}, causing
+     * WorldGuard to abort the add operation.</p>
+     *
+     * <p>This method is <strong>not</strong> invoked when regions are loaded
+     * from storage during world/server startup.</p>
+     *
+     * @param world  the world in which the region is being defined
+     * @param region the region that is about to be added
+     * @param actor  the platform-specific actor object, or {@code null} if triggered via API
+     * @return {@code true} if the operation should proceed, {@code false} to cancel
+     */
+    default boolean callRegionAddEvent(World world, ProtectedRegion region, @Nullable Object actor) {
+        return true;
+    }
+
+    /**
+     * Called just before a region is about to be removed via command or API.
+     *
+     * <p>Implementations may fire a cancellable platform event here. If the
+     * event is cancelled this method must return {@code false}, causing
+     * WorldGuard to abort the remove operation.</p>
+     *
+     * @param world           the world in which the region resides
+     * @param region          the region that is about to be removed
+     * @param removalStrategy the removal strategy that will be applied to child regions
+     * @param actor           the platform-specific actor object, or {@code null} if triggered via API
+     * @return {@code true} if the operation should proceed, {@code false} to cancel
+     */
+    default boolean callRegionDeleteEvent(World world, ProtectedRegion region,
+                                          RemovalStrategy removalStrategy, @Nullable Object actor) {
+        return true;
+    }
+
+    /**
+     * Called just before a region's boundaries are about to be redefined via command or API.
+     *
+     * @param world     the world in which the region resides
+     * @param oldRegion the existing region before the change
+     * @param newRegion the new region that will replace it (same id, new bounds)
+     * @param actor     the platform-specific actor object, or {@code null} if triggered via API
+     * @return {@code true} if the operation should proceed, {@code false} to cancel
+     */
+    default boolean callRegionRedefineEvent(World world, ProtectedRegion oldRegion,
+                                            ProtectedRegion newRegion, @Nullable Object actor) {
+        return true;
+    }
+
+    /**
+     * Called just before a flag on a region is about to be changed or cleared via command or API.
+     *
+     * @param world    the world in which the region resides
+     * @param region   the region being modified
+     * @param flag     the flag being changed
+     * @param newValue the new value being set, or {@code null} if the flag is being cleared
+     * @param actor    the platform-specific actor object, or {@code null} if triggered via API
+     * @return {@code true} if the operation should proceed, {@code false} to cancel
+     */
+    default boolean callRegionFlagChangeEvent(World world, ProtectedRegion region, Flag<?> flag,
+                                              @Nullable Object newValue, @Nullable Object actor) {
+        return true;
+    }
+
+    /**
+     * Called just before members or owners of a region are about to change via command or API.
+     *
+     * <p>Note: implementations may fire this event asynchronously since UUID
+     * resolution is performed off the main thread.</p>
+     *
+     * @param world      the world in which the region resides
+     * @param region     the region being modified
+     * @param changeType a string identifying the type of change
+     *                   ({@code "ADD_MEMBER"}, {@code "REMOVE_MEMBER"}, {@code "ADD_OWNER"}, {@code "REMOVE_OWNER"})
+     * @param domain     the platform-specific domain entries being added or removed
+     * @param actor      the platform-specific actor object, or {@code null} if triggered via API
+     * @return {@code true} if the operation should proceed, {@code false} to cancel
+     */
+    default boolean callRegionMemberChangeEvent(World world, ProtectedRegion region, String changeType,
+                                                @Nullable Object domain, @Nullable Object actor) {
+        return true;
+    }
+
+    /**
+     * Called just before a region's priority is about to be changed via command or API.
+     *
+     * @param world       the world in which the region resides
+     * @param region      the region being modified
+     * @param oldPriority the current priority
+     * @param newPriority the new priority being set
+     * @param actor       the platform-specific actor object, or {@code null} if triggered via API
+     * @return {@code true} if the operation should proceed, {@code false} to cancel
+     */
+    default boolean callRegionPriorityChangeEvent(World world, ProtectedRegion region, int oldPriority,
+                                                  int newPriority, @Nullable Object actor) {
+        return true;
     }
 }

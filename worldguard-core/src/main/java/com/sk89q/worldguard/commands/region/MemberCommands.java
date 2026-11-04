@@ -72,7 +72,15 @@ public class MemberCommands extends RegionCommandsBase {
         final String description = String.format("Adding members to the region '%s' on '%s'", region.getId(), world.getName());
         AsyncCommandBuilder.wrap(resolver, sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
-                .onSuccess(String.format("Region '%s' updated with new members.", region.getId()), region.getMembers()::addAll)
+                .onSuccess((String) null, resolved -> {
+                    if (WorldGuard.getInstance().getPlatform().callRegionMemberChangeEvent(
+                            world, region, "ADD_MEMBER", resolved, sender)) {
+                        region.getMembers().addAll(resolved);
+                        sender.print(String.format("Region '%s' updated with new members.", region.getId()));
+                    } else {
+                        sender.print("Member change was cancelled by a plugin.");
+                    }
+                })
                 .onFailure("Failed to add new members", worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
     }
@@ -106,7 +114,15 @@ public class MemberCommands extends RegionCommandsBase {
         final String description = String.format("Adding owners to the region '%s' on '%s'", region.getId(), world.getName());
         AsyncCommandBuilder.wrap(checkedAddOwners(sender, manager, region, world, resolver), sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
-                .onSuccess(String.format("Region '%s' updated with new owners.", region.getId()), region.getOwners()::addAll)
+                .onSuccess((String) null, resolved -> {
+                    if (WorldGuard.getInstance().getPlatform().callRegionMemberChangeEvent(
+                            world, region, "ADD_OWNER", resolved, sender)) {
+                        region.getOwners().addAll(resolved);
+                        sender.print(String.format("Region '%s' updated with new owners.", region.getId()));
+                    } else {
+                        sender.print("Owner change was cancelled by a plugin.");
+                    }
+                })
                 .onFailure("Failed to add new owners", worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
     }
@@ -182,7 +198,15 @@ public class MemberCommands extends RegionCommandsBase {
         AsyncCommandBuilder.wrap(callable, sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .onSuccess(String.format("Region '%s' updated with members removed.", region.getId()), region.getMembers()::removeAll)
+                .onSuccess((String) null, resolved -> {
+                    if (WorldGuard.getInstance().getPlatform().callRegionMemberChangeEvent(
+                            world, region, "REMOVE_MEMBER", resolved, sender)) {
+                        region.getMembers().removeAll(resolved);
+                        sender.print(String.format("Region '%s' updated with members removed.", region.getId()));
+                    } else {
+                        sender.print("Member removal was cancelled by a plugin.");
+                    }
+                })
                 .onFailure("Failed to remove members", worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
     }
@@ -225,7 +249,15 @@ public class MemberCommands extends RegionCommandsBase {
         AsyncCommandBuilder.wrap(callable, sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .onSuccess(String.format("Region '%s' updated with owners removed.", region.getId()), region.getOwners()::removeAll)
+                .onSuccess((String) null, resolved -> {
+                    if (WorldGuard.getInstance().getPlatform().callRegionMemberChangeEvent(
+                            world, region, "REMOVE_OWNER", resolved, sender)) {
+                        region.getOwners().removeAll(resolved);
+                        sender.print(String.format("Region '%s' updated with owners removed.", region.getId()));
+                    } else {
+                        sender.print("Owner removal was cancelled by a plugin.");
+                    }
+                })
                 .onFailure("Failed to remove owners", worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
     }
