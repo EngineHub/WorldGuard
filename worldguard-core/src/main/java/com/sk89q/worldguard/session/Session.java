@@ -227,6 +227,12 @@ public class Session {
      */
     @Nullable
     public Location testMoveTo(LocalPlayer player, Location to, MoveType moveType, boolean forced) {
+        if (lastValid == null) {
+            // If lastValid is null, the session has not yet been initialized. This shouldn't happen, but theoretically
+            // can due to Bukkit event orderings.
+            return null;
+        }
+
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
         if (!forced && needRefresh.getAndSet(false)) {
