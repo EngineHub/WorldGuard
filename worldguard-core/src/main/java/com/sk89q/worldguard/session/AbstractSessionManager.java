@@ -142,7 +142,14 @@ public abstract class AbstractSessionManager implements SessionManager {
         }
 
         var bypassCacheKey = new BypassCacheKey(world.getName(), player.getUniqueId());
-        return bypassCache.asMap().computeIfAbsent(bypassCacheKey, (_) -> BYPASS_PERMISSION_TEST.test(world, player));
+        // Not asMap().computeIfAbsent: it renews the write time on every hit, so the
+        // result would never expire for a player who keeps being checked.
+        Boolean bypass = bypassCache.getIfPresent(bypassCacheKey);
+        if (bypass == null) {
+            bypass = BYPASS_PERMISSION_TEST.test(world, player);
+            bypassCache.put(bypassCacheKey, bypass);
+        }
+        return bypass;
     }
 
     @Override
