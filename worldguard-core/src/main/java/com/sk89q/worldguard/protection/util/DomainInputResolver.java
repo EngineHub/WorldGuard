@@ -43,6 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class DomainInputResolver implements Callable<DefaultDomain> {
 
     private static final Pattern GROUP_PATTERN = Pattern.compile("(?i)^[G]:(.+)$");
+    private static final int MAX_PLAYER_NAME_LENGTH = 16;
 
     /**
      * The policy for locating users.
@@ -119,9 +120,14 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
             }
         }
 
-        if (!namesToQuery.isEmpty()) {
+        // Paper rejects longer names with an exception, so leave them unresolved.
+        List<String> validNames = namesToQuery.stream()
+                .filter(name -> name.length() <= MAX_PLAYER_NAME_LENGTH)
+                .toList();
+
+        if (!validNames.isEmpty()) {
             try {
-                for (Profile profile : profileService.findAllByName(namesToQuery)) {
+                for (Profile profile : profileService.findAllByName(validNames)) {
                     namesToQuery.remove(profile.getName().toLowerCase());
                     domain.addPlayer(profile.getUniqueId());
                 }
