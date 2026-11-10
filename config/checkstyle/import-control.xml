@@ -24,6 +24,7 @@
     </subpackage>
 
     <subpackage name="bukkit">
+      <allow pkg="org.mockito"/>
       <allow pkg="org.bukkit"/>
       <allow pkg="org.bstats.bukkit"/>
       <allow pkg="org.bstats.charts"/>
