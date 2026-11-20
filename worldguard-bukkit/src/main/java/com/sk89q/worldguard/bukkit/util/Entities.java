@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.util;
 
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import org.bukkit.Tag;
 import org.bukkit.entity.Allay;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.ArmorStand;
@@ -69,7 +70,7 @@ public final class Entities {
      * @return true if tamed
      */
     public static boolean isTamed(@Nullable Entity entity) {
-        return entity instanceof Tameable && ((Tameable) entity).isTamed();
+        return entity instanceof Tameable tameable && tameable.isTamed();
     }
 
     /**
@@ -122,13 +123,7 @@ public final class Entities {
      * @return true if the type is a Boat type
      */
     public static boolean isBoat(EntityType type) {
-        return switch (type) {
-            case OAK_BOAT, DARK_OAK_BOAT, SPRUCE_BOAT, ACACIA_BOAT, CHERRY_BOAT, JUNGLE_BOAT, MANGROVE_BOAT,
-                 BIRCH_BOAT, PALE_OAK_BOAT, BAMBOO_RAFT, OAK_CHEST_BOAT, DARK_OAK_CHEST_BOAT, SPRUCE_CHEST_BOAT,
-                 ACACIA_CHEST_BOAT, CHERRY_CHEST_BOAT, JUNGLE_CHEST_BOAT, MANGROVE_CHEST_BOAT, BIRCH_CHEST_BOAT,
-                 PALE_OAK_CHEST_BOAT, BAMBOO_CHEST_RAFT -> true;
-            default -> false;
-        };
+        return Tag.ENTITY_TYPES_BOAT.isTagged(type);
     }
 
     /**
@@ -153,8 +148,7 @@ public final class Entities {
      */
     public static Entity getShooter(Entity entity) {
 
-        while (entity instanceof Projectile) {
-            Projectile projectile = (Projectile) entity;
+        while (entity instanceof Projectile projectile) {
             ProjectileSource remover = projectile.getShooter();
             if (remover instanceof Entity && remover != entity) {
                 entity = (Entity) remover;
@@ -261,16 +255,14 @@ public final class Entities {
      */
     public static @Nonnull StateFlag getExplosionFlag(Entity entity) {
         return switch (entity) {
-            case BreezeWindCharge breezeWindCharge -> Flags.BREEZE_WIND_CHARGE;
-            case WindCharge windCharge -> Flags.WIND_CHARGE_BURST;
-            case Firework firework -> Flags.FIREWORK_DAMAGE;
-            case Fireball fireball -> Flags.GHAST_FIREBALL;
-            case Wither wither -> Flags.WITHER_DAMAGE;
-            case Creeper creeper -> Flags.CREEPER_EXPLOSION;
-            case TNTPrimed tnt -> Flags.TNT;
-            case SulfurCube sulfurCube -> Flags.TNT;
-            case ExplosiveMinecart minecart -> Flags.TNT;
-            case EnderDragon dragon -> Flags.ENDERDRAGON_BLOCK_DAMAGE;
+            case BreezeWindCharge _ -> Flags.BREEZE_WIND_CHARGE;
+            case WindCharge _ -> Flags.WIND_CHARGE_BURST;
+            case Firework _ -> Flags.FIREWORK_DAMAGE;
+            case Fireball _ -> Flags.GHAST_FIREBALL;
+            case Wither _ -> Flags.WITHER_DAMAGE;
+            case Creeper _ -> Flags.CREEPER_EXPLOSION;
+            case TNTPrimed _, SulfurCube _, ExplosiveMinecart _ -> Flags.TNT;
+            case EnderDragon _ -> Flags.ENDERDRAGON_BLOCK_DAMAGE;
             case null, default -> Flags.OTHER_EXPLOSION;
         };
     }
