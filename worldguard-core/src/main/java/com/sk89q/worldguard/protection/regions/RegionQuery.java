@@ -45,11 +45,11 @@ import com.sk89q.worldguard.protection.util.NormativeOrders;
 import com.sk89q.worldguard.protection.util.RegionCollectionConsumer;
 
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
@@ -513,7 +513,7 @@ public class RegionQuery {
             @Override
             Map<QueryOption, ApplicableRegionSet> createCache(RegionManager manager, Location location, Map<QueryOption, ApplicableRegionSet> cache) {
                 if (cache == null) {
-                    cache = new EnumMap<>(QueryOption.class);
+                    cache = new ConcurrentHashMap<>(QueryOption.values().length);
                     cache.put(QueryOption.NONE, manager.getApplicableRegions(location.toVector().toBlockPoint(), QueryOption.NONE));
                 }
 
@@ -530,7 +530,7 @@ public class RegionQuery {
             @Override
             Map<QueryOption, ApplicableRegionSet> createCache(RegionManager manager, Location location, Map<QueryOption, ApplicableRegionSet> cache) {
                 if (cache == null) {
-                    Map<QueryOption, ApplicableRegionSet> newCache = new EnumMap<>(QueryOption.class);
+                    Map<QueryOption, ApplicableRegionSet> newCache = new ConcurrentHashMap<>(QueryOption.values().length);
                     ApplicableRegionSet result = manager.getApplicableRegions(location.toVector().toBlockPoint(), QueryOption.SORT);
                     newCache.put(QueryOption.NONE, result);
                     newCache.put(QueryOption.SORT, result);
@@ -551,7 +551,7 @@ public class RegionQuery {
             @Override
             Map<QueryOption, ApplicableRegionSet> createCache(RegionManager manager, Location location, Map<QueryOption, ApplicableRegionSet> cache) {
                 if (cache == null) {
-                    Map<QueryOption, ApplicableRegionSet> newCache = new EnumMap<>(QueryOption.class);
+                    Map<QueryOption, ApplicableRegionSet> newCache = new ConcurrentHashMap<>(QueryOption.values().length);
                     ApplicableRegionSet noParResult = manager.getApplicableRegions(location.toVector().toBlockPoint(), QueryOption.NONE);
                     Set<ProtectedRegion> noParRegions = noParResult.getRegions();
                     Set<ProtectedRegion> regions = new HashSet<>();
