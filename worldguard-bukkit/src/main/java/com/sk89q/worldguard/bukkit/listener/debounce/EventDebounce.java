@@ -74,6 +74,20 @@ public class EventDebounce<K> {
         }
     }
 
+    /**
+     * Non-cancellable variant: returns an Entry if this key has not been
+     * seen within the debounce window, or null if the key is already cached.
+     */
+    @Nullable
+    public Entry getIfNotPresent(K key) {
+        Entry entry = cache.getUnchecked(key);
+        if (entry.cancelled != null) {
+            return null;
+        }
+        entry.cancelled = false;
+        return entry;
+    }
+
     public static <K> EventDebounce<K> create(int debounceTime) {
         return new EventDebounce<>(debounceTime);
     }
