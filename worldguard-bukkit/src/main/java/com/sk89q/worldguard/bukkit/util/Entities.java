@@ -26,6 +26,7 @@ import org.bukkit.entity.Allay;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Boat;
 import org.bukkit.entity.BreezeWindCharge;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
@@ -123,7 +124,8 @@ public final class Entities {
      * @return true if the type is a Boat type
      */
     public static boolean isBoat(EntityType type) {
-        return Tag.ENTITY_TYPES_BOAT.isTagged(type);
+        Class<?> entityClass = type.getEntityClass();
+        return entityClass != null && Boat.class.isAssignableFrom(entityClass);
     }
 
     /**
