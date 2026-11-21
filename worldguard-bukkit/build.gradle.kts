@@ -23,6 +23,9 @@ dependencies {
 
     "implementation"(libs.paperLib)
     "implementation"(libs.bstats.bukkit)
+
+    "testImplementation"(libs.paperApi)
+    "testImplementation"(libs.mockito.core)
 }
 
 tasks.named<Copy>("processResources") {

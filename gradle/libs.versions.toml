@@ -40,6 +40,7 @@ flyway-core = "org.flywaydb:flyway-core:3.0"
 commandbook = "com.sk89q:commandbook:2.3"
 
 hamcrest-library = "org.hamcrest:hamcrest-library:2.2"
+mockito-core = "org.mockito:mockito-core:5.22.0"
 
 # Mojang-provided libraries, CHECK AGAINST MINECRAFT for versions
 guava = "com.google.guava:guava:33.6.0-jre"

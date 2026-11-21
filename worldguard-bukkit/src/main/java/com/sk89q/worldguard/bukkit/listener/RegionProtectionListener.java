@@ -56,6 +56,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SulfurCube;
 import org.bukkit.entity.Tameable;
@@ -66,8 +67,10 @@ import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -423,7 +426,10 @@ public class RegionProtectionListener extends AbstractListener {
                     && ((ItemFrame) entity).getItem().getType() != Material.AIR) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_FRAME_ROTATE));
                 what = "change that";
-            } else if (event.getOriginalEvent() instanceof InventoryOpenEvent || event.getOriginalEvent() instanceof InventoryMoveItemEvent) {
+            } else if (event.getOriginalEvent() instanceof InventoryOpenEvent
+                    || event.getOriginalEvent() instanceof InventoryMoveItemEvent
+                    || (event.getOriginalEvent() instanceof PlayerInteractEntityEvent
+                    && entity instanceof Minecart && entity instanceof InventoryHolder)) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
                 what = "open that";
             } else {
